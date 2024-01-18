@@ -1,23 +1,21 @@
-const axios = require("axios");
+const fetch = require("node-fetch");
 
-exports.handler = async function (event, context) {
+exports.handler = async (event, context) => {
+    const url = "https://api.chucknorris.io/jokes/random";
+
     try {
-        // const thinkificResponse = await axios.get("https://jsonplaceholder.typicode.com"
-        // // {
-        // //     headers: {
-        // //         Authorization: "xxxxxxxxxxxxxxxxxx",
-        // //         Subdomain: "instituteofsustainabilitystudies",
-        // //         ContentType: "application/json"
-        // //     },
-        // // }
-        // );
+      const getJokes = await fetch(url);
 
-        const thinkificResponse = fetch("https://jsonplaceholder.typicode.com")
-        .then((res) => console.log(context.res))
-
-        thinkificResponse()
+      const jsonJoke = await getJokes.json();
+      return {
+        statusCode: 200,
+        body: JSON.stringify(jsonJoke)
+      }
 
     } catch (error) {
-        console.log(error);
+        return {
+            statusCode: 422,
+            body: error.stack
+        }
     }
 };
