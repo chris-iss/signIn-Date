@@ -1,12 +1,16 @@
 const fetch = require("node-fetch");
+require('dotenv').config()
+
 
 exports.handler = async (event, context) => {
-    const url = "https://api.chucknorris.io/jokes/random";
+    const url = "https://api.hubapi.com/crm/v3/objects/contacts";
+    const apikey = process.env.API_KEY;
 
     try {
       const getJokes = await fetch(url, {
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'AUTHORIZATION': `Bearer ${apikey}`
         }
       });
 
