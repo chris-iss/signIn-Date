@@ -7,8 +7,8 @@ const getResponse = async () => {
         const response = await fetch(url)
         const jsonData = await response.json();
         console.log(jsonData)
-        const h1 = document.querySelector("h1");
-        h1.textContent =  jsonData.value
+        // const h1 = document.querySelector("h1");
+        // h1.textContent =  jsonData.value
         
     } catch (error) {
         console.error("Fetch error:", error);
