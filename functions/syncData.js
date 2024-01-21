@@ -141,7 +141,7 @@ exports.handler = async (event, context) => {
         updateContactResponse()
       } catch (error) {
         console.error("Error during HubSpot contact update:", error.message);
-        const TriggerZapier = await fetch("https://hooks.zapier.com/hooks/catch/14129819/3gstv75/", {
+        const TriggerZapier = await fetch(`${process.env.URL_ZAPIERWEBHOOKCONTACT}`, {
             method: "POST",
             body: JSON.stringify({
                 endpoint: "New Sign In",
