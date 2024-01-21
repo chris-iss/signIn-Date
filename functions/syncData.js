@@ -138,7 +138,7 @@ exports.handler = async (event, context) => {
         });
 
         const updateContactResponse = await updateContact.json();
-        updateContactResponse()
+        console.log("HubSpot Contact Update Response:", updateContactResponse);
       } catch (error) {
         console.error("Error during HubSpot contact update:", error.message);
         const TriggerZapier = await fetch(`${process.env.URL_ZAPIERWEBHOOKCONTACT}`, {
@@ -153,7 +153,7 @@ exports.handler = async (event, context) => {
             })
         });
 
-        TriggerZapier()
+        console.log("Hubspot Contact Thinkific Acess Date Update Error:", TriggerZapier.json())
       }
     };
 
