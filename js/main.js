@@ -5,8 +5,8 @@ const getResponse = async () => {
         
         const url = "/.netlify/functions/syncData"
         const response = await fetch(url)
-        const jsonData = await response.json();
-        console.log(jsonData)
+        await response.json();
+        
     } catch (error) {
         console.error("Fetch error:", error);
     }

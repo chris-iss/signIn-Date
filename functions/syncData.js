@@ -93,9 +93,11 @@ exports.handler = async (event, context) => {
         // Response from hubspot contact search by email
         const hubspotContactResponse = await searchContact.json();
         
+        
         if (hubspotContactResponse.results) {
           // Update each HubSpot contact with the appropriate access_date from Thinkific
           for (const result of hubspotContactResponse.results) {
+            
             const thinkificEnrollment = filteredCourseEnrollments.find(
               (enrollment) => enrollment.user_email === result.properties.email
             );
