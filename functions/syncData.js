@@ -6,6 +6,7 @@ require("dotenv").config();
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 exports.handler = async (event, context) => {
+    
   try {
     const thinkificEnrolmentUrl = `https://api.thinkific.com/api/public/v1/enrollments`;
     const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
@@ -39,7 +40,7 @@ exports.handler = async (event, context) => {
         // Filter enrollments based on the desired course name
         const enrollmentsForCourse = thinkificEnrolmentResponse.items.filter(
           (enrollment) =>
-            enrollment.course_name === "Diploma in Business Sustainability 2024"
+            enrollment.course_name === "Diploma in Business Sustainability 2024" || enrollment.course_name === "Certificate in Business Sustainability 2024"
         );
 
         // Append the filtered enrollments to the array
@@ -58,6 +59,8 @@ exports.handler = async (event, context) => {
         if (email) extractUserEnrolmentEmails.push(email.user_email);
       })
     );
+
+    console.log("FILTERED", filteredCourseEnrollments)
 
 
     // Step 3: Search for the contact on HubSpot using the email from users registered on a course in Thinkific
@@ -97,10 +100,24 @@ exports.handler = async (event, context) => {
               (enrollment) => enrollment.user_email === result.properties.email
             );
 
-            // Update contact property with the started at date
+            let expiryDate;
+
+            //Calculate the thinkific expiry date and update it on thinkific  (WORK ON THIS LATER)
+            if (thinkificEnrollment.started_at && !isNaN(new Date(thinkificEnrollment.started_at))) {
+                const startedAtDate = new Date(thinkificEnrollment.started_at);
+
+                if (!isNaN(startedAtDate)) {
+                    expiryDate = new Date(thinkificEnrollment.started_at);
+                    expiryDate.setMonth(startedAtDate.getMonth() + 12)
+                }
+            }
+        
+
+            // Update contact property with the startedAt date and Thinkific ExpiryDate
             const accessDateContactPropertyUpdate = {
                 "properties": {
-                    "thinkific_access_date": thinkificEnrollment.started_at
+                    "thinkific_access_date": thinkificEnrollment.started_at,
+                    "thinikific_user_expirydate": expiryDate
                 }
             }
 
@@ -118,14 +135,16 @@ exports.handler = async (event, context) => {
 
 
     // Step 4: Update HubSpot contact with the appropriate access_date from Thinkific
-    const updateHubspotContact = async (contactId, accessDateProperty, enrolmentData) => {
+    const updateHubspotContact = async (contactId, accessDateExpiryDateProperty, thinkificEnrolmentData) => {
         
         //Convert tthe date to the format hubspot understands
-        if (accessDateProperty.properties.thinkific_access_date) {
-            accessDateProperty.properties.thinkific_access_date = new Date(accessDateProperty.properties.thinkific_access_date).toISOString().split('T')[0];
+        if (accessDateExpiryDateProperty.properties.thinkific_access_date && accessDateExpiryDateProperty.properties.thinikific_user_expirydate ) {
+            accessDateExpiryDateProperty.properties.thinkific_access_date = new Date(accessDateExpiryDateProperty.properties.thinkific_access_date).toISOString().split('T')[0];
+            accessDateExpiryDateProperty.properties.thinikific_user_expirydate = new Date(accessDateExpiryDateProperty.properties.thinikific_user_expirydate).toISOString().split('T')[0];
         }
+
         
-      try {
+       try {
         const updateContactURL = `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`;
 
         const updateContact = await fetch(updateContactURL, {
@@ -134,7 +153,7 @@ exports.handler = async (event, context) => {
             Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify( accessDateProperty ),
+          body: JSON.stringify( accessDateExpiryDateProperty ),
         });
 
         const updateContactResponse = await updateContact.json();
@@ -147,9 +166,9 @@ exports.handler = async (event, context) => {
                 endpoint: "New Sign In",
                 message: "Hubspot User Error: Unable to Update Contact",
                 errorMessage: error.message,
-                studentEmail: enrolmentData.user_email,
+                studentEmail: thinkificEnrolmentData.user_email,
                 contactId: contactId,
-                signInDate: enrolmentData.started_at
+                signInDate: thinkificEnrolmentData.started_at
             })
         });
 
