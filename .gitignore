@@ -1,6 +1,7 @@
 # Local Netlify folder
 .netlify
 .env
+.package-lock.json
 
 node_modules
 apikeys.js
