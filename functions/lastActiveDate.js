@@ -6,16 +6,14 @@ exports.handler = async (event, context) => {
   const validationKey = process.env.Netlify_API_KEY;
 
   if (getNetlifyKey === validationKey) {
-    console.log("FIRST RUN")
-    const extractParameteres = JSON.parse(event.body);
-
-    const extractThinkificEmail = extractParameteres.payload.user.email;
-    const extractCourseName = extractParameteres.payload.course.name;
-    const lastActivityDate = new Date(extractParameteres.created_at);
-    const formattedLastActiveDate = lastActivityDate.toISOString().split("T")[0];
-    console.log("SECOND RUN")
 
     const hubspotSearchContact = async () => {
+        const extractParameteres = JSON.parse(event.body);
+        const extractThinkificEmail = extractParameteres.payload.user.email;
+        const extractCourseName = extractParameteres.payload.course.name;
+        const lastActivityDate = new Date(extractParameteres.created_at);
+        const formattedLastActiveDate = lastActivityDate.toISOString().split("T")[0];
+
         console.log("THIRD RUN")
         const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
       try {
