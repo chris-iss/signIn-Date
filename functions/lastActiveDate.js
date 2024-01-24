@@ -4,13 +4,13 @@ require("dotenv").config();
 exports.handler = async (event, context) => {
   const getNetlifyKey = event.queryStringParameters.API_KEY;
   const validationKey = process.env.Netlify_API_KEY;
+  const extractParameteres = JSON.parse(event.body);
+  const extractCourseName = extractParameteres.payload.course.name;
 
   if (getNetlifyKey === validationKey) {
 
     const hubspotSearchContact = async () => {
-        const extractParameteres = JSON.parse(event.body);
         const extractThinkificEmail = extractParameteres.payload.user.email;
-        const extractCourseName = extractParameteres.payload.course.name;
         const lastActivityDate = new Date(extractParameteres.created_at);
         const formattedLastActiveDate = lastActivityDate.toISOString().split("T")[0];
 
@@ -18,37 +18,21 @@ exports.handler = async (event, context) => {
         const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
       try {
         const hubspotSearchProperties = {
-          after: "0",
-          filterGroups: [
-            {
-              filters: [
-                {
-                  operator: "EQ",
-                  propertyName: "email",
-                  value: extractThinkificEmail,
-                },
-              ],
-            },
-            {
-              filters: [
-                {
-                  operator: "EQ",
-                  propertyName: "hs_additional_emails",
-                  value: extractThinkificEmail,
-                },
-              ],
-            },
-          ],
-          limit: "100",
-          properties: ["email", "thinkific_diploma_last_activity_date", "id"], // Include id for updating
-          sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-        };
+            after: "0",
+            filterGroups: [
+              { filters: [{ operator: "EQ", propertyName: "email", value: extractThinkificEmail }] },
+              { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: extractThinkificEmail}] },
+            ],
+            limit: "100",
+            properties: ["email", "thinkific_diploma_last_activity_date", "id"], // Include id for updating
+            sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
+          };
         console.log("FOURTH RUN")
 
         const searchContact = await fetch(hubspotBaseURL, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(hubspotSearchProperties),
