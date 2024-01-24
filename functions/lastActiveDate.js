@@ -66,7 +66,7 @@ exports.handler = async (event, context) => {
       }
     };
 
-    hubspotSearchContact();
+    await hubspotSearchContact();
 
     const updateThinkificLastActivityDateProperty = async (
       contactId,
