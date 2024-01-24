@@ -58,7 +58,7 @@ exports.handler = async (event, context) => {
             }   
         }
     
-        hubspotSearchContact();
+        await hubspotSearchContact();
     
         const  updateThinkificAccessDateProperty = async (contactId, firstSignDate) => {
             const formatSignDate = new Date(firstSignDate).toISOString().split("T")[0]
