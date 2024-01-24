@@ -57,8 +57,7 @@ exports.handler = async (event, context) => {
         // Response from hubspot contact search by email
         const hubspotContactResponse = await searchContact.json();
 
-        const extractHubspotUserId =
-          hubspotContactResponse.results[0].properties.hs_object_id;
+        const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id;
 
         await updateThinkificLastActivityDateProperty(
           extractHubspotUserId,
