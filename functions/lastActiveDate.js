@@ -6,7 +6,6 @@ exports.handler = async (event, context) => {
   const validationKey = process.env.Netlify_API_KEY;
 
   if (getNetlifyKey === validationKey) {
-    const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
     const extractParameteres = JSON.parse(event.body);
 
     const extractThinkificEmail = extractParameteres.payload.user.email;
@@ -17,6 +16,7 @@ exports.handler = async (event, context) => {
       .split("T")[0];
 
     const hubspotSearchContact = async () => {
+        const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
       try {
         const hubspotSearchProperties = {
           after: "0",
