@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-require("dotenv").config();
+// require("dotenv").config();
 
 exports.handler = async (event, context) => {
     const getNetlifyKey = event.queryStringParameters.API_KEY;
@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
                   const searchContact = await fetch(hubspotBaseURL, {
                     method: "POST",
                     headers: {
-                      Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                      "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
                       "Content-Type": "application/json",
                     },
                     body: JSON.stringify(hubspotSearchProperties),
