@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
           };
         console.log("FOURTH RUN")
 
-        const searchContact = await fetch(hubspotBaseURL, {
+        const searchContact = await fetch(`${hubspotBaseURL}`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
