@@ -49,8 +49,20 @@ exports.handler = async (event, context) => {
           extractHubspotUserId,
           formattedLastActiveDate
         );
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: "Search was Successful"
+            })
+        }
       } catch (error) {
-        console.log("HUBSPOT SEARCH ERROR", error.message);
+        return {
+            statusCode: 422,
+            body: JSON.stringify({
+                message: error.message
+            })
+        }
       }
     };
 
