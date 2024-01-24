@@ -35,7 +35,7 @@ exports.handler = async (event, context) => {
             "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(hubspotSearchProperties),
+          body: JSON.stringify(hubspotSearchProperties)
         });
         console.log("FIFTH RUN")
 
