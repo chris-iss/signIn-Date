@@ -60,8 +60,6 @@ exports.handler = async (event, context) => {
       })
     );
 
-    console.log("FILTERED", filteredCourseEnrollments)
-
 
     // Step 3: Search for the contact on HubSpot using the email from users registered on a course in Thinkific
     const searchHubspot = async (__email) => {
@@ -124,7 +122,8 @@ exports.handler = async (event, context) => {
             }
 
             if (thinkificEnrollment) {
-                await updateHubspotContact(result.id, accessDateContactPropertyUpdate, thinkificEnrollment);
+                // await updateHubspotContact(result.id, accessDateContactPropertyUpdate, thinkificEnrollment);
+                // await updateThinkificExpiryDate(thinkificEnrollment.id, expiryDate)
             }
           }
         } else {
