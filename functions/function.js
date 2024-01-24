@@ -6,13 +6,17 @@ exports.handler = async (event, context) => {
     const validationKey = process.env.Netlify_API_KEY;
 
     if (getNetlifyKey === validationKey) {
-        const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
-        const extractParameteres =  JSON.parse(event.body)
-        const fetchThinkificEmail = extractParameteres .payload.email
-        const firstSignDate = extractParameteres.created_at
+      
         
-    
+        console.log("LOADED SUCCESSFULLY");
+
         const hubspotSearchContact = async () => {
+            const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+            const extractParameteres =  JSON.parse(event.body)
+            const fetchThinkificEmail = extractParameteres .payload.email
+            const firstSignDate = extractParameteres.created_at
+
+            console.log("FUNCTION RUN")
             try {
                 const hubspotSearchProperties = {
                     after: "0",
@@ -24,6 +28,8 @@ exports.handler = async (event, context) => {
                     properties: ["email", "thinkific_access_date", "id"], // Include id for updating
                     sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                   };
+
+                  console.log("THIRD FUNCTION RUN")
           
                   const searchContact = await fetch(hubspotBaseURL, {
                     method: "POST",
@@ -33,10 +39,14 @@ exports.handler = async (event, context) => {
                     },
                     body: JSON.stringify(hubspotSearchProperties),
                   });
+
+                  console.log("FOURTH FUNCTION RUN")
         
                   
                   // Response from hubspot contact search by email
                   const hubspotContactResponse = await searchContact.json();
+
+                  console.log("FIFTH FUNCTION RUN", hubspotContactResponse)
     
                   const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id
                   const extractThinkificAccessDate = hubspotContactResponse.results[0].properties.thinkific_access_date
@@ -78,7 +88,6 @@ exports.handler = async (event, context) => {
         }
     
         
-    
         return {
             statusCode: 200,
             body: JSON.stringify({
