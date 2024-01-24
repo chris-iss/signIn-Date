@@ -14,7 +14,6 @@ exports.handler = async (event, context) => {
         const lastActivityDate = new Date(extractParameteres.created_at);
         const formattedLastActiveDate = lastActivityDate.toISOString().split("T")[0];
 
-        console.log("THIRD RUN")
         const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
       try {
         const hubspotSearchProperties = {
@@ -27,7 +26,6 @@ exports.handler = async (event, context) => {
             properties: ["email", "thinkific_diploma_last_activity_date", "id"], // Include id for updating
             sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
           };
-        console.log("FOURTH RUN")
 
         const searchContact = await fetch(`${hubspotBaseURL}`, {
           method: "POST",
@@ -37,11 +35,9 @@ exports.handler = async (event, context) => {
           },
           body: JSON.stringify(hubspotSearchProperties)
         });
-        console.log("FIFTH RUN")
 
         // Response from hubspot contact search by email
         const hubspotContactResponse = await searchContact.json();
-        console.log("SIXTH RUN")
 
         const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id;
 
@@ -67,7 +63,9 @@ exports.handler = async (event, context) => {
 
     const updateThinkificLastActivityDateProperty = async (contactId, lastActivityDate) => {
         console.log("LAST ACTIVE CONSOLE 1")
+       
       let lastActivity_DateProperty;
+      console.log("LAST ACTIVE CONSOLE 2")
 
       if (extractCourseName === "Diploma in Business Sustainability 2024") {
         lastActivity_DateProperty = {
@@ -75,22 +73,19 @@ exports.handler = async (event, context) => {
             thinkific_diploma_last_activity_date: lastActivityDate,
           },
         };
-        console.log("LAST ACTIVE CONSOLE 2")
-      } else if (
-        extractCourseName === "Certificate in Business Sustainability 2024"
-      ) {
+      } else if (extractCourseName === "Certificate in Business Sustainability 2024") {
         lastActivity_DateProperty = {
           properties: {
             thinkific_diploma_last_activity_date: lastActivityDate,
           },
         };
-        console.log("LAST ACTIVE CONSOLE 3")
       }
+      console.log("LAST ACTIVE CONSOLE 3")
 
       const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,{
           method: "PATCH",
           headers: {
-            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(lastActivity_DateProperty),
