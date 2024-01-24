@@ -2,11 +2,11 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 
 exports.handler = async (event, context) => {
-  const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
   const getNetlifyKey = event.queryStringParameters.API_KEY;
   const validationKey = process.env.Netlify_API_KEY;
 
   if (getNetlifyKey === validationKey) {
+    const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
     const extractParameteres = JSON.parse(event.body);
 
     const extractThinkificEmail = extractParameteres.payload.user.email;
