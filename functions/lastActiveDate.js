@@ -45,10 +45,7 @@ exports.handler = async (event, context) => {
 
         const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id;
 
-        await updateThinkificLastActivityDateProperty(
-          extractHubspotUserId,
-          formattedLastActiveDate
-        );
+        await updateThinkificLastActivityDateProperty(extractHubspotUserId, formattedLastActiveDate);
 
         return {
             statusCode: 200,
@@ -68,10 +65,7 @@ exports.handler = async (event, context) => {
 
     await hubspotSearchContact();
 
-    const updateThinkificLastActivityDateProperty = async (
-      contactId,
-      lastActivityDate
-    ) => {
+    const updateThinkificLastActivityDateProperty = async (contactId, lastActivityDate) => {
       let lastActivity_DateProperty;
 
       if (extractCourseName === "Diploma in Business Sustainability 2024") {
@@ -90,9 +84,7 @@ exports.handler = async (event, context) => {
         };
       }
 
-      const updateContact = await fetch(
-        `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,
-        {
+      const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`,{
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
