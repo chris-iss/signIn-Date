@@ -6,16 +6,17 @@ exports.handler = async (event, context) => {
   const validationKey = process.env.Netlify_API_KEY;
 
   if (getNetlifyKey === validationKey) {
+    console.log("FIRST RUN")
     const extractParameteres = JSON.parse(event.body);
 
     const extractThinkificEmail = extractParameteres.payload.user.email;
     const extractCourseName = extractParameteres.payload.course.name;
     const lastActivityDate = new Date(extractParameteres.created_at);
-    const formattedLastActiveDate = lastActivityDate
-      .toISOString()
-      .split("T")[0];
+    const formattedLastActiveDate = lastActivityDate.toISOString().split("T")[0];
+    console.log("SECOND RUN")
 
     const hubspotSearchContact = async () => {
+        console.log("THIRD RUN")
         const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
       try {
         const hubspotSearchProperties = {
@@ -44,6 +45,7 @@ exports.handler = async (event, context) => {
           properties: ["email", "thinkific_diploma_last_activity_date", "id"], // Include id for updating
           sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
         };
+        console.log("FOURTH RUN")
 
         const searchContact = await fetch(hubspotBaseURL, {
           method: "POST",
@@ -53,9 +55,11 @@ exports.handler = async (event, context) => {
           },
           body: JSON.stringify(hubspotSearchProperties),
         });
+        console.log("FIFTH RUN")
 
         // Response from hubspot contact search by email
         const hubspotContactResponse = await searchContact.json();
+        console.log("SIXTH RUN")
 
         const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id;
 

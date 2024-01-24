@@ -6,9 +6,6 @@ exports.handler = async (event, context) => {
     const validationKey = process.env.Netlify_API_KEY;
 
     if (getNetlifyKey === validationKey) {
-      
-        
-        console.log("LOADED SUCCESSFULLY");
 
         const hubspotSearchContact = async () => {
             const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
