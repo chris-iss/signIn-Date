@@ -3,7 +3,7 @@
 const getResponse = async () => {
     try {
         
-        const url = "/.netlify/functions/syncData"
+        const url = "/.netlify/functions/function"
         const response = await fetch(url)
         await response.json();
     } catch (error) {
