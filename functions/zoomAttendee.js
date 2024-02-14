@@ -19,7 +19,7 @@ exports.handler = async (event, context) => { // Defines an async function as th
        
       let userZoomAttendee; // Initializes a variable to hold the data for updating HubSpot contact property
 
-      if (zoomAttendance === null || zoomAttendance === "Yes") { // Checks if the Zoom attendance is null or already set to "Yes"
+      if (zoomAttendance === null || zoomAttendance === "" || zoomAttendance === undefined || zoomAttendance === "Yes") { // Checks if the Zoom attendance is null or already set to "Yes"
           userZoomAttendee = { // Constructs the data object for updating HubSpot contact property
               properties: {
                   zoom_participant_attendance: "Yes", // Sets the Zoom participant attendance property to "Yes"
@@ -60,7 +60,7 @@ exports.handler = async (event, context) => { // Defines an async function as th
         };
  
         // Make a POST request to search for HubSpot contacts
-        const executeSearch = await fetch(`${process.env.HUBSPOTBASEURL}`, { // Makes a POST request to search for HubSpot contacts
+        const executeSearch = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", { // Makes a POST request to search for HubSpot contacts
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`, // Includes authorization token in the request headers
