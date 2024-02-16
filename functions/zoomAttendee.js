@@ -2,6 +2,11 @@ const crypto = require('crypto');
 
 exports.handler = async (event, context) => {
   try {
+    // Check if ZOOM_WEBHOOK_SECRET_TOKEN is defined
+    if (!process.env.ZOOM_WEBHOOK_SECRET_TOKEN) {
+        throw new Error('ZOOM_WEBHOOK_SECRET_TOKEN is missing or undefined');
+      }
+      
     // Extract body from the incoming request
     const { body, queryStringParameters } = event;
     console.log("QUERY", queryStringParameters)
