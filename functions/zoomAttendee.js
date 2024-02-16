@@ -4,6 +4,7 @@ exports.handler = async (event, context) => {
   try {
     // Extract body from the incoming request
     const { body, queryStringParameters } = event;
+    console.log("QUERY", queryStringParameters)
     const requestBody = JSON.parse(body);
 
     // Hash the plainToken
