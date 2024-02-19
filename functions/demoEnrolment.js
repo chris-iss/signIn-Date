@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-exports.handler = async function(event, context) {
+exports.handler = async (event, context) => {
     try { 
         console.log(event);
         return {
