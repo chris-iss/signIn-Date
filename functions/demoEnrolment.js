@@ -1,14 +1,9 @@
 const fetch = require("node-fetch")
 require("dotenv").config();
 
-exports.handle = async (event, context) => {
-    const getNetlifyKey = event.queryStringParameters.API_KEY
-    const getValidationKey = process.env.Netlify_API_KEY
-
-    const response = {
+exports.handle = async function(event, context)  {
+    return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Received API_KEY successfully." }),
-      };
-  
-      return response;
+        body: JSON.stringify({ message: "Hello World" }),
+    };
 }
