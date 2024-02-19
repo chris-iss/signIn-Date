@@ -8,7 +8,12 @@ exports.handle = async (event, context) => {
     if (getNetlifyKey === getValidationKey) {
         return {
             statusCode: 200,
-            message: "Success"
+            body: JSON.stringify({message: "Success"})
+        }
+    } else {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({message: "Failed"})
         }
     }
 }
