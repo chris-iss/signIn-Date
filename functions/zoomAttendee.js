@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
     const fetchZoomData = JSON.parse(event.body);
     const participantEmaiil = fetchZoomData.payload.object.participant.email;
     const attendanceDate = fetchZoomData.payload.object.participant.join_time;
-    const typeOfMeeting = fetchZoomData.topic
+    const typeOfMeeting = fetchZoomData.payload.object.topic
 
 
     const formatAttendanceDate = new Date(attendanceDate);
@@ -43,11 +43,11 @@ exports.handler = async (event, context) => {
               "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
               "Content-Type": "application/json",
           },
-          body: JSON.stringify(userZoomAttendee)
+          body: JSON.stringify(userInfoSessionAttendance)
       })
 
       const hubspottUpdateResponse = await updateProperty.json();
-      console.log("UPDATED", hubspottUpdateResponse);
+      console.log("INFO SESSION ATTENDANCE UPDATED:", hubspottUpdateResponse);
     };
 
     const searchContact = async () => {
