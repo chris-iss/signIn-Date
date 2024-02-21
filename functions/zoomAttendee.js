@@ -6,6 +6,7 @@ exports.handler = async (event, context) => {
   const getValidationKey = process.env.Netlify_API_KEY;
 
   if (getNetlifyKey === getValidationKey) {
+    console.log("EVENT BODY:", event.body)
     const fetchZoomData = JSON.parse(event.body);
     const participantEmaiil = fetchZoomData.payload.object.participant.email;
     const attendanceDate = fetchZoomData.payload.object.participant.join_time;
