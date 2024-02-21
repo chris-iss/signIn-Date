@@ -1,91 +1,35 @@
-const fetch = require("node-fetch");
-require("dotenv").config();
+//ZOOM VALIDATE TOKEN CODE
+const crypto = require('crypto');
 
 exports.handler = async (event, context) => {
-  const getNetlifyKey = event.queryStringParameters.API_KEY;
-  const getValidationKey = process.env.Netlify_API_KEY;
+  try {
+    // Extract body from the incoming request
+    const { body } = event;
+    const requestBody = JSON.parse(body);
 
-  if (getNetlifyKey === getValidationKey) {
-    const fetchZoomData = JSON.parse(event.body);
-    const participantEmaiil = fetchZoomData.payload.object.participant.email;
-    const attendanceDate = fetchZoomData.payload.object.participant.join_time;
+    // Hash the plainToken
+    const plainToken = requestBody.payload.plainToken;
+    const hashedToken = crypto.createHmac('sha256', process.env.ZOOM_WEBHOOK_SECRET_TOKEN)
+                                .update(plainToken)
+                                .digest('hex');
 
-    const formatAttendanceDate = new Date(attendanceDate);
-    const zoomAttendanceDate = formatAttendanceDate.toISOString().split("T")[0];
-
-    const updateUserZoomAttendanceProperty = async (hubspot_userId, zoomAttendance) => {
-
-      let userZoomAttendee;
-
-      if (zoomAttendance === null || zoomAttendance === "" || zoomAttendance === undefined || zoomAttendance === "Yes") {
-          userZoomAttendee = {
-              properties: {
-                  zoom_participant_attendance: "Yes",
-                  zoom_attendance_date: zoomAttendanceDate
-              }
-          }
-      }
-
-      const updateProperty = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspot_userId}`, {
-          method: "PATCH",
-          headers: {
-              "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userZoomAttendee)
-      })
-
-      const hubspottUpdateResponse = await updateProperty.json();
-      console.log("UPDATED", hubspottUpdateResponse);
+    // Create the response JSON object
+    const responseObject = {
+      plainToken: plainToken,
+      encryptedToken: hashedToken
     };
 
-    const searchContact = async () => {
-      try {
-
-        const hubspotSearchProperties = {
-            after: "0",
-            filterGroups: [
-              { filters: [{ operator: "EQ", propertyName: "email", value: participantEmaiil }] },
-              { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: participantEmaiil }] },
-            ],
-            limit: "100",
-            properties: ["email", "zoom_participant_attendance", "id"],
-            sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-        };
- 
-        const executeSearch = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(hubspotSearchProperties)
-        });
-
-        const searchResult = await executeSearch.json();
-        const hubspot_userId = searchResult.results[0].properties.hs_object_id;
-        const hubspot_userEmail = searchResult.results[0].properties.email;
-        const zoomAttendance = searchResult.results[0].properties.zoom_participant_attendance;
-
-        if (hubspot_userEmail === participantEmaiil) {
-            await updateUserZoomAttendanceProperty(hubspot_userId, zoomAttendance);
-        }
-       
-      } catch (error) {
-        return {
-          statusCode: 400,
-          message: error.message,
-        };
-      }
-    };
-
-    await searchContact();
-
-    const response = {
+    // Respond with the response JSON object
+    return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Received API_KEY successfully." }),
+      body: JSON.stringify(responseObject)
     };
-
-    return response;
+  } catch (error) {
+    // Handle errors
+    console.error("Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "An error occurred" })
+    };
   }
 };
