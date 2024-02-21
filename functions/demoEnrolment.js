@@ -163,7 +163,7 @@ exports.handler = async (event, context) => {
 
                         const getProperties = hubspotContactResponse.properties;
                         userData = {
-                            "course_id": "2573444",
+                            "course_id": `${process.env.COURSE_ID}`,
                             "firstname": getProperties.firstname.value,
                             "lastname": getProperties.lastname.value,
                             "email": getProperties.email.value,
