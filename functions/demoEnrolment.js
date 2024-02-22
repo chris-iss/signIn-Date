@@ -12,12 +12,15 @@ exports.handler = async (event, context) => {
             if (event.httpMethod === "GET") {
                 console.log("EVENT TEST", event)
                 const BodyData = JSON.parse(event.body);
+                console.log("1")
                 const fetchObjectId = BodyData.objectId;
+                console.log("2")
                 let enrolUserId;
                 let userData;
                 
                 // Function to sign into Thinkific
                 const signIntoThinkific = (user) => {
+                    console.log("3")
                     const iat = Math.floor(Date.now() / 1000);
                     const jti = `${iat}/${crypto.randomBytes(9).toString('hex')}`;
 
@@ -41,6 +44,7 @@ exports.handler = async (event, context) => {
 
 
                 const createOrEnrolStudent = async (userData) => {
+                    console.log("4")
                     try {
                         //check if user exist in thinkific
                         const userRequest = await fetch(`https://api.thinkific.com/api/public/v1/users/email:${userData.email}`, {
@@ -53,11 +57,13 @@ exports.handler = async (event, context) => {
                         });  
 
                         const userExistData = await userRequest.json();
+                        console.log("5")
                         
                         if (userExistData.error === "Record not found") {
 
                              // User doesn't exist, create the user
                             const createThinkificUser = async () => {
+                                console.log("6")
                                 
                                 const createUser = await fetch("https://api.thinkific.com/api/public/v1/users", {
                                     method: "POST",
@@ -72,18 +78,22 @@ exports.handler = async (event, context) => {
                                         "email": userData.email  
                                     })
                                 })
+                                console.log("7")
 
                                 const createUserResponse = await createUser.json();
+                                console.log("8")
                                 enrolUserId = createUserResponse.id
                                 
                             }
 
                             await createThinkificUser();
+                            console.log("9")
 
 
 
                             // Enroll the user in the course
                             const enrolUserCourseRequest = async () => {
+                                console.log("10")
                                 const enrolUser = await fetch("https://api.thinkific.com/api/public/v1/enrollments", {
                                     method: "POST",
                                     headers: {
@@ -96,6 +106,7 @@ exports.handler = async (event, context) => {
                                         "user_id": enrolUserId
                                     })
                                 })
+                                console.log("11")
 
                                 const enrolUserResponse = await enrolUser.json();
                                 console.log("ENROLLED USER", enrolUserResponse)
@@ -121,6 +132,7 @@ exports.handler = async (event, context) => {
                 
                 // Function to send redirect URL to webhook
                 const sendRedirecctLinkToWebhook = async (email, redirectUrl) => {
+                    console.log("12")
                     try {
                         const webhookPayload = {
                             endpoint: "https://hooks.zapier.com/hooks/catch/14129819/3lpalce/",
@@ -150,6 +162,7 @@ exports.handler = async (event, context) => {
 
                 // Fetch contact from HubSpot after form submission
                 const fetchContact = async () => {
+                    console.log("13")
                     try {
                         const hubspotContact = await fetch(`https://api.hubapi.com/contacts/v1/contact/vid/${fetchObjectId}/profile`, {
                             method: "GET",
@@ -158,8 +171,10 @@ exports.handler = async (event, context) => {
                                 "Content-Type": "application/json"
                             }
                         });
+                        console.log("14")
 
                         const hubspotContactResponse = await hubspotContact.json();
+                        console.log("15")
 
                         const getProperties = hubspotContactResponse.properties;
                         userData = {
