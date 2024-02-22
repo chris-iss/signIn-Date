@@ -36,7 +36,7 @@ exports.handler = async (event, context) => {
                     // Sign jwt Token
                     const token = jwt.sign(payload, process.env.THINKIFIC_SUB_DOMAIN)
 
-                    let url = `https://${process.env.THINKIFIC_SUB_DOMAIN}.thinkific.com/api/sso/v2/sso/jwt?jwt=${token}}`;
+                    let url = `https://${process.env.THINKIFIC_SUB_DOMAIN}.thinkific.com/api/sso/v2/sso/jwt?jwt=${token}`;
                     
                     return url;
                 }
