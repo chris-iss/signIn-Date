@@ -10,6 +10,7 @@ exports.handler = async (event, context) => {
     try {
         if (getNetlifyKey === getValidationKey) {
             if (event.httpMethod === "GET") {
+                console.log("EVENT TEST", event)
                 const BodyData = JSON.parse(event.body);
                 const fetchObjectId = BodyData.objectId;
                 let enrolUserId;
