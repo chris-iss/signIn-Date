@@ -10,7 +10,6 @@ exports.handler = async (event, context) => {
     try {
         if (getNetlifyKey === getValidationKey) {
             if (event.httpMethod === "GET") {
-                console.log("EVENT TEST", event)
                 const BodyData = JSON.parse(event.body);
                 console.log("1")
                 const fetchObjectId = BodyData.objectId;
@@ -176,14 +175,16 @@ exports.handler = async (event, context) => {
                         const hubspotContactResponse = await hubspotContact.json();
                         console.log("15")
 
-                        const getProperties = hubspotContactResponse.properties;
+                        let getProperties = hubspotContactResponse.properties || {};
+                        
                         userData = {
-                            "course_id": `${process.env.COURSE_ID}`,
-                            "firstname": getProperties.firstname.value,
-                            "lastname": getProperties.lastname.value,
-                            "email": getProperties.email.value,
-                            "phone": getProperties.phone.value
+                            course_id: `${process.env.COURSE_ID}`,
+                            firstname: getProperties.firstname ? getProperties.firstname.value : null,
+                            lastname: getProperties.lastname ? getProperties.lastname.value : null,
+                            email: getProperties.email ? getProperties.email.value : null,
+                            phone: getProperties.phone ? getProperties.phone.value : null
                         };
+                        console.log("DATA", userData)
 
                         await createOrEnrolStudent(userData);
                     } catch (error) {
