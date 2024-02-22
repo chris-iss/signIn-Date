@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
     try {
         if (getNetlifyKey === getValidationKey) {
             if (event.httpMethod === "GET") {
-                console.log("FIRST CHECK")
+                console.log("SECOND CHECK httpMethod === GET Passed")
                 const BodyData = JSON.parse(event.body);
                 console.log("1")
                 const fetchObjectId = BodyData.objectId;
