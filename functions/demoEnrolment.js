@@ -14,7 +14,7 @@ exports.handler = async (event, context) => {
                 const BodyData = JSON.parse(event.body);
                 console.log("1")
                 const fetchObjectId = BodyData.objectId;
-                console.log("2")
+                console.log("2", fetchObjectId)
                 let enrolUserId;
                 let userData;
                 
@@ -162,7 +162,7 @@ exports.handler = async (event, context) => {
 
                 // Fetch contact from HubSpot after form submission
                 const fetchContact = async () => {
-                    console.log("13")
+                    console.log("13", fetchObjectId)
                     try {
                         const hubspotContact = await fetch(`https://api.hubapi.com/contacts/v1/contact/vid/${fetchObjectId}/profile`, {
                             method: "GET",
