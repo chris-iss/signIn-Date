@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
     try {
         if (getNetlifyKey === getValidationKey) {
             console.log("CHECK SEE HTTP EVENT", event)
-            if (event.httpMethod === "GET") {
+            
                 const BodyData = JSON.parse(event.body);
                 const formatPayload = JSON.parse(BodyData.body)
                 console.log("BODY", BodyData)
@@ -197,7 +197,7 @@ exports.handler = async (event, context) => {
                 // };
 
                 // await fetchContact();
-            }
+    
 
             return {
                 statusCode: 200,
