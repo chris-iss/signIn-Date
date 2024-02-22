@@ -9,6 +9,7 @@ exports.handler = async (event, context) => {
 
     try {
         if (getNetlifyKey === getValidationKey) {
+            console.log("EVENT", event)
             if (event.httpMethod === "GET") {
                 console.log("SECOND CHECK httpMethod === GET Passed")
                 const BodyData = JSON.parse(event.body);
