@@ -157,6 +157,8 @@ exports.handler = async (event, context) => {
                 }
 
 
+
+
                 // Fetch contact from HubSpot after form submission
                 const fetchContact = async () => {
                     console.log("3", fetchObjectId)
@@ -185,7 +187,7 @@ exports.handler = async (event, context) => {
                         };
                         console.log("DATA", userData)
 
-                        // await createOrEnrolStudent(userData);
+                        await createOrEnrolStudent(userData);
                     } catch (error) {
                         throw new Error(`Error fetching contact: ${error.message}`);
                     }
