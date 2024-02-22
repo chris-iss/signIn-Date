@@ -10,6 +10,7 @@ exports.handler = async (event, context) => {
     try {
         if (getNetlifyKey === getValidationKey) {
                 const BodyData = JSON.parse(event.body);
+                console.log("FIRST BODY", BodyData)
                 const getpayload = JSON.parse(BodyData.body)
                 console.log("BODY PAYLOAD", getpayload)
                 const fetchObjectId = getpayload[0].objectId;
@@ -157,7 +158,7 @@ exports.handler = async (event, context) => {
                 }
 
 
-                
+
                 // Fetch contact from HubSpot after form submission
                 const fetchContact = async () => {
                     console.log("3", fetchObjectId)
@@ -203,7 +204,8 @@ exports.handler = async (event, context) => {
                 statusCode: 401,
                 body: JSON.stringify({ message: "UnAuthorized Access"})
             };
-        }
+            }
+        
     } catch(error) {
         return {
             statusCode: 400,
