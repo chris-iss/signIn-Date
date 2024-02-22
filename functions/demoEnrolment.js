@@ -6,6 +6,7 @@ require("dotenv").config();
 exports.handler = async (event, context) => {
     const getNetlifyKey = event.queryStringParameters.API_KEY;
     const getValidationKey = process.env.Netlify_API_KEY;
+    console.log("KEYS", getNetlifyKey, getValidationKey)
 
     try {
         if (getNetlifyKey === getValidationKey) {
