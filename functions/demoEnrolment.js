@@ -193,7 +193,7 @@ exports.handler = async (event, context) => {
                     }
                 };
 
-                fetchContact();
+                await fetchContact();
             }
 
             return {
