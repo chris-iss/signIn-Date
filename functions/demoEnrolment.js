@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
                 console.log("YOU SEE AM", bodyData)
                 const formatPayload = bodyData[0]
                 console.log("BODY", bodyData)
-                const fetchObjectId = formatPayload[0].objectId;
+                const fetchObjectId = formatPayload.objectId;
                 console.log("BODY OBJECT ID", fetchObjectId)
                 let enrolUserId;
                 let userData;
