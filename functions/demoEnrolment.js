@@ -10,9 +10,9 @@ exports.handler = async (event, context) => {
 
     try {
         if (getNetlifyKey === getValidationKey) {
-            console.log("CHECK SEE HTTP EVENT", event)
             
                 const BodyData = JSON.parse(event.body);
+                console.log("YOU SEE AM", BodyData)
                 const formatPayload = JSON.parse(BodyData.body)
                 console.log("BODY", BodyData)
                 const fetchObjectId = formatPayload[0].objectId;
