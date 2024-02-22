@@ -9,13 +9,11 @@ exports.handler = async (event, context) => {
 
     try {
         if (getNetlifyKey === getValidationKey) {
-            console.log("EVENT", event)
-            if (event.httpMethod === "GET") {
-                console.log("SECOND CHECK httpMethod === GET Passed")
                 const BodyData = JSON.parse(event.body);
-                console.log("1")
-                const fetchObjectId = BodyData.objectId;
-                console.log("2", fetchObjectId)
+                const getpayload = JSON.parse(BodyData.body)
+                console.log("BODY PAYLOAD", getpayload)
+                const fetchObjectId = getpayload[0].objectId;
+                console.log("BODY 2", fetchObjectId)
                 let enrolUserId;
                 let userData;
                 
@@ -159,8 +157,7 @@ exports.handler = async (event, context) => {
                 }
 
 
-
-
+                
                 // Fetch contact from HubSpot after form submission
                 const fetchContact = async () => {
                     console.log("3", fetchObjectId)
@@ -196,7 +193,6 @@ exports.handler = async (event, context) => {
                 };
 
                 await fetchContact();
-            }
 
             return {
                 statusCode: 200,
