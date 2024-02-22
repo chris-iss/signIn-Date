@@ -187,7 +187,7 @@ exports.handler = async (event, context) => {
                         };
                         console.log("DATA", userData)
 
-                        await createOrEnrolStudent(userData);
+                        // await createOrEnrolStudent(userData);
                     } catch (error) {
                         throw new Error(`Error fetching contact: ${error.message}`);
                     }
