@@ -19,15 +19,12 @@ exports.handler = async (event, context) => {
     try {
         const getNetlifyKey = event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
-        console.log("KEYS", getNetlifyKey, getValidationKey)
 
         if (getNetlifyKey === getValidationKey) {
             
                 const bodyData = JSON.parse(event.body);
                 const formatPayload = bodyData[0]
-                console.log("BODY", bodyData)
                 const fetchObjectId = formatPayload.objectId;
-                console.log("BODY OBJECT ID", fetchObjectId)
                 let enrolUserId;
                 let userData;
                 
