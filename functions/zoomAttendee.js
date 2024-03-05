@@ -34,9 +34,7 @@ exports.handler = async (event, context) => {
       const typeOfMeeting = fetchZoomData.payload.object.topic;
 
       const formatAttendanceDate = new Date(attendanceDate);
-      const infoSessionAttendanceDate = formatAttendanceDate
-        .toISOString()
-        .split("T")[0];
+      const infoSessionAttendanceDate = formatAttendanceDate.toISOString().split("T")[0];
 
       const updateUserZoomAttendanceProperty = async (
         hubspot_userId,
@@ -134,13 +132,10 @@ exports.handler = async (event, context) => {
           );
 
           const searchResult = await executeSearch.json();
-          const hubspot_userId =
-            searchResult.results[0].properties.hs_object_id;
+          const hubspot_userId = searchResult.results[0].properties.hs_object_id;
           const hubspot_userEmail = searchResult.results[0].properties.email;
-          const zoomAttendance =
-            searchResult.results[0].properties.zoom_participant_attendance;
-          const infoSessioonAttendance =
-            searchResult.results[0].properties.information_session_attendance;
+          const zoomAttendance = searchResult.results[0].properties.zoom_participant_attendance;
+          const infoSessioonAttendance = searchResult.results[0].properties.information_session_attendance;
 
           if (hubspot_userEmail === participantEmaiil) {
             await updateUserZoomAttendanceProperty(
