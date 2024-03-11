@@ -6,10 +6,9 @@ exports.handler = async (event, context) => {
         const netlifyKey = event.queryStringParameters.API_KEY
         const getNetlifyKey = process.env.Netlify_API_KEY;
         const requestBody = JSON.parse(event.body);
-        let payload = requestBody.payload
+        let payload = requestBody.payload;
 
-
-        if (netlifyKey === getNetlifyKey && payload.product_name === "Demo - Diploma in Business Sustainability") {
+        if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
 
             // Step 1: Submit Data to Hubspot Demo Form
             const formSubmission = async () => {
@@ -20,7 +19,7 @@ exports.handler = async (event, context) => {
                             { name: "firstname", value: payload.user.first_name },
                             { name: "lastname", value: payload.user.last_name },
                             { name: "email", value: payload.user.email },
-                            { name: "phone", value: "0899765434" }
+                            { name: "phone", value: "0899765434000" }
                         ],
                         context: {
                             hutk: `${process.env.HUBSPOTUTK}`, 
@@ -46,7 +45,7 @@ exports.handler = async (event, context) => {
                     throw new Error(`Error creating or updating contact in HubSpot: ${error.message}`);
                 }
             }
-            //await formSubmission();
+            await formSubmission();
 
 
             // Step 2: Create or Update Contact and Demo Taken
@@ -78,7 +77,7 @@ exports.handler = async (event, context) => {
                         throw new Error(`Error submitting data to HubSpot Demo Form: ${error.message}`);
                     }
                 }
-                //await creactHubspotContact();
+                await creactHubspotContact();
 
                 // Step 3: Send Errors to Huspot Webhook
                 const sendErrorTooZapierWebhook = async (first_name, last_name, error) => {
