@@ -123,7 +123,7 @@ exports.handler = async (event, context) => {
 
             if (thinkificEnrollment) {
                 // await updateHubspotContact(result.id, accessDateContactPropertyUpdate, thinkificEnrollment);
-                // await updateThinkificExpiryDate(thinkificEnrollment.id, expiryDate)
+                await updateThinkificExpiryDate(thinkificEnrollment.id, expiryDate)
             }
           }
         } else {
@@ -135,52 +135,58 @@ exports.handler = async (event, context) => {
     };
 
 
+    // Update thinkific expiry date
+    const updateThinkificExpiryDate = async (expirt_id, expiryDtate) => {
+      
+    }
+
+
     // Step 4: Update HubSpot contact with the appropriate access_date from Thinkific
-    const updateHubspotContact = async (contactId, accessDateExpiryDateProperty, thinkificEnrolmentData) => {
+    // const updateHubspotContact = async (contactId, accessDateExpiryDateProperty, thinkificEnrolmentData) => {
         
-        //Convert tthe date to the format hubspot understands
-        if (accessDateExpiryDateProperty.properties.thinkific_access_date && accessDateExpiryDateProperty.properties.thinikific_user_expirydate ) {
-            accessDateExpiryDateProperty.properties.thinkific_access_date = new Date(accessDateExpiryDateProperty.properties.thinkific_access_date).toISOString().split('T')[0];
-            accessDateExpiryDateProperty.properties.thinikific_user_expirydate = new Date(accessDateExpiryDateProperty.properties.thinikific_user_expirydate).toISOString().split('T')[0];
-        }
+    //     //Convert tthe date to the format hubspot understands
+    //     if (accessDateExpiryDateProperty.properties.thinkific_access_date && accessDateExpiryDateProperty.properties.thinikific_user_expirydate ) {
+    //         accessDateExpiryDateProperty.properties.thinkific_access_date = new Date(accessDateExpiryDateProperty.properties.thinkific_access_date).toISOString().split('T')[0];
+    //         accessDateExpiryDateProperty.properties.thinikific_user_expirydate = new Date(accessDateExpiryDateProperty.properties.thinikific_user_expirydate).toISOString().split('T')[0];
+    //     }
 
         
-       try {
-        const updateContactURL = `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`;
+    //    try {
+    //     const updateContactURL = `https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`;
 
-        const updateContact = await fetch(updateContactURL, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify( accessDateExpiryDateProperty ),
-        });
+    //     const updateContact = await fetch(updateContactURL, {
+    //       method: "PATCH",
+    //       headers: {
+    //         Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify( accessDateExpiryDateProperty ),
+    //     });
 
-        const updateContactResponse = await updateContact.json();
-        console.log("HubSpot Contact Update Response:", updateContactResponse);
-      } catch (error) {
-        console.error("Error during HubSpot contact update:", error.message);
-        const TriggerZapier = await fetch(`${process.env.URL_ZAPIERWEBHOOKCONTACT}`, {
-            method: "POST",
-            body: JSON.stringify({
-                endpoint: "New Sign In",
-                message: "Hubspot User Error: Unable to Update Contact",
-                errorMessage: error.message,
-                studentEmail: thinkificEnrolmentData.user_email,
-                contactId: contactId,
-                signInDate: thinkificEnrolmentData.started_at
-            })
-        });
+    //     const updateContactResponse = await updateContact.json();
+    //     console.log("HubSpot Contact Update Response:", updateContactResponse);
+    //   } catch (error) {
+    //     console.error("Error during HubSpot contact update:", error.message);
+    //     const TriggerZapier = await fetch(`${process.env.URL_ZAPIERWEBHOOKCONTACT}`, {
+    //         method: "POST",
+    //         body: JSON.stringify({
+    //             endpoint: "New Sign In",
+    //             message: "Hubspot User Error: Unable to Update Contact",
+    //             errorMessage: error.message,
+    //             studentEmail: thinkificEnrolmentData.user_email,
+    //             contactId: contactId,
+    //             signInDate: thinkificEnrolmentData.started_at
+    //         })
+    //     });
 
-        console.log("Hubspot Contact Thinkific Acess Date Update Error:", TriggerZapier.json())
-      }
-    };
+    //     console.log("Hubspot Contact Thinkific Acess Date Update Error:", TriggerZapier.json())
+    //   }
+    // };
 
     // Step 5: Loop through user emails and update HubSpot
-    for (const _email of extractUserEnrolmentEmails) {
-      await searchHubspot(_email);
-    }
+    // for (const _email of extractUserEnrolmentEmails) {
+    //   await searchHubspot(_email);
+    // }
 
     return {
       statusCode: 200,
