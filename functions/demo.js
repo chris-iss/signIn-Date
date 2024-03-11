@@ -46,7 +46,7 @@ exports.handler = async (event, context) => {
                     throw new Error(`Error creating or updating contact in HubSpot: ${error.message}`);
                 }
             }
-            await formSubmission();
+            //await formSubmission();
 
 
             // Step 2: Create or Update Contact and Demo Taken
@@ -78,7 +78,7 @@ exports.handler = async (event, context) => {
                         throw new Error(`Error submitting data to HubSpot Demo Form: ${error.message}`);
                     }
                 }
-                await creactHubspotContact();
+                //await creactHubspotContact();
 
                 // Step 3: Send Errors to Huspot Webhook
                 const sendErrorTooZapierWebhook = async (first_name, last_name, error) => {
