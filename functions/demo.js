@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
                             { name: "firstname", value: payload.user.first_name },
                             { name: "lastname", value: payload.user.last_name },
                             { name: "email", value: payload.user.email },
-                            { name: "phone", value: "0899765434000" }
+                            { name: "phone", value: payload.user.phone }
                         ],
                         context: {
                             hutk: `${process.env.HUBSPOTUTK}`, 
