@@ -21,7 +21,7 @@ exports.handler = async (event, context) => {
                             { name: "firstname", value: payload.user.first_name },
                             { name: "lastname", value: payload.user.last_name },
                             { name: "email", value: payload.user.email },
-                            { name: "phone", value: payload.user.phone }
+                            { name: "phone", value: "00000000000000000" }
                         ],
                         context: {
                             hutk: `${process.env.HUBSPOTUTK}`, 
@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
             };
         }      
     } catch(error) { 
-        await sendErrorToZapierWebhook(payload.user.first_name, payload.user.last_name, error.message); 
+        //await sendErrorToZapierWebhook(payload.user.first_name, payload.user.last_name, error.message); 
               
         return {
             statusCode: 400,
