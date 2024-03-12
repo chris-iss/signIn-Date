@@ -8,6 +8,8 @@ exports.handler = async (event, context) => {
         const requestBody = JSON.parse(event.body);
         let payload = requestBody.payload;
 
+        console.log(event)
+
         if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
             let userPhoneNumber;
 
