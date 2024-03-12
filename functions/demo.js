@@ -8,11 +8,32 @@ exports.handler = async (event, context) => {
         const requestBody = JSON.parse(event.body);
         let payload = requestBody.payload;
 
-        console.log("REQUEST", requestBody)
-
         if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
+            let userPhoneNumber;
 
-            // Step 1: Submit Data to Hubspot Demo Form
+            // Step 1: Functioon to extract user phone number
+            const fetchUser = async () => {
+                const getUserData = await fetch(`https://api.thinkific.com/api/public/v1/users/${payload.user.id}
+                `, {
+                    methhod: "GET",
+                    headers: {
+                        "X-Auth-API-Key": process.env.THINKIFIC_API_KEY,
+                        "X-Auth-Subdomain": process.env.THINKIFIC_SUB_DOMAIN,
+                        "Content-Type": "application/json",
+                    },
+                })
+
+                if (!getUserData.ok) {
+                    throw new Error(`Thinkific API Error: ${getUserData.status} - ${getUserData.statusText}`);
+                }
+
+                const getUserResponse = await getUserData.json();
+                userPhoneNumber = getUserResponse.custom_profile_fields[0].value
+            }
+            await fetchUser();
+
+
+            // Step 2: Submit Data to Hubspot Demo Form
             const formSubmission = async () => {
                 try {
                     const formData = {
@@ -21,7 +42,7 @@ exports.handler = async (event, context) => {
                             { name: "firstname", value: payload.user.first_name },
                             { name: "lastname", value: payload.user.last_name },
                             { name: "email", value: payload.user.email },
-                            { name: "phone", value: "00000000000000000" }
+                            { name: "phone", value: userPhoneNumber }
                         ],
                         context: {
                             hutk: `${process.env.HUBSPOTUTK}`, 
@@ -42,15 +63,13 @@ exports.handler = async (event, context) => {
                     return  await submitData.json();
 
                 } catch(error) {
-                    await sendErrorTooZapierWebhook(payload.user.first_name, payload.user.last_name, error.message);
-
                     throw new Error(`Error creating or updating contact in HubSpot: ${error.message}`);
                 }
             }
             await formSubmission();
 
 
-            // Step 2: Create or Update Contact and Demo Taken
+            //Step 3: Create or Update Contact and Demo Taken
                 const creactHubspotContact = async () => {
                     try {
                         const contactProperty = {
@@ -74,23 +93,10 @@ exports.handler = async (event, context) => {
                         return await createContact.json();
 
                     }catch(error) {
-                        await sendErrorTooZapierWebhook(payload.user.first_name, payload.user.last_name, error.message);
-
                         throw new Error(`Error submitting data to HubSpot Demo Form: ${error.message}`);
                     }
                 }
                 await creactHubspotContact();
-
-                // Step 3: Send Errors to Huspot Webhook
-                const sendErrorTooZapierWebhook = async (first_name, last_name, error) => {
-                    const sendNotificcation = await fetch(`${process.env.DEMOERRORWEBHOOK}`, {
-                        method: "POST",
-                        body: JSON.stringify({ firstname: first_name, lastname: last_name, message: error})
-                    });
-
-                    return sendNotificcation.json();
-                };
-
             
                 return {
                     statusCode: 200,
@@ -103,7 +109,6 @@ exports.handler = async (event, context) => {
             };
         }      
     } catch(error) { 
-        //await sendErrorToZapierWebhook(payload.user.first_name, payload.user.last_name, error.message); 
               
         return {
             statusCode: 400,
