@@ -7,8 +7,9 @@ exports.handler = async (event, context) => {
         const getNetlifyKey = process.env.Netlify_API_KEY;
         const requestBody = JSON.parse(event.body);
         let payload = requestBody.payload;
+        let clientIpAddress = event.headers['x-forwarded-for'];
 
-        console.log(event)
+        console.log("CLIENT IP ADDRESS:", clientIpAddress)
 
         if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
             let userPhoneNumber;
@@ -49,7 +50,8 @@ exports.handler = async (event, context) => {
                         context: {
                             hutk: `${process.env.HUBSPOTUTK}`, 
                             pageUri: "https://instituteofsustainabilitystudies.com",
-                            pageName: "Business & Corporate Sustainability Training Courses | ISS"
+                            pageName: "Business & Corporate Sustainability Training Courses | ISS",
+                            ipAddress: clientIpAddress
                         },
                     };
                     
