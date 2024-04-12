@@ -3,7 +3,7 @@ require("dotenv").config();
 const fetch = require("node-fetch");
 
 const wooCommerce = new WoocommerceRestApi({
-    url: 'https://stg.instituteofsustainabilitystudies.com',
+    url: 'https://instituteofsustainabilitystudies.com',
     consumerKey: process.env.CONSUMERKEY,
     consumerSecret: process.env.CONSUMERSECRET,
     version: 'wc/v3' 
@@ -31,14 +31,15 @@ exports.handler = async (event) => {
             const getData = await fetch(`https://api.hubapi.com/contacts/v1/contact/vid/${objectId}/profile`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${process.env.SOSVHUBSPOT_API_KEY}`,
+                    "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
                     "Content-Type": "application/json"
                 }
             });
 
             const response = await getData.json();
+            const company = response.properties.company.value
 
-            if (response) {
+            if (company === "sosv-member") {
                 const getEmail = response.properties.email.value;
                 const firstname = response.properties.firstname.value
                 const couponCode = generateCouponCode();
