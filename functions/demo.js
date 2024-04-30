@@ -12,7 +12,7 @@ exports.handler = async (event, context) => {
         console.log("COURSE-NAME:", payload.course.name);
 
 
-        if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
+        if (netlifyKey === getNetlifyKey && payload.course.name === "Preview - ISS Online Platform") {
             let userPhoneNumber;
 
             // Step 1: Functioon to extract user phone number
