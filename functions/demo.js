@@ -9,6 +9,8 @@ exports.handler = async (event, context) => {
         let payload = requestBody.payload;
         let clientIpAddress = event.headers['x-forwarded-for'];
 
+        console.log("COURSE-NAME:", payload.course.name);
+
 
         if (netlifyKey === getNetlifyKey && payload.course.name === "Demo - Diploma in Business Sustainability") {
             let userPhoneNumber;
