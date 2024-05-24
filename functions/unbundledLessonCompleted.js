@@ -34,18 +34,13 @@ exports.handler = async (event) => {
 
         //event.queryStringParameters &&
 
-        const getNetlifyKey =  event.queryStringParameters.API_KEY;
+        //const getNetlifyKey =  event.queryStringParameters.API_KEY;
+        const getNetlifyKey =  event.queryStringParameters;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameteres = JSON.parse(event.body);
         const extractLessonName = extractParameteres?.payload?.lesson?.name;
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
-
-        const debugKey = event.queryStringParameters
-        console.log("DEBUG-KEY", debugKey)
-
-        cconsole.log("NETLIFY KEYS", getNetlifyKey, getValidationKey)
-
 
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
@@ -56,8 +51,11 @@ exports.handler = async (event) => {
         }
 
         for (let surveyName of courseWrapUp) {
+    
             if (extractLessonName === surveyName && courseCompleted === "completed") {
                 const capitalizedCourseCompleted = "Complete"; 
+
+                console.log("UPDATED NOW")
 
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
