@@ -41,16 +41,19 @@ exports.handler = async (event) => {
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
 
+        const debugKey = event.queryStringParameters
+        console.log("DEBUG-KEY", debugKey)
+
         cconsole.log("NETLIFY KEYS", getNetlifyKey, getValidationKey)
 
 
         // Validate API key
-        // if (getNetlifyKey !== getValidationKey) {
-        //     return {
-        //         statusCode: 401,
-        //         body: JSON.stringify({ message: "Unauthorized Access" })
-        //     };
-        // }
+        if (getNetlifyKey !== getValidationKey) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ message: "Unauthorized Access" })
+            };
+        }
 
         for (let surveyName of courseWrapUp) {
             if (extractLessonName === surveyName && courseCompleted === "completed") {
