@@ -42,7 +42,7 @@ exports.handler = async (event) => {
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
 
-        console.log("CHEECK-KEYSS", getNetlifyKey, getValidationKey)
+        console.log("CHECK-KEY", getNetlifyKey, getValidationKey)
 
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
