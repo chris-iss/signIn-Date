@@ -45,12 +45,12 @@ exports.handler = async (event) => {
 
 
         // Validate API key
-        if (getNetlifyKey !== getValidationKey) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({ message: "Unauthorized Access" })
-            };
-        }
+        // if (getNetlifyKey !== getValidationKey) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({ message: "Unauthorized Access" })
+        //     };
+        // }
 
         for (let surveyName of courseWrapUp) {
             if (extractLessonName === surveyName && courseCompleted === "completed") {
