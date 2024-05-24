@@ -57,7 +57,9 @@ exports.handler = async (event) => {
             if (extractLessonName === surveyName && courseCompleted === "completed") {
                 const capitalizedCourseCompleted = "Complete"; 
 
-                console.log("UPDATED NOW")
+                console.log("LESOON-NAME:", extractLessonName);
+                console.log("COURSSE COMPLETED", courseCompleted)
+
 
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
@@ -100,6 +102,7 @@ exports.handler = async (event) => {
                         break;
                     case "CSRD End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
+                        console.log("UPDATED NOW")
                         break;
                     // Add other cases for modules if needed
                     default:
@@ -147,6 +150,7 @@ exports.handler = async (event) => {
                         // Update Module Completion Contact Property to Complete
                         const updateModuleCompletion = async () => {
                             try {
+                                console.log("ENTER UPDAT FUNCTION")
                                 // Define the properties object for updating HubSpot contact
                                 const moduleCompletionProperties = {};
                                 moduleCompletionProperties[contactPropertyToUpdate] = capitalizedCourseCompleted;
