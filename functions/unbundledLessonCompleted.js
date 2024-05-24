@@ -32,10 +32,7 @@ exports.handler = async (event) => {
             "CSRD End-of-Course Survey"
         ]; 
 
-        //event.queryStringParameters &&
-
-        //const getNetlifyKey =  event.queryStringParameters.API_KEY;
-        const getNetlifyKey =  event.queryStringParameters.API_KEY;
+        const getNetlifyKey =  event.queryStringParameters && event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameteres = JSON.parse(event.body);
         const extractLessonName = extractParameteres?.payload?.lesson?.name;
@@ -143,7 +140,6 @@ exports.handler = async (event) => {
                         // Update Module Completion Contact Property to Complete
                         const updateModuleCompletion = async () => {
                             try {
-                                console.log("ENTER UPDAT FUNCTION")
                                 // Define the properties object for updating HubSpot contact
                                 const moduleCompletionProperties = {};
                                 moduleCompletionProperties[contactPropertyToUpdate] = capitalizedCourseCompleted;
