@@ -190,7 +190,7 @@ exports.handler = async (event) => {
                     }
                 };
 
-                hubspotSearchContact();
+                await hubspotSearchContact();
             } 
         }
 
