@@ -32,14 +32,16 @@ exports.handler = async (event) => {
             "CSRD End-of-Course Survey"
         ]; 
 
-        const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
+        //event.queryStringParameters &&
+
+        const getNetlifyKey =  event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameteres = JSON.parse(event.body);
         const extractLessonName = extractParameteres?.payload?.lesson?.name;
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
 
-        console.log("FIRE", extractParameteres)
+        cconsole.log("NETLIFY KEYS", getNetlifyKey, getValidationKey)
 
 
         // Validate API key
