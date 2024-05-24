@@ -42,8 +42,6 @@ exports.handler = async (event) => {
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
 
-        console.log("CHECK-KEY", getNetlifyKey, getValidationKey)
-
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
             return {
@@ -56,10 +54,6 @@ exports.handler = async (event) => {
     
             if (extractLessonName === surveyName && courseCompleted === "completed") {
                 const capitalizedCourseCompleted = "Complete"; 
-
-                console.log("LESOON-NAME:", extractLessonName);
-                console.log("COURSSE COMPLETED", courseCompleted)
-
 
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
@@ -102,7 +96,6 @@ exports.handler = async (event) => {
                         break;
                     case "CSRD End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
-                        console.log("UPDATED NOW")
                         break;
                     // Add other cases for modules if needed
                     default:
@@ -190,7 +183,7 @@ exports.handler = async (event) => {
                             }
                         };
 
-                        updateModuleCompletion();
+                        await updateModuleCompletion();
                     } catch (error) {
                         // Log any errors during the HubSpot contact search
                         console.log("HUBSPOT SEARCH ERROR", error.message);
