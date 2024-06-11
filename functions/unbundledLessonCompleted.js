@@ -29,7 +29,7 @@ exports.handler = async (event) => {
             "End of Course Survey - Module 10",
             "End of Course Survey - Module 11",
             "End of Course Survey - Module 12",
-            "CSRD End-of-Course Survey"
+            "End-of-Course Survey"
         ]; 
 
         const getNetlifyKey =  event.queryStringParameters && event.queryStringParameters.API_KEY;
@@ -91,7 +91,7 @@ exports.handler = async (event) => {
                     case "End of Course Survey - Module 12":
                         contactPropertyToUpdate = "unbundled_module_12";
                         break;
-                    case "CSRD End-of-Course Survey":
+                    case "End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
                         break;
                     // Add other cases for modules if need be
