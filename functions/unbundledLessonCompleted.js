@@ -94,7 +94,7 @@ exports.handler = async (event) => {
                     case "CSRD End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
                         break;
-                    // Add other cases for modules if needed
+                    // Add other cases for modules if need be
                     default:
                         console.log("No contact property defined for:", surveyName);
                         continue;
