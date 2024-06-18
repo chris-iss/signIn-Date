@@ -1,5 +1,5 @@
-const fetch = require("node-fetch");
-require("dotenv").config();
+const axios = require('axios');
+require('dotenv').config();
 
 let isExecuting = false;
 
@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     if (isExecuting) {
         return {
             statusCode: 409,
-            body: JSON.stringify({ message: "Function is already executing" })
+            body: JSON.stringify({ message: "Function is already executing"})
         };
     }
 
@@ -20,19 +20,11 @@ exports.handler = async (event) => {
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
-                body: JSON.stringify({ message: "Unauthorized Access" })
+                body: JSON.stringify({ message: "Unauthorized Access"})
             };
         }
 
         const requestBody = JSON.parse(event.body);
-
-        // Ensure all required fields are present and non-empty
-        if (!requestBody || !requestBody.email || !requestBody.firsrtname || !requestBody.lastname) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Missing or invalid request body" })
-            };
-        }
 
         // Split comma-separated strings into arrays
         const emails = requestBody.email.split(',');
@@ -42,39 +34,59 @@ exports.handler = async (event) => {
         // Array to hold participant information
         const participantInfo = [];
 
-        // Assuming emails, firstnames, and lastnames arrays are of the same length
+        // Function to create HubSpot contact
+        async function createHubSpotContact(firstName, lastName, email) {
+            try {
+                const response = await axios.post(
+                    `https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/${email}/?hapikey=${process.env.HUBSPOT_API_KEY}`,
+                    {
+                        properties: [
+                            { property: 'firstname', value: firstName },
+                            { property: 'lastname', value: lastName },
+                            { property: 'email', value: email }
+                        ]
+                    }
+                );
+
+                if (response.status === 200) {
+                    console.log(`Contact created successfully for ${firstName} ${lastName}`);
+                    return response.data;
+                } else {
+                    console.error(`Failed to create contact: ${response.statusText}`);
+                    return null;
+                }
+
+            } catch (error) {
+                console.error('Error creating HubSpot contact:', error.message);
+                return null;
+            }
+        }
+
+        // Iterate through participants and create HubSpot contacts
         for (let i = 0; i < emails.length; i++) {
             const trimmedEmail = emails[i].trim();
             const trimmedFirstname = firstnames[i].trim();
             const trimmedLastname = lastnames[i].trim();
+
             // Push each participant's data into participantInfo array
             participantInfo.push({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail });
+
+            // Create HubSpot contact
+            await createHubSpotContact(trimmedFirstname, trimmedLastname, trimmedEmail);
         }
-
-
-        participantInfo.forEach((participant, index) => {
-            console.log(`Loop Iteration: ${index + 1}`); 
-            console.log(`Firstname: ${participant.firstName}`); 
-            console.log(`Lastname: ${participant.lastName}`); 
-            console.log(`Email: ${participant.email}`); console.log("---");
-        })
-
+        
+        console.log("Processed participantInfo:", participantInfo);
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Data processed successfully", participantInfo })
         };
     } catch(error) {
+        console.error('Error processing data:', error.message);
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: error.message })
+            body: JSON.stringify({ message: "Missing or invalid request body" })
         };
     } finally {
         isExecuting = false;
     }
 };
-
-
-
-
-
-
