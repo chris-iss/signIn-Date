@@ -50,6 +50,9 @@ exports.handler = async (event) => {
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
 
             try {
+                console.log(`Fetching order details from: ${url}`);
+                console.log(`Using credentials: ${consumerKey} / ${consumerSecret}`);
+
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
@@ -58,7 +61,8 @@ exports.handler = async (event) => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Error fetching order details: ${response.statusText}`);
+                    const errorDetails = await response.text();
+                    throw new Error(`Error fetching order details: ${response.status} - ${response.statusText} - ${errorDetails}`);
                 }
 
                 const data = await response.json();
