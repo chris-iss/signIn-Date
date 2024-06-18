@@ -1,14 +1,13 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-
 let isExecuting = false;
 
 exports.handler = async (event) => {
     if (isExecuting) {
         return {
             statusCode: 409,
-            body: JSON.stringify({ message: "Function is already executing"})
+            body: JSON.stringify({ message: "Function is already executing" })
         };
     }
 
@@ -21,17 +20,16 @@ exports.handler = async (event) => {
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
-                body: JSON.stringify({ message: "Unauthorized Access"})
+                body: JSON.stringify({ message: "Unauthorized Access" })
             };
         }
 
         const requestBody = JSON.parse(event.body);
         const emails = requestBody.email.split(',');
-        const firstnames = requestBody.firsrtname.split(',');
+        const firstnames = requestBody.firstname.split(',');
         const lastnames = requestBody.lastname.split(',');
         let currency = requestBody.currency;
-        let startDate = requestBody.startdate
-
+        let startDate = requestBody.startdate;
 
         const participantInfo = [];
 
@@ -41,8 +39,8 @@ exports.handler = async (event) => {
             const requestOptions = {
                 method: 'POST',
                 headers: {
-                     "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                     "Content-Type": "application/json"
+                    "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     properties: [
@@ -80,26 +78,25 @@ exports.handler = async (event) => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ email: trimmedEmail, currency: currency, startDate: startDate})
+                    body: JSON.stringify({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail, currency: currency, startDate: startDate })
                 });
+
+                if (!sendResponseToZapier.ok) {
+                    const zapierErrorData = await sendResponseToZapier.json();
+                    throw new Error(`Failed to send data to Zapier: ${sendResponseToZapier.status} - ${zapierErrorData.message}`);
+                }
             } catch (error) {
-                console.error('Error creating HubSpot contact:', error.message);
-                // Optionally handle or log the error here
+                console.error('Error creating HubSpot contact or sending data to Zapier:', error.message);
             }
         }
 
         console.log("Processed participantInfo:", participantInfo);
-        const sendEmailBackToZapir = () => {
-            const sendRsponse = async () => {
-
-            }
-        }
 
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Data processed successfully", participantInfo })
         };
-    } catch(error) {
+    } catch (error) {
         console.error('Error processing data:', error.message);
         return {
             statusCode: 400,
@@ -109,7 +106,3 @@ exports.handler = async (event) => {
         isExecuting = false;
     }
 };
-
-
-
-
