@@ -1,5 +1,6 @@
-const axios = require('axios');
-require('dotenv').config();
+const fetch = require("node-fetch");
+require("dotenv").config();
+
 
 let isExecuting = false;
 
@@ -25,54 +26,55 @@ exports.handler = async (event) => {
         }
 
         const requestBody = JSON.parse(event.body);
-
-        // Split comma-separated strings into arrays
         const emails = requestBody.email.split(',');
         const firstnames = requestBody.firsrtname.split(',');
         const lastnames = requestBody.lastname.split(',');
 
-        // Array to hold participant information
         const participantInfo = [];
 
-        // Function to create HubSpot contact
         async function createHubSpotContact(firstName, lastName, email) {
-            try {
-                const response = await axios.post(
-                    `https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/${email}/?hapikey=${process.env.HUBSPOT_API_KEY}`,
-                    {
-                        properties: [
-                            { property: 'firstname', value: firstName },
-                            { property: 'lastname', value: lastName },
-                            { property: 'email', value: email }
-                        ]
-                    }
-                );
+            const url = `https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/${encodeURIComponent(email)}`;
 
-                if (response.status === 200) {
-                    console.log(`Contact created successfully for ${firstName} ${lastName}`);
-                    return response.data;
-                } else {
-                    console.error(`Failed to create contact: ${response.statusText}`);
-                    return null;
-                }
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                     "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                     "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    properties: [
+                        { property: 'firstname', value: firstName },
+                        { property: 'lastname', value: lastName },
+                        { property: 'email', value: email }
+                    ]
+                })
+            };
 
-            } catch (error) {
-                console.error('Error creating HubSpot contact:', error.message);
-                return null;
+            const response = await fetch(url, requestOptions);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to create HubSpot contact: ${response.status} - ${errorData.message}`);
             }
+
+            const data = await response.json();
+            console.log(`Contact created successfully for ${firstName} ${lastName}`);
+            return data;
         }
 
-        // Iterate through participants and create HubSpot contacts
         for (let i = 0; i < emails.length; i++) {
             const trimmedEmail = emails[i].trim();
             const trimmedFirstname = firstnames[i].trim();
             const trimmedLastname = lastnames[i].trim();
 
-            // Push each participant's data into participantInfo array
             participantInfo.push({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail });
 
-            // Create HubSpot contact
-            await createHubSpotContact(trimmedFirstname, trimmedLastname, trimmedEmail);
+            try {
+                await createHubSpotContact(trimmedFirstname, trimmedLastname, trimmedEmail);
+            } catch (error) {
+                console.error('Error creating HubSpot contact:', error.message);
+                // Optionally handle or log the error here
+            }
         }
         
         console.log("Processed participantInfo:", participantInfo);
@@ -90,3 +92,7 @@ exports.handler = async (event) => {
         isExecuting = false;
     }
 };
+
+
+
+
