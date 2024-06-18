@@ -14,7 +14,7 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     try {
-        const getNetlifyKey = event.queryStringParameters.API_KEY;
+        const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
 
         if (getNetlifyKey !== getValidationKey) {
@@ -24,7 +24,13 @@ exports.handler = async (event) => {
             };
         }
 
+        console.log("Event Body:", event.body); // Log the event body for debugging
         const requestBody = JSON.parse(event.body);
+
+        if (!requestBody.email || !requestBody.firstname || !requestBody.lastname || !requestBody.currency || !requestBody.startdate) {
+            throw new Error("Missing required fields in the request body");
+        }
+
         const emails = requestBody.email.split(',');
         const firstnames = requestBody.firstname.split(',');
         const lastnames = requestBody.lastname.split(',');
@@ -78,7 +84,7 @@ exports.handler = async (event) => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail, currency: currency, startDate: startDate })
+                    body: JSON.stringify({ email: trimmedEmail, currency: currency, startDate: startDate })
                 });
 
                 if (!sendResponseToZapier.ok) {
@@ -100,7 +106,7 @@ exports.handler = async (event) => {
         console.error('Error processing data:', error.message);
         return {
             statusCode: 400,
-            body: JSON.stringify({ message: "Missing or invalid request body" })
+            body: JSON.stringify({ message: error.message })
         };
     } finally {
         isExecuting = false;
