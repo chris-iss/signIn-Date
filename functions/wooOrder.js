@@ -45,6 +45,7 @@ exports.handler = async (event) => {
             };
         }
 
+        //
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
