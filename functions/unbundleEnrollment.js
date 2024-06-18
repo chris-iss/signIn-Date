@@ -26,33 +26,36 @@ exports.handler = async (event) => {
 
         const requestBody = JSON.parse(event.body);
 
-        // Ensure all required fields are present and non-empty
-        if (!requestBody || !requestBody.email || !requestBody.firstname || !requestBody.lastname) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Missing or invalid request body" })
-            };
-        }
+        console.log("RBODY-", requestBody)
+        console.log(typeof (requestBody))
 
-        // Split the comma-separated strings into arrays
-        const emails = requestBody.email.split(',');
-        const firstnames = requestBody.firstname.split(',');
-        const lastnames = requestBody.lastname.split(',');
+        // // Ensure all required fields are present and non-empty
+        // if (!requestBody || !requestBody.email || !requestBody.firstname || !requestBody.lastname) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({ message: "Missing or invalid request body" })
+        //     };
+        // }
 
-        // Array to hold participant information
-        const participantInfo = [];
+        // // Split the comma-separated strings into arrays
+        // const emails = requestBody.email.split(',');
+        // const firstnames = requestBody.firstname.split(',');
+        // const lastnames = requestBody.lastname.split(',');
 
-        // Assuming emails, firstnames, and lastnames arrays are of the same length
-        for (let i = 0; i < emails.length; i++) {
-            const trimmedEmail = emails[i].trim();
-            const trimmedFirstname = firstnames[i].trim();
-            const trimmedLastname = lastnames[i].trim();
-            
-            // Push each participant's data into participantInfo array
-            participantInfo.push({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail });
-        }
+        // // Array to hold participant information
+        // const participantInfo = [];
 
-        console.log("Processed participantInfo:", participantInfo);
+        // // Assuming emails, firstnames, and lastnames arrays are of the same length
+        // for (let i = 0; i < emails.length; i++) {
+        //     const trimmedEmail = emails[i].trim();
+        //     const trimmedFirstname = firstnames[i].trim();
+        //     const trimmedLastname = lastnames[i].trim();
+
+        //     // Push each participant's data into participantInfo array
+        //     participantInfo.push({ firstName: trimmedFirstname, lastName: trimmedLastname, email: trimmedEmail });
+        // }
+
+        // console.log("Processed participantInfo:", participantInfo);
 
         return {
             statusCode: 200,
