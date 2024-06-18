@@ -30,6 +30,8 @@ exports.handler = async (event) => {
         const firstnames = requestBody.firsrtname.split(',');
         const lastnames = requestBody.lastname.split(',');
 
+        console.log("RAW-DATA", requestBody)
+
         const participantInfo = [];
 
         async function createHubSpotContact(firstName, lastName, email) {
