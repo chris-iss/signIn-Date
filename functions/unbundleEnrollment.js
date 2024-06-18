@@ -20,8 +20,34 @@ exports.handler = async (event) => {
 
     if (getNetlifyKey === getValidationKey) {
         const extractParameteres = JSON.parse(event.body);
-        console.log("DATA-RESULT", extractParameteres)
         let enrolUserId;
+
+
+        // Split the comma-separated strings into arrays
+        const emails = extractParameteres.email.split(',');
+        const firstnames = extractParameteres.firstname.split(',');
+        const lastnames = extractParameteres.lastname.split(',');
+
+        // Array to hold participant information
+        const participantInfo = [];
+
+        // Iterate over the arrays and construct participant objects
+        for (let i = 0; i < emails.length; i++) {
+            const email = emails[i].trim();
+            const firstname = firstnames[i].trim();
+            const lastname = lastnames[i].trim();
+            // Push each participant's data into participantInfo array
+            participantInfo.push({ firstName: firstname, lastName: lastname, email: email });
+        }
+        
+        // Simulating a loop over participantInfo (replace with actual loop logic)
+        participantInfo.forEach((participant, index) => {
+            console.log(`Loop Iteration: ${index + 1}`);
+            console.log(`Firstname: ${participant.firstName}`);
+            console.log(`Lastname: ${participant.lastName}`);
+            console.log(`Email: ${participant.email}`);
+            console.log("---");
+        });
 
        
         return {
