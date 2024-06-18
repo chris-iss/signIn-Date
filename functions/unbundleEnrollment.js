@@ -19,6 +19,8 @@ exports.handler = async (event) => {
     const getValidationKey = process.env.Netlify_API_KEY;
 
     if (getNetlifyKey === getValidationKey) {
+        const extractParameteres = JSON.parse(event.body);
+        console.log("DATA-RESULT", extractParameteres)
         let enrolUserId;
 
        
