@@ -26,6 +26,8 @@ exports.handler = async (event) => {
 
         console.log("Event Body:", event.body); // Log the event body for debugging
         const requestBody = JSON.parse(event.body);
+        const orderId = requestBody.orderId;
+        console.log("OrderId", orderId)
 
 
         return {
