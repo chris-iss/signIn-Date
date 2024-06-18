@@ -22,17 +22,18 @@ exports.handler = async (event) => {
         const extractParameteres = JSON.parse(event.body);
         let enrolUserId;
 
+        console.log("TEST", extractParameteres)
         // Split the comma-separated strings into arrays
-        const emails = extractParameteres.email.split(',');
-        const firstnames = extractParameteres.firstname.split(',');
-        const lastnames = extractParameteres.lastname.split(',');
+        //const emails = extractParameteres.email.split(',');
+        //const firstnames = extractParameteres.firstname.split(',');
+        //const lastnames = extractParameteres.lastname.split(',');
 
-        console.log("Firstname", firstnames)
-        console.log("Lastnae", lastnames)
-        console.log("Email", emails)
+        //console.log("Firstname", firstnames)
+        //console.log("Lastnae", lastnames)
+        //console.log("Email", emails)
 
         // Array to hold participant information
-        const participantInfo = [];
+        //const participantInfo = [];
 
         // // Assuming emails, firstnames, and lastnames arrays are of the same length
         // for (let i = 0; i < emails.length; i++) {
