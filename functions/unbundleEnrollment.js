@@ -84,12 +84,15 @@ exports.handler = async (event) => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ email: trimmedEmail, currency: currency, startDate: startDate })
+                    body: JSON.stringify({ firstname: trimmedFirstname, lastname: trimmedLastname, email: trimmedEmail, currency: currency, startDate: startDate })
                 });
 
                 if (!sendResponseToZapier.ok) {
                     const zapierErrorData = await sendResponseToZapier.json();
-                    throw new Error(`Failed to send data to Zapier: ${sendResponseToZapier.status} - ${zapierErrorData.message}`);
+                    console.error(`Failed to send data to Zapier for ${trimmedEmail}: ${sendResponseToZapier.status} - ${zapierErrorData.message}`);
+                } else {
+                    const zapierResponseData = await sendResponseToZapier.json();
+                    console.log(`Data sent to Zapier successfully for ${trimmedEmail}:`, zapierResponseData);
                 }
             } catch (error) {
                 console.error('Error creating HubSpot contact or sending data to Zapier:', error.message);
