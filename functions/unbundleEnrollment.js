@@ -30,7 +30,7 @@ exports.handler = async (event) => {
         const firstnames = requestBody.firsrtname.split(',');
         const lastnames = requestBody.lastname.split(',');
         let currency = requestBody.currency;
-        let startDate = requestBody.start-date
+        let startDate = requestBody.startdate
 
 
         const participantInfo = [];
