@@ -27,20 +27,24 @@ exports.handler = async (event) => {
         const firstnames = extractParameteres.firstname.split(',');
         const lastnames = extractParameteres.lastname.split(',');
 
+        console.log("Firstname", firstnames)
+        console.log("Lastnae", lastnames)
+        console.log("Email", emails)
+
         // Array to hold participant information
         const participantInfo = [];
 
-        // Assuming emails, firstnames, and lastnames arrays are of the same length
-        for (let i = 0; i < emails.length; i++) {
-            const email = emails[i].trim();
-            const firstname = firstnames[i].trim();
-            const lastname = lastnames[i].trim();
-            // Push each participant's data into participantInfo array
-            participantInfo.push({ firstName: firstname, lastName: lastname, email: email });
-        }
-        
-        // Logging the participantInfo array to check the result
-        console.log(participantInfo);
+        // // Assuming emails, firstnames, and lastnames arrays are of the same length
+        // for (let i = 0; i < emails.length; i++) {
+        //     const email = emails[i].trim();
+        //     const firstname = firstnames[i].trim();
+        //     const lastname = lastnames[i].trim();
+        //     // Push each participant's data into participantInfo array
+        //     participantInfo.push({ firstName: firstname, lastName: lastname, email: email });
+        // }
+
+        // // Logging the participantInfo array to check the result
+        // console.log(participantInfo);
        
         return {
             statusCode: 200,
