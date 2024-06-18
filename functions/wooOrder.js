@@ -27,7 +27,36 @@ exports.handler = async (event) => {
         console.log("Event Body:", event.body); // Log the event body for debugging
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        console.log("OrderId", orderId)
+
+        const consumerKey = `${process.env.CONSUMERKEY}`; // Replace with your WooCommerce consumer key
+        const consumerSecret = `${process.env.CONSUMERSECRET}`; // Replace with your WooCommerce consumer secret
+        const baseUrl = 'https://www.stg.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
+
+        const getOrderDetails = async (orderId) => {
+            const url = `${baseUrl}/${orderId}`;
+            const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': auth
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching order details: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Order Details:', data);
+                return data;
+            } catch (error) {
+                console.error(error.message);
+                return null;
+            }
+        };
+        getOrderDetails(orderId);
 
 
         return {
