@@ -28,12 +28,9 @@ exports.handler = async (event) => {
         const requestBody = JSON.parse(event.body);
 
 
-        
-        console.log("Processed participantInfo:", participantInfo);
-
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Data processed successfully", participantInfo })
+            body: JSON.stringify({ message: "Data processed successfully"})
         };
     } catch (error) {
         console.error('Error processing data:', error.message);
