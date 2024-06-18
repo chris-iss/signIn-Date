@@ -29,8 +29,9 @@ exports.handler = async (event) => {
         const emails = requestBody.email.split(',');
         const firstnames = requestBody.firsrtname.split(',');
         const lastnames = requestBody.lastname.split(',');
+        let currency = requestBody.currency;
+        let startDate = requestBody.start-date
 
-        console.log("RAW-DATA", requestBody)
 
         const participantInfo = [];
 
@@ -79,7 +80,7 @@ exports.handler = async (event) => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ email: trimmedEmail})
+                    body: JSON.stringify({ email: trimmedEmail, currency: currency, startDate: startDate})
                 });
             } catch (error) {
                 console.error('Error creating HubSpot contact:', error.message);
