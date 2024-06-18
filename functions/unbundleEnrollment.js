@@ -71,13 +71,27 @@ exports.handler = async (event) => {
 
             try {
                 await createHubSpotContact(trimmedFirstname, trimmedLastname, trimmedEmail);
+
+                const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email: trimmedEmail})
+                });
             } catch (error) {
                 console.error('Error creating HubSpot contact:', error.message);
                 // Optionally handle or log the error here
             }
         }
-        
+
         console.log("Processed participantInfo:", participantInfo);
+        const sendEmailBackToZapir = () => {
+            const sendRsponse = async () => {
+
+            }
+        }
+
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Data processed successfully", participantInfo })
