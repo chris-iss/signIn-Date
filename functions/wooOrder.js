@@ -14,7 +14,7 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     try {
-        const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
+        const getNetlifyKey = event.queryStringParameters?.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
 
         if (getNetlifyKey !== getValidationKey) {
@@ -27,9 +27,23 @@ exports.handler = async (event) => {
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
 
-        const consumerKey = `${process.env.CONSUMERKEY}`; // Replace with your WooCommerce consumer key
-        const consumerSecret = `${process.env.CONSUMERSECRET}`; // Replace with your WooCommerce consumer secret
+        if (!orderId) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Missing orderId in the request body" })
+            };
+        }
+
+        const consumerKey = process.env.CONSUMERKEY;
+        const consumerSecret = process.env.CONSUMERSECRET;
         const baseUrl = 'https://www.stg.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
+
+        if (!consumerKey || !consumerSecret) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: "Missing WooCommerce credentials" })
+            };
+        }
 
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
@@ -51,16 +65,23 @@ exports.handler = async (event) => {
                 console.log('Order Details:', data);
                 return data;
             } catch (error) {
-                console.error(error.message);
+                console.error('Fetch error:', error.message);
                 return null;
             }
         };
-        await getOrderDetails();
 
+        const orderDetails = await getOrderDetails();
+
+        if (!orderDetails) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: "Failed to fetch order details" })
+            };
+        }
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Data processed successfully"})
+            body: JSON.stringify({ message: "Data processed successfully", orderDetails })
         };
     } catch (error) {
         console.error('Error processing data:', error.message);
