@@ -59,7 +59,7 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Data processed successfully", participantInfo })
+            body: JSON.stringify({ message: "Data processed successfully" })
         };
     } catch(error) {
         return {
