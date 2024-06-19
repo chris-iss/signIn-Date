@@ -150,7 +150,7 @@ exports.handler = async (event) => {
                         firstname: participant.firstName,
                         lastname: participant.lastName,
                         email: participant.email,
-                        currency: data.currency,
+                        currency: requestBody.currency,
                         startDate: requestBody.startdate
                     })
                 });
