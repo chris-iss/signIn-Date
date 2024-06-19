@@ -67,6 +67,7 @@ exports.handler = async (event) => {
                 }
 
                 const data = await response.json();
+                console.log("ORIGINAL-DATA", data)
 
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_']; 
                 const extractedData = data.meta_data
