@@ -83,6 +83,7 @@ exports.handler = async (event) => {
             }
         };
 
+        //
         const extractedData = await getOrderDetails();
 
         if (!extractedData) {
