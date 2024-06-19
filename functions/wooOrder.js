@@ -68,6 +68,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
                 console.log("ORIGINAL-DATA", data);
+                console.log("CURRENCY", data.currency)
 
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
@@ -84,7 +85,6 @@ exports.handler = async (event) => {
         };
 
         const extractedData = await getOrderDetails();
-        console.log("CURRENCY", extractedData.currency)
 
         if (!extractedData) {
             return {
@@ -151,7 +151,7 @@ exports.handler = async (event) => {
                         firstname: participant.firstName,
                         lastname: participant.lastName,
                         email: participant.email,
-                        currency: extractedData.currency,
+                        currency: data.currency,
                         startDate: requestBody.startdate
                     })
                 });
