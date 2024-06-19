@@ -67,7 +67,13 @@ exports.handler = async (event) => {
                 }
 
                 const data = await response.json();
-                console.log('Order Details:', data);
+
+                const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_']; 
+                const extractedData = data.meta_data
+                .filter(meta => keysToExtract
+                .includes(meta.key)) .map(meta => ({ key: meta.key, value: meta.value })); 
+                console.log("EXTRACTED-DATA",extractedData);
+
                 return data;
             } catch (error) {
                 console.error('Fetch error:', error.message);
