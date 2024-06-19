@@ -1,12 +1,9 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-// Global flag to ensure function isn't executed concurrently
 let isExecuting = false;
 
-// Main Lambda function handler
 exports.handler = async (event) => {
-    // Check if the function is already executing to avoid concurrent executions
     if (isExecuting) {
         return {
             statusCode: 409,
@@ -17,11 +14,9 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     try {
-        // Retrieve API key from query parameters and environment variables
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
 
-        // Validate API key
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
@@ -29,12 +24,10 @@ exports.handler = async (event) => {
             };
         }
 
-        // Parse the request body and extract order ID
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
         console.log("START-DATE", requestBody.startDate);
 
-        // Check for missing orderId in the request body
         if (!orderId) {
             return {
                 statusCode: 400,
@@ -42,12 +35,10 @@ exports.handler = async (event) => {
             };
         }
 
-        // WooCommerce credentials from environment variables
         const consumerKey = process.env.CONSUMERKEY;
         const consumerSecret = process.env.CONSUMERSECRET;
         const baseUrl = 'https://www.stg.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
 
-        // Check for missing WooCommerce credentials
         if (!consumerKey || !consumerSecret) {
             return {
                 statusCode: 500,
@@ -55,7 +46,8 @@ exports.handler = async (event) => {
             };
         }
 
-        // Function to fetch order details from WooCommerce
+        let selectedCourseIds = [];
+
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
@@ -76,7 +68,6 @@ exports.handler = async (event) => {
                 const data = await response.json();
                 console.log("ORIGINAL-DATA", data);
 
-                // Extract relevant meta data
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
                     .filter(meta => keysToExtract.includes(meta.key))
@@ -84,7 +75,6 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
-                // Map of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
                     "Sustainability Plan Development": "2755219",
@@ -101,23 +91,19 @@ exports.handler = async (event) => {
                     "Corporate Sustainability Reporting Directive - (CSRD)": "2730358",
                 };
 
-                // Extract list of courses selected
                 let courses = [];
                 const getCourseBought = data.line_items.map((course) => {
                     courses.push(course.name);
                 });
 
-                // Array to store course IDs
-                const selectedCourseIds = [];
-
-                // Map selected courses to their corresponding Thinkific course IDs
-                courses.forEach(course => {
+                selectedCourseIds = courses.map(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
-                        selectedCourseIds.push(moduleCourseIdMap[course]);
+                        return moduleCourseIdMap[course];
                     } else {
                         console.log(`Course ID not found for '${course}'`);
+                        return null;
                     }
-                });
+                }).filter(id => id !== null);
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
                 return extractedData;
@@ -127,10 +113,8 @@ exports.handler = async (event) => {
             }
         };
 
-        // Fetch extracted order details
         const extractedData = await getOrderDetails();
 
-        // Check if order details were fetched successfully
         if (!extractedData) {
             return {
                 statusCode: 500,
@@ -138,7 +122,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // If no participant data found, notify Zapier and exit
         if (extractedData.length === 0) {
             try {
                 const notifyZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
@@ -169,7 +152,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // Extract participants' information
         const participants = [];
         for (let i = 1; i <= 3; i++) {
             const nameKey = `name${i === 1 ? '_' : i + '_'}`;
@@ -184,7 +166,6 @@ exports.handler = async (event) => {
             }
         }
 
-        // Function to create or update a contact in HubSpot
         async function createHubSpotContact(firstName, lastName, email) {
             const url = `https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/${encodeURIComponent(email)}`;
 
@@ -215,7 +196,6 @@ exports.handler = async (event) => {
             return data;
         }
 
-        // Function to enroll a participant in a Thinkific course
         async function enrollInThinkific(firstName, lastName, email, courseId) {
             const url = `https://api.thinkific.com/api/public/v1/enrollments`;
 
@@ -245,18 +225,14 @@ exports.handler = async (event) => {
             return data;
         }
 
-        // Loop through participants and process each one
         for (const participant of participants) {
             try {
-                // Create or update contact in HubSpot
                 await createHubSpotContact(participant.firstName, participant.lastName, participant.email);
 
-                // Enroll participant in each selected Thinkific course
                 for (const courseId of selectedCourseIds) {
                     await enrollInThinkific(participant.firstName, participant.lastName, participant.email, courseId);
                 }
 
-                // Send response to Zapier
                 const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
                     method: "POST",
                     headers: {
