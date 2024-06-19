@@ -26,6 +26,7 @@ exports.handler = async (event) => {
 
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
+        console.log("START-DATE", requestBody.startDate)
 
         if (!orderId) {
             return {
@@ -83,6 +84,7 @@ exports.handler = async (event) => {
         };
 
         const extractedData = await getOrderDetails();
+        console.log("CURRENCY", extractedData.currency)
 
         if (!extractedData) {
             return {
