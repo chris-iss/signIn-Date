@@ -46,6 +46,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Declare selectedCourseIds here so it is available in the main scope
         let selectedCourseIds = [];
 
         const getOrderDetails = async () => {
@@ -276,3 +277,4 @@ exports.handler = async (event) => {
         isExecuting = false;
     }
 };
+
