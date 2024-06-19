@@ -76,15 +76,44 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
-                // Extract courses selected
+                const moduleCourseIdMap = {
+                    "Introduction to Business Sustainability": "2755212",
+                    "Sustainability Plan Development": "2755219",
+                    "Sustainability Plan Implementation": "2755224",
+                    "Decarbonisation: Achieving Net Zero": "2755233",
+                    "Circular Economy": "2755243",
+                    "Business with Biodiversity": "2755260",
+                    "Diversity, Equity, and Inclusion": "2755264",
+                    "Sustainable Finance": "2755272",
+                    "Sustainable Operations": "2755276",
+                    "Sustainable Supply Chain": "2755278",
+                    "Green Marketing": "2755281",
+                    "ESG Reporting and Auditing": "2755283",
+                    "Corporate Sustainability Reporting Directive": "2730358",
+                };
+
+                // Extract List of Courses Selected
                 let courses = []
+                
                 const getCourseBought = data.line_items
                 .map((course) => {
                     courses.push(course.name)
                 })
 
-                console.log("SELECTED-COURSE", getCourseBought);
-                console.log("EXTRACTED-COURSE", courses)
+                // Array to store course IDs
+                const selectedCourseIds = [];
+                
+                courses.forEach(course => {
+                    if (moduleCourseIdMap.hasOwnProperty(course)) {
+                        selectedCourseIds.push(moduleCourseIdMap[course]);
+                    } else {
+                        console.log(`Course ID not found for '${course}'`);
+                    }
+                });
+
+                // Now you can enroll the user using selectedCourseIds array
+                console.log("Enrolling user with course IDs:", selectedCourseIds);
+                                
 
                 return extractedData;
             } catch (error) {
