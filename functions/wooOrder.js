@@ -51,8 +51,8 @@ exports.handler = async (event) => {
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
 
             try {
-                console.log(`Fetching order details from: ${url}`);
-                console.log(`Using credentials: ${consumerKey} / ${consumerSecret}`);
+                //console.log(`Fetching order details from: ${url}`);
+                //console.log(`Using credentials: ${consumerKey} / ${consumerSecret}`);
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -76,6 +76,16 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
+                // Extract courses selected
+                let courses = []
+                const getCourseBought = data.line_items
+                .map((course) => {
+                    courses.push(course.name)
+                })
+
+                console.log("SELECTED-COURSE", getCourseBought);
+                console.log("EXTRACTED-COURSE", courses)
+
                 return extractedData;
             } catch (error) {
                 console.error('Fetch error:', error.message);
@@ -83,13 +93,44 @@ exports.handler = async (event) => {
             }
         };
 
-        //
         const extractedData = await getOrderDetails();
 
         if (!extractedData) {
             return {
                 statusCode: 500,
                 body: JSON.stringify({ message: "Failed to fetch order details" })
+            };
+        }
+
+        //  If the participant array is empty enroll with billing details
+        if (extractedData.length === 0) {
+            try {
+                const notifyZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "No participant data found for the order",
+                        orderId: orderId
+                    })
+                });
+
+
+                if (!notifyZapier.ok) {
+                    const zapierErrorData = await notifyZapier.json();
+                    console.error(`Failed to send notification to Zapier: ${notifyZapier.status} - ${zapierErrorData.message}`);
+                } else {
+                    const zapierResponseData = await notifyZapier.json();
+                    console.log(`Notification sent to Zapier successfully:`, zapierResponseData);
+                }
+            } catch (error) {
+                console.error('Error sending notification to Zapier:', error.message);
+            }
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: "No participant data found, notification sent to Zapier" })
             };
         }
 
