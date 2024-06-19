@@ -149,7 +149,7 @@ exports.handler = async (event) => {
                         firstname: participant.firstName,
                         lastname: participant.lastName,
                         email: participant.email,
-                        currency: requestBody.currency,
+                        currency: extractedData.currency,
                         startDate: requestBody.startdate
                     })
                 });
