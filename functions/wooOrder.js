@@ -89,12 +89,12 @@ exports.handler = async (event) => {
                     "Sustainable Supply Chain": "2755278",
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
-                    "Corporate Sustainability Reporting Directive": "2730358",
+                    "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                 };
 
                 // Extract List of Courses Selected
                 let courses = []
-                
+
                 const getCourseBought = data.line_items
                 .map((course) => {
                     courses.push(course.name)
