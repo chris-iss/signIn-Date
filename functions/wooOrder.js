@@ -26,7 +26,6 @@ exports.handler = async (event) => {
 
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        console.log("START-DATE", requestBody.startDate);
 
         if (!orderId) {
             return {
@@ -45,9 +44,6 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Missing WooCommerce credentials" })
             };
         }
-
-        // Declare selectedCourseIds here so it is available in the main scope
-        let selectedCourseIds = [];
 
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
@@ -97,24 +93,26 @@ exports.handler = async (event) => {
                     courses.push(course.name);
                 });
 
-                selectedCourseIds = courses.map(course => {
+                const selectedCourseIds = [];
+                
+                courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
-                        return moduleCourseIdMap[course];
+                        selectedCourseIds.push(moduleCourseIdMap[course]);
                     } else {
                         console.log(`Course ID not found for '${course}'`);
-                        return null;
                     }
-                }).filter(id => id !== null);
+                });
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
-                return extractedData;
+
+                return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 return null;
             }
         };
 
-        const extractedData = await getOrderDetails();
+        const { extractedData, selectedCourseIds } = await getOrderDetails();
 
         if (!extractedData) {
             return {
@@ -167,54 +165,48 @@ exports.handler = async (event) => {
             }
         }
 
-        async function createHubSpotContact(firstName, lastName, email) {
-            const url = `https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/${encodeURIComponent(email)}`;
-
-            const requestOptions = {
+        const createThinkificUser = async (firstName, lastName, email) => {
+            const url = 'https://api.thinkific.com/api/public/v1/users';
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    properties: [
-                        { property: 'firstname', value: firstName },
-                        { property: 'lastname', value: lastName },
-                        { property: 'email', value: email }
-                    ]
-                })
-            };
-
-            const response = await fetch(url, requestOptions);
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to create HubSpot contact: ${response.status} - ${errorData.message}`);
-            }
-
-            const data = await response.json();
-            console.log(`Contact created successfully for ${firstName} ${lastName}`);
-            return data;
-        }
-
-        async function enrollInThinkific(firstName, lastName, email, courseId) {
-            const url = `https://api.thinkific.com/api/public/v1/enrollments`;
-
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    "AUTHORIZATION": `Bearer ${process.env.THINKIFIC_API_KEY}`,
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json',
+                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
                 },
                 body: JSON.stringify({
                     first_name: firstName,
                     last_name: lastName,
-                    email: email,
-                    course_id: courseId
+                    email: email
                 })
-            };
+            });
 
-            const response = await fetch(url, requestOptions);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
+            }
+
+            const data = await response.json();
+            console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
+            return data.id;
+        };
+
+        const enrollInThinkificCourse = async (courseId, userId) => {
+            const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
+                },
+                body: JSON.stringify({
+                    course_id: courseId,
+                    user_id: userId,
+                    activated_at: new Date().toISOString(),
+                    expiry_date: null
+                })
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -222,19 +214,34 @@ exports.handler = async (event) => {
             }
 
             const data = await response.json();
-            console.log(`User enrolled successfully in course ${courseId}`);
+            console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
             return data;
-        }
+        };
 
         for (const participant of participants) {
             try {
-                await createHubSpotContact(participant.firstName, participant.lastName, participant.email);
+                const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                 for (const courseId of selectedCourseIds) {
-                    await enrollInThinkific(participant.firstName, participant.lastName, participant.email, courseId);
+                    await enrollInThinkificCourse(courseId, userId);
                 }
 
-                const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
+                await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
+                    method: 'POST',
+                    headers: {
+                        "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        properties: [
+                            { property: 'firstname', value: participant.firstName },
+                            { property: 'lastname', value: participant.lastName },
+                            { property: 'email', value: participant.email }
+                        ]
+                    })
+                });
+
+                await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -248,14 +255,6 @@ exports.handler = async (event) => {
                         skuCode: requestBody.skuCode
                     })
                 });
-
-                if (!sendResponseToZapier.ok) {
-                    const zapierErrorData = await sendResponseToZapier.json();
-                    console.error(`Failed to send data to Zapier for ${participant.email}: ${sendResponseToZapier.status} - ${zapierErrorData.message}`);
-                } else {
-                    const zapierResponseData = await sendResponseToZapier.json();
-                    console.log(`Data sent to Zapier successfully for ${participant.email}:`, zapierResponseData);
-                }
             } catch (error) {
                 console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
             }
@@ -277,4 +276,3 @@ exports.handler = async (event) => {
         isExecuting = false;
     }
 };
-
