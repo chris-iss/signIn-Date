@@ -63,7 +63,10 @@ exports.handler = async (event) => {
                 }
 
                 const data = await response.json();
-                console.log("ORIGINAL-DATA", data);
+                console.log("ORIGINAL-DATA - Firstname", data.billing.first_name);
+                console.log("ORIGINAL-DATA - Lastname", data.billing.last_name);
+                console.log("ORIGINAL-DATA - Email", data.billing.email);
+
 
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
@@ -183,7 +186,7 @@ exports.handler = async (event) => {
         
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`); // Log detailed error response
+                console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
                 throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
             }
         
