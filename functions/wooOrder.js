@@ -65,10 +65,12 @@ exports.handler = async (event) => {
                 const data = await response.json();
                 console.log("ORIGINAL-DATA", data);
 
-                const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_', 'phone_', 'phone2_', 'phone3_'];
+                const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
                     .filter(meta => keysToExtract.includes(meta.key))
                     .map(meta => ({ key: meta.key, value: meta.value }));
+
+                console.log("EXTRACTED-DATA", extractedData);
 
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
@@ -153,19 +155,18 @@ exports.handler = async (event) => {
         for (let i = 1; i <= 3; i++) {
             const nameKey = `name${i === 1 ? '_' : i + '_'}`;
             const emailKey = `email${i === 1 ? '_' : i + '_'}`;
-            const phoneKey = `phone${i === 1 ? '_' : i + '_'}`;
 
             const name = extractedData.find(item => item.key === nameKey)?.value;
             const email = extractedData.find(item => item.key === emailKey)?.value;
-            const phone = extractedData.find(item => item.key === phoneKey)?.value;
 
-            if (name && email && phone) {
+            if (name && email) {
                 const [firstName, lastName] = name.split(' ');
-                participants.push({ firstName, lastName, email, phone });
+                participants.push({ firstName, lastName, email });
             }
         }
 
-        const createThinkificUser = async (firstName, lastName, email, phone) => {
+        const createThinkificUser = async (firstName, lastName, email) => {
+            console.log(`Details passed to create thinkific user  ${firstName}, ${lastName}, ${email}`)
             const url = 'https://api.thinkific.com/api/public/v1/users';
             const headers = {
                 'Content-Type': 'application/json',
@@ -182,7 +183,7 @@ exports.handler = async (event) => {
                     first_name: firstName,
                     last_name: lastName,
                     email: email,
-                    phone_number: phone
+                    pnone: "0899765434"
                 })
             });
 
@@ -233,7 +234,7 @@ exports.handler = async (event) => {
 
         for (const participant of participants) {
             try {
-                const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email, participant.phone);
+                const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                 for (const courseId of selectedCourseIds) {
                     await enrollInThinkificCourse(courseId, userId);
@@ -249,7 +250,7 @@ exports.handler = async (event) => {
                         properties: [
                             { property: 'firstname', value: participant.firstName },
                             { property: 'lastname', value: participant.lastName },
-                            { property: 'email', value: participant.email },
+                            { property: 'email', value: participant.email }
                         ]
                     })
                 });
