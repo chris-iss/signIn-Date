@@ -26,6 +26,7 @@ exports.handler = async (event) => {
 
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
+        console.log(`UnbundleSkuCode ${requestBody.unbundledSkuCode} | DiplomaSkuCode ${requestBody.diplomaSkuCode}`)
 
         if (!orderId) {
             return {
@@ -63,10 +64,6 @@ exports.handler = async (event) => {
                 }
 
                 const data = await response.json();
-                console.log("ORIGINAL-DATA - Firstname", data.billing.first_name);
-                console.log("ORIGINAL-DATA - Lastname", data.billing.last_name);
-                console.log("ORIGINAL-DATA - Email", data.billing.email);
-
 
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
