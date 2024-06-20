@@ -183,7 +183,7 @@ exports.handler = async (event) => {
                     first_name: firstName,
                     last_name: lastName,
                     email: email,
-                    pnone: "0899765434"
+                    phone: "0899765434"
                 })
             });
 
