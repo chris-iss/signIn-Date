@@ -94,7 +94,7 @@ exports.handler = async (event) => {
                 });
 
                 const selectedCourseIds = [];
-                
+
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
                         selectedCourseIds.push(moduleCourseIdMap[course]);
@@ -172,7 +172,7 @@ exports.handler = async (event) => {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                    'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
                 },
                 body: JSON.stringify({
                     first_name: firstName,
