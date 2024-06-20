@@ -187,16 +187,18 @@ exports.handler = async (event) => {
                     send_welcome_email: false
                 })
             });
-
+        
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`); // Log detailed error response
                 throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
             }
-
+        
             const data = await response.json();
             console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
             return data.id;
         };
+        
 
         const enrollInThinkificCourse = async (courseId, userId) => {
             const url = 'https://api.thinkific.com/api/public/v1/enrollments';
