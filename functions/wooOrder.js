@@ -177,14 +177,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     first_name: firstName,
                     last_name: lastName,
-                    email: email,
-                    custom_profile_fields: [
-                        {
-                            value: "0899765434",
-                            custom_profile_field_definition_id: 1
-                        }
-                    ],
-                    send_welcome_email: false
+                    email: email
                 })
             });
         
