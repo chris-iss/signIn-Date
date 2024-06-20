@@ -170,7 +170,7 @@ exports.handler = async (event) => {
             const headers = {
                 'Content-Type': 'application/json',
                 'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
+                'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
             };
 
             console.log("Thinkific user creation headers:", headers);
