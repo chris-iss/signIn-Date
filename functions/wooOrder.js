@@ -250,7 +250,6 @@ exports.handler = async (event) => {
                             { property: 'firstname', value: participant.firstName },
                             { property: 'lastname', value: participant.lastName },
                             { property: 'email', value: participant.email },
-                            { property: 'phone', value: participant.phone }
                         ]
                     })
                 });
@@ -264,7 +263,6 @@ exports.handler = async (event) => {
                         firstname: participant.firstName,
                         lastname: participant.lastName,
                         email: participant.email,
-                        phone: participant.phone,
                         currency: requestBody.currency,
                         startDate: requestBody.startDate,
                         skuCode: requestBody.skuCode
