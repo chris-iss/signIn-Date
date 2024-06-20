@@ -4,6 +4,7 @@ require("dotenv").config();
 let isExecuting = false;
 
 exports.handler = async (event) => {
+    // Prevents function from executing multiple times simultaneously
     if (isExecuting) {
         return {
             statusCode: 409,
@@ -14,6 +15,7 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     try {
+        // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
 
@@ -24,6 +26,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
 
@@ -45,6 +48,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Function to get order details from WooCommerce
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
@@ -64,6 +68,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
+                // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
                     .filter(meta => keysToExtract.includes(meta.key))
@@ -71,6 +76,7 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
+                // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
                     "Sustainability Plan Development": "2755219",
@@ -94,6 +100,7 @@ exports.handler = async (event) => {
 
                 const selectedCourseIds = [];
 
+                // Select course IDs based on the courses bought
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
                         selectedCourseIds.push(moduleCourseIdMap[course]);
@@ -191,6 +198,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Extract participant information from order details
         const participants = [];
         for (let i = 1; i <= 3; i++) {
             const nameKey = `name${i === 1 ? '_' : i + '_'}`;
@@ -205,6 +213,7 @@ exports.handler = async (event) => {
             }
         }
 
+        // Function to create Thinkific user
         const createThinkificUser = async (firstName, lastName, email) => {
             const url = 'https://api.thinkific.com/api/public/v1/users';
             const response = await fetch(url, {
@@ -231,8 +240,8 @@ exports.handler = async (event) => {
             console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
             return data.id;
         };
-        
 
+        // Function to enroll user in Thinkific course
         const enrollInThinkificCourse = async (courseId, userId) => {
             const url = 'https://api.thinkific.com/api/public/v1/enrollments';
             const response = await fetch(url, {
@@ -260,6 +269,7 @@ exports.handler = async (event) => {
             return data;
         };
 
+        // Create Thinkific users and enroll them in courses
         for (const participant of participants) {
             try {
                 const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
@@ -268,6 +278,7 @@ exports.handler = async (event) => {
                     await enrollInThinkificCourse(courseId, userId);
                 }
 
+                // Create or update contact in HubSpot
                 await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
                     method: 'POST',
                     headers: {
@@ -283,6 +294,7 @@ exports.handler = async (event) => {
                     })
                 });
 
+                // Send data to Zapier
                 await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
                     method: "POST",
                     headers: {
