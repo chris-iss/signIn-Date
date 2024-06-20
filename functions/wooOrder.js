@@ -157,8 +157,10 @@ exports.handler = async (event) => {
                     return data.id;
                 };
                 
-                for (const courseId of selectedCourseIds) {
-                    await enrollInThinkificCourse(courseId, data.id);
+                if (data.id) {
+                    for (const courseId of selectedCourseIds) {
+                        await enrollInThinkificCourse(courseId, data.id);
+                    }
                 }
         
                 const enrollInThinkificCourse = async (courseId, userId) => {
@@ -198,6 +200,7 @@ exports.handler = async (event) => {
             };
         }
 
+
         // Extract participant information from order details
         const participants = [];
         for (let i = 1; i <= 3; i++) {
@@ -212,6 +215,7 @@ exports.handler = async (event) => {
                 participants.push({ firstName, lastName, email });
             }
         }
+
 
         // Function to create Thinkific user
         const createThinkificUser = async (firstName, lastName, email) => {
@@ -241,6 +245,7 @@ exports.handler = async (event) => {
             return data.id;
         };
 
+
         // Function to enroll user in Thinkific course
         const enrollInThinkificCourse = async (courseId, userId) => {
             const url = 'https://api.thinkific.com/api/public/v1/enrollments';
@@ -268,6 +273,7 @@ exports.handler = async (event) => {
             console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
             return data;
         };
+        
 
         // Create Thinkific users and enroll them in courses
         for (const participant of participants) {
