@@ -94,7 +94,7 @@ exports.handler = async (event) => {
                 });
 
                 const selectedCourseIds = [];
-
+                
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
                         selectedCourseIds.push(moduleCourseIdMap[course]);
@@ -166,14 +166,19 @@ exports.handler = async (event) => {
         }
 
         const createThinkificUser = async (firstName, lastName, email) => {
+            console.log(`Details passed to create thinkific user  ${firstName}, ${lastName}, ${email}`)
             const url = 'https://api.thinkific.com/api/public/v1/users';
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+            };
+
+            console.log("Thinkific user creation headers:", headers);
+
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                    'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-                },
+                headers: headers,
                 body: JSON.stringify({
                     first_name: firstName,
                     last_name: lastName,
@@ -181,25 +186,31 @@ exports.handler = async (event) => {
                 })
             });
 
+            const responseBody = await response.text();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
+                console.error('Response body:', responseBody);
+                throw new Error(`Failed to create Thinkific user: ${response.status} - ${responseBody}`);
             }
 
-            const data = await response.json();
+            const data = JSON.parse(responseBody);
             console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
             return data.id;
         };
 
         const enrollInThinkificCourse = async (courseId, userId) => {
             const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
+            };
+
+            console.log("Thinkific enrollment headers:", headers);
+
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                    'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
-                },
+                headers: headers,
                 body: JSON.stringify({
                     course_id: courseId,
                     user_id: userId,
@@ -208,12 +219,14 @@ exports.handler = async (event) => {
                 })
             });
 
+            const responseBody = await response.text();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
+                console.error('Response body:', responseBody);
+                throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${responseBody}`);
             }
 
-            const data = await response.json();
+            const data = JSON.parse(responseBody);
             console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
             return data;
         };
