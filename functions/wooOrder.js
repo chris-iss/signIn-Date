@@ -177,7 +177,8 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     first_name: firstName,
                     last_name: lastName,
-                    email: email
+                    email: email,
+                    phone: "0899765434"
                 })
             });
 
@@ -198,7 +199,7 @@ exports.handler = async (event) => {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                    'X-Auth-Subdomain': process.env.THINKIFIC_SUBDOMAIN
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
                 },
                 body: JSON.stringify({
                     course_id: courseId,
