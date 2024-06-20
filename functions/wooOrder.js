@@ -124,26 +124,67 @@ exports.handler = async (event) => {
             };
         }
 
+        // This function triggers only when participant array is empty.
         if (extractedData.length === 0) {
             try {
-                const notifyZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: "No participant data found for the order",
-                        orderId: orderId
-                    })
-                });
-
-                if (!notifyZapier.ok) {
-                    const zapierErrorData = await notifyZapier.json();
-                    console.error(`Failed to send notification to Zapier: ${notifyZapier.status} - ${zapierErrorData.message}`);
-                } else {
-                    const zapierResponseData = await notifyZapier.json();
-                    console.log(`Notification sent to Zapier successfully:`, zapierResponseData);
-                }
+                const createThinkificUser = async () => {
+                    const url = 'https://api.thinkific.com/api/public/v1/users';
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                            'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                        },
+                        body: JSON.stringify({
+                            first_name: data.billing.first_name,
+                            last_name: data.billing.last_name,
+                            email: data.billing.email
+                        })
+                    });
+                
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
+                        throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
+                    }
+                
+                    const data = await response.json();
+                    console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
+                    return data.id;
+                };
+                
+                //for (const courseId of selectedCourseIds) {
+                //    await enrollInThinkificCourse(courseId, userId);
+                //}
+        
+                const enrollInThinkificCourse = async (courseId, userId) => {
+                    const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                            'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                        },
+                        body: JSON.stringify({
+                            course_id: courseId,
+                            user_id: userId,
+                            activated_at: new Date().toISOString(),
+                            expiry_date: null
+                        })
+                    });
+        
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
+                    }
+        
+                    const data = await response.json();
+                    console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+                    return data;
+                };
+        
             } catch (error) {
                 console.error('Error sending notification to Zapier:', error.message);
             }
@@ -219,7 +260,7 @@ exports.handler = async (event) => {
             }
 
             const data = await response.json();
-            console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+            console.log(`User enrolled in Thinkific course successfully: ${courseId} userId: ${data.id}`);
             return data;
         };
 
