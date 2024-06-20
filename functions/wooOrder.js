@@ -154,9 +154,9 @@ exports.handler = async (event) => {
                     return data.id;
                 };
                 
-                //for (const courseId of selectedCourseIds) {
-                //    await enrollInThinkificCourse(courseId, userId);
-                //}
+                for (const courseId of selectedCourseIds) {
+                    await enrollInThinkificCourse(courseId, data.id);
+                }
         
                 const enrollInThinkificCourse = async (courseId, userId) => {
                     const url = 'https://api.thinkific.com/api/public/v1/enrollments';
@@ -232,7 +232,7 @@ exports.handler = async (event) => {
             }
         
             const data = await response.json();
-            console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
+            console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
             return data.id;
         };
         
@@ -260,7 +260,7 @@ exports.handler = async (event) => {
             }
 
             const data = await response.json();
-            console.log(`User enrolled in Thinkific course successfully: ${courseId} userId: ${data.id}`);
+            console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
             return data;
         };
 
