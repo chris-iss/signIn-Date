@@ -26,7 +26,6 @@ exports.handler = async (event) => {
 
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        console.log(`UnbundleSkuCode ${requestBody.unbundledSkuCode} | DiplomaSkuCode ${requestBody.diplomaSkuCode}`)
 
         if (!orderId) {
             return {
@@ -295,7 +294,8 @@ exports.handler = async (event) => {
                         email: participant.email,
                         currency: requestBody.currency,
                         startDate: requestBody.startDate,
-                        skuCode: requestBody.skuCode
+                        unbundledSkuCode: requestBody.unbundledSkuCode,
+                        diplomaSkuCode: requestBody.diplomaSkuCode
                     })
                 });
             } catch (error) {
