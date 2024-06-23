@@ -39,7 +39,7 @@ exports.handler = async (event) => {
 
         const consumerKey = process.env.CONSUMERKEY;
         const consumerSecret = process.env.CONSUMERSECRET;
-        const baseUrl = 'https://www.stg.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
+        const baseUrl = 'https://www.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
 
         if (!consumerKey || !consumerSecret) {
             return {
@@ -91,6 +91,7 @@ exports.handler = async (event) => {
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
                     "Corporate Sustainability Reporting Directive - (CSRD)": "2730358",
+                    "Diploma in Business Sustainability 2024": "2622273"
                 };
 
                 let courses = [];
@@ -273,7 +274,7 @@ exports.handler = async (event) => {
             console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
             return data;
         };
-        
+
 
         // Create Thinkific users and enroll them in courses
         for (const participant of participants) {
