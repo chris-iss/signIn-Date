@@ -128,7 +128,7 @@ exports.handler = async (event) => {
             };
         }
 
-        // This function triggers only when participant array is empty.
+        // This function triggers only when extractedData(participants) array is empty and enrolls user into thinkific.
         if (extractedData.length === 0) {
             try {
                 const createThinkificUser = async () => {
@@ -146,6 +146,7 @@ exports.handler = async (event) => {
                             email: data.billing.email
                         })
                     });
+
                 
                     if (!response.ok) {
                         const errorData = await response.json();
@@ -157,6 +158,8 @@ exports.handler = async (event) => {
                     console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
                     return data.id;
                 };
+
+                await createThinkificUser();
                 
                 if (data.id) {
                     for (const courseId of selectedCourseIds) {
@@ -164,6 +167,7 @@ exports.handler = async (event) => {
                     }
                 }
         
+                //Enrol user into thinkific course
                 const enrollInThinkificCourse = async (courseId, userId) => {
                     const url = 'https://api.thinkific.com/api/public/v1/enrollments';
                     const response = await fetch(url, {
@@ -202,7 +206,82 @@ exports.handler = async (event) => {
         }
 
 
-        // Extract participant information from order details
+        //Function to set Buyer hubspot contact propertty to Yes
+        if (extractedData.length > 0) {
+
+            //Update Buyer not Participant Conatct Property
+            const updateBuyerNotParticipantProperty = async (contactId, setToYes) => {
+    
+                // Define the properties object for updating HubSpot contact
+                const thinkificSignDateProperty = {
+                    "properties": {
+                        "buyer_not_participant": setToYes,
+                    }  
+                };
+    
+                // Make a PATCH request to update the HubSpot contact
+                const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(thinkificSignDateProperty)
+                });
+    
+                const response = await updateContact.json();
+                console.log("Buy Not Participant Update", response);
+            };
+
+
+             // Function to search for a HubSpot contact using Thinkific email
+            const hubspotSearchContact = async () => {
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+
+                try {
+                    const hubspotSearchProperties = {
+                        after: "0",
+                        filterGroups: [
+                            { filters: [{ operator: "EQ", propertyName: "email", value: data.billing.email }] },
+                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: data.billing.email }] },
+                        ],
+                        limit: "100",
+                        properties: ["email", "buyer_not_participant", "id"], // Include id for updating
+                        sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
+                    };
+
+                    // Make a POST request to search for HubSpot contacts
+                    const searchContact = await fetch(hubspotBaseURL, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(hubspotSearchProperties),
+                    });
+
+                    // Parse the response from HubSpot contact search by email
+                    const hubspotContactResponse = await searchContact.json();
+                    console.log("SEARCH RESULT:", hubspotContactResponse)
+
+            
+
+                    // If Thinkific access date is empty or null, update the property
+                    //if (extractThinkificAccessDate === "" || extractThinkificAccessDate === null) {
+                        //let buyerNotParticipant = "Yes"
+                        //await updateBuyerNotParticipantProperty(extractHubspotUserId, buyerNotParticipant);
+                    //}
+                } catch (error) {
+                    console.log("HUBSPOT SEARCH ERROR", error.message);
+                }
+            };
+
+            await hubspotSearchContact();
+        }
+
+
+
+        // ENGINE FUNCTION - Extract participant information from order details
         const participants = [];
         for (let i = 1; i <= 3; i++) {
             const nameKey = `name${i === 1 ? '_' : i + '_'}`;
