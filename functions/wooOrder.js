@@ -29,7 +29,6 @@ exports.handler = async (event) => {
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        let rawData;
 
         if (!orderId) {
             return {
@@ -69,7 +68,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
-                rawData = data
+                let rawData = data
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -115,14 +114,14 @@ exports.handler = async (event) => {
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
-                return { extractedData, selectedCourseIds };
+                return { rawData, extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 return null;
             }
         };
 
-        const { extractedData, selectedCourseIds } = await getOrderDetails();
+        const {rawData, extractedData, selectedCourseIds } = await getOrderDetails();
 
         if (!extractedData) {
             return {
@@ -144,9 +143,9 @@ exports.handler = async (event) => {
                             'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
                         },
                         body: JSON.stringify({
-                            first_name: data.billing.first_name,
-                            last_name: data.billing.last_name,
-                            email: data.billing.email
+                            first_name: rawData.billing.first_name,
+                            last_name: rawData.billing.last_name,
+                            email: rawData.billing.email
                         })
                     });
 
