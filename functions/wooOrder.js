@@ -264,7 +264,8 @@ exports.handler = async (event) => {
 
                     // Parse the response from HubSpot contact search by email
                     const hubspotContactResponse = await searchContact.json();
-                    console.log("SEARCH RESULT:", hubspotContactResponse)
+                    const hubspotExtractedData = hubspotContactResponse.results[0].properties
+                    console.log("SEARCH RESULT:", hubspotExtractedData)
 
             
 
