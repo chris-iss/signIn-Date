@@ -286,6 +286,7 @@ exports.handler = async (event) => {
 
 
             const getDealsByContactId = async () => {
+                console.log("ID", contactId)
                 const hubspotBaseURL = `https://api.hubapi.com/crm/v3/associations/contacts/deals/${contactId}`;
             
                 const response = await fetch(hubspotBaseURL, {
