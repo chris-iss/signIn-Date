@@ -237,6 +237,33 @@ exports.handler = async (event) => {
             };
 
 
+            //Get Deal Id from hubspott
+            const getDealsByContactId = async (contactId) => {
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/associations/contacts/deals/${contactId}`;
+            
+                try {
+                    const response = await fetch(hubspotBaseURL, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error(`HubSpot deal retrieval failed: ${response.statusText}`);
+                    }
+            
+                    const data = await response.json();
+                    console.log("GET DEAL ID", data)
+                    return data.results;
+                } catch (error) {
+                    console.error("Error retrieving HubSpot deals:", error.message);
+                    throw error;
+                }
+            };
+
+
              // Function to search for a HubSpot contact using Thinkific email
             const hubspotSearchContact = async () => {
                 const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
@@ -274,7 +301,8 @@ exports.handler = async (event) => {
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
                         let buyerNotParticipant = true
-                        await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
+                        await getDealsByContactId(hsObjectId)
+                        //await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
                     }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
