@@ -273,7 +273,7 @@ exports.handler = async (event) => {
 
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
-                        let buyerNotParticipant = "Yes"
+                        let buyerNotParticipant = true
                         await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
                     }
                 } catch (error) {
