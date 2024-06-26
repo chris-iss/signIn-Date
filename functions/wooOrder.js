@@ -30,6 +30,7 @@ exports.handler = async (event) => {
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
         const billingUserEmail = requestBody.billing_user_email
+        let contactId = "";
 
         if (!orderId) {
             return {
@@ -269,7 +270,7 @@ exports.handler = async (event) => {
                     const buyNotPart = hubspotContactResponse.results[0].properties.buyer_not_participant;
                     console.log("SEARCH RESULT:", hsObjectId, buyNotPart)
 
-            
+                    contactId = hsObjectId
 
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
@@ -282,6 +283,27 @@ exports.handler = async (event) => {
             };
 
             await hubspotSearchContact();
+
+
+            const getDealsByContactId = async () => {
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/associations/contacts/deals/${contactId}`;
+            
+                const response = await fetch(hubspotBaseURL, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+            
+                if (!response.ok) {
+                    throw new Error(`HubSpot deal retrieval failed: ${response.statusText}`);
+                }
+            
+                const data = await response.json();
+                console.log("DEAL SEARCH RESULT:", data)
+                return data.results;
+            };
         }
 
 
