@@ -93,7 +93,7 @@ exports.handler = async (event) => {
                     "Sustainable Supply Chain": "2755278",
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
-                    "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
+                    "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability 2024": "2622273"
                 };
 
@@ -209,54 +209,31 @@ exports.handler = async (event) => {
         }
 
 
-        //Function to Create deal and Update Buyer Not Participant CP under Deal
+        ////////////////Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else//////////////////////////
         if (extractedData.length > 0) {
 
-            // Function to update the `buyer_not_participant` property of a deal
-            const updateBuyerNotParticipantProperty = async (dealId, setToYes) => {
-                const propertyUpdate = {
-                    properties: {
-                        buyer_not_participant: setToYes,
-                    }
+            //Update Buyer not Participant Conatct Property
+            const updateBuyerNotParticipantProperty = async (contactId, setToYes) => {
+    
+                // Define the properties object for updating HubSpot contact
+                const thinkificSignDateProperty = {
+                    "properties": {
+                        "buyer_not_participant": setToYes,
+                    }  
                 };
-
-                const updateDeal = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${dealId}`, {
+    
+                // Make a PATCH request to update the HubSpot contact
+                const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
                     method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(propertyUpdate)
+                    body: JSON.stringify(thinkificSignDateProperty)
                 });
-
-                const response = await updateDeal.json();
+    
+                const response = await updateContact.json();
                 console.log("Buyer Not Participant Update Response:", response);
-            };
-
-            // Function to create a deal in HubSpot
-            const createHubSpotDeal = async (contactId) => {
-                const dealData = {
-                    properties: {
-                        dealname: `Deal for ${billingUserEmail}`,
-                        hubspot_owner_id: contactId,
-                        pipeline: "default",
-                        dealstage: "appointmentscheduled",
-                        buyer_not_participant: true
-                    }
-                };
-
-                const createDeal = await fetch(`https://api.hubapi.com/crm/v3/objects/deals`, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(dealData)
-                });
-
-                const response = await createDeal.json();
-                console.log("Deal Created Response:", response);
-                return response.id;
             };
 
 
@@ -297,8 +274,7 @@ exports.handler = async (event) => {
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
                         let buyerNotParticipant = true
-                        const dealId = await createHubSpotDeal(hsObjectId);
-                        await updateBuyerNotParticipantProperty(dealId, buyerNotParticipant);
+                        await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
                     }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
@@ -326,7 +302,7 @@ exports.handler = async (event) => {
         }
 
 
-        // Function to create Thinkific user for multiple creation
+        // Function to create Thinkific user
         const createThinkificUser = async (firstName, lastName, email) => {
             const url = 'https://api.thinkific.com/api/public/v1/users';
             const response = await fetch(url, {
@@ -390,6 +366,7 @@ exports.handler = async (event) => {
                 const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                 for (const courseId of selectedCourseIds) {
+                    console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`)
                     await enrollInThinkificCourse(courseId, userId);
                 }
 
