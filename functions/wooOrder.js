@@ -29,7 +29,7 @@ exports.handler = async (event) => {
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        const billingUserEmail = requestBody.billing_user_email;
+        const billingUserEmail = requestBody.billing_user_email
 
         if (!orderId) {
             return {
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
-                let rawData = data;
+                let rawData = data
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -79,7 +79,7 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
-                // Mapping of course names to Thinkific course IDs
+                // Mapping of course names to Thinkific course IDss
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
                     "Sustainability Plan Development": "2755219",
@@ -93,7 +93,7 @@ exports.handler = async (event) => {
                     "Sustainable Supply Chain": "2755278",
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
-                    "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
+                    "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability 2024": "2622273"
                 };
 
@@ -122,7 +122,7 @@ exports.handler = async (event) => {
             }
         };
 
-        const { rawData, extractedData, selectedCourseIds } = await getOrderDetails();
+        const {rawData, extractedData, selectedCourseIds } = await getOrderDetails();
 
         if (!extractedData) {
             return {
@@ -131,7 +131,7 @@ exports.handler = async (event) => {
             };
         }
 
-        // This function triggers only when extractedData(participants) array is empty and enrolls user into Thinkific.
+        // This function triggers only when extractedData(participants) array is empty and enrolls user into thinkific.
         if (extractedData.length === 0) {
             try {
                 const createThinkificUser = async () => {
@@ -150,25 +150,27 @@ exports.handler = async (event) => {
                         })
                     });
 
+                
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
                         throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
                     }
-
+                
                     const data = await response.json();
                     console.log(`Thinkific user created successfully for ${firstName} ${lastName}`);
                     return data.id;
                 };
 
-                const userId = await createThinkificUser();
-
-                if (userId) {
+                await createThinkificUser();
+                
+                if (data.id) {
                     for (const courseId of selectedCourseIds) {
-                        await enrollInThinkificCourse(courseId, userId);
+                        await enrollInThinkificCourse(courseId, data.id);
                     }
                 }
-
+        
+                //Enrol user into thinkific course
                 const enrollInThinkificCourse = async (courseId, userId) => {
                     const url = 'https://api.thinkific.com/api/public/v1/enrollments';
                     const response = await fetch(url, {
@@ -181,102 +183,240 @@ exports.handler = async (event) => {
                         body: JSON.stringify({
                             course_id: courseId,
                             user_id: userId,
-                            activated: true
+                            activated_at: new Date().toISOString(),
+                            expiry_date: null
                         })
                     });
-
+        
                     if (!response.ok) {
                         const errorData = await response.json();
-                        console.error(`Failed to enroll in course: ${response.status} - ${JSON.stringify(errorData)}`);
-                        throw new Error(`Failed to enroll in course: ${response.status} - ${errorData.message}`);
+                        throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
                     }
-
+        
                     const data = await response.json();
-                    console.log(`User successfully enrolled in course with ID: ${courseId}`);
+                    console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+                    return data;
                 };
+        
             } catch (error) {
-                console.error('Error creating Thinkific user or enrolling in course:', error.message);
+                console.error('Error sending notification to Zapier:', error.message);
             }
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: "No participant data found, notification sent to Zapier" })
+            };
         }
 
-        const isParticipantArrayEmpty = extractedData.length === 0;
-        console.log('IS-PARTICIPANT-ARRAY-EMPTY:', isParticipantArrayEmpty);
 
-        // Function to set BuyerNotParticipant hubspot contact property to true when buying the modules for someone else
-        const updateBuyerNotParticipantProperty = async (contactId, setToTrue) => {
-            // Define the properties object for updating HubSpot contact
-            const thinkificSignDateProperty = {
-                "properties": {
-                    "buyer_not_participant": setToTrue, // Set to boolean true
+        //Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else
+        if (extractedData.length > 0) {
+
+            //Update Buyer not Participant Conatct Property
+            const updateBuyerNotParticipantProperty = async (contactId, setToYes) => {
+    
+                // Define the properties object for updating HubSpot contact
+                const thinkificSignDateProperty = {
+                    "properties": {
+                        "buyer_not_participant": setToYes,
+                    }  
+                };
+    
+                // Make a PATCH request to update the HubSpot contact
+                const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(thinkificSignDateProperty)
+                });
+    
+                const response = await updateContact.json();
+                console.log("Buyer Not Participant Update Response:", response);
+            };
+
+
+             // Function to search for a HubSpot contact using Thinkific email
+            const hubspotSearchContact = async () => {
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+
+                try {
+                    const hubspotSearchProperties = {
+                        after: "0",
+                        filterGroups: [
+                            { filters: [{ operator: "EQ", propertyName: "email", value: billingUserEmail }] },
+                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: billingUserEmail }] },
+                        ],
+                        limit: "100",
+                        properties: ["email", "buyer_not_participant", "id"], // Include id for updating
+                        sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
+                    };
+
+                    // Make a POST request to search for HubSpot contacts
+                    const searchContact = await fetch(hubspotBaseURL, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(hubspotSearchProperties),
+                    });
+
+                    // Parse the response from HubSpot contact search by email
+                    const hubspotContactResponse = await searchContact.json();
+                    const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
+                    const buyNotPart = hubspotContactResponse.results[0].properties.buyer_not_participant;
+                    console.log("SEARCH RESULT:", hsObjectId, buyNotPart)
+
+            
+
+                    // If hubspotId and buyerNotParticipant, update the property
+                    if (hsObjectId) {
+                        let buyerNotParticipant = "Yes"
+                        await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
+                    }
+                } catch (error) {
+                    console.log("HUBSPOT SEARCH ERROR", error.message);
                 }
             };
 
-            // Make a PATCH request to update the HubSpot contact
-            const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
-                method: "PATCH",
+            await hubspotSearchContact();
+        }
+
+
+
+        // ENGINE FUNCTION - Extract participant information from order details
+        const participants = [];
+        for (let i = 1; i <= 3; i++) {
+            const nameKey = `name${i === 1 ? '_' : i + '_'}`;
+            const emailKey = `email${i === 1 ? '_' : i + '_'}`;
+
+            const name = extractedData.find(item => item.key === nameKey)?.value;
+            const email = extractedData.find(item => item.key === emailKey)?.value;
+
+            if (name && email) {
+                const [firstName, lastName] = name.split(' ');
+                participants.push({ firstName, lastName, email });
+            }
+        }
+
+
+        // Function to create Thinkific user
+        const createThinkificUser = async (firstName, lastName, email) => {
+            const url = 'https://api.thinkific.com/api/public/v1/users';
+            const response = await fetch(url, {
+                method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
+                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
                 },
-                body: JSON.stringify(thinkificSignDateProperty)
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email
+                })
+            });
+        
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
+                throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
+            }
+        
+            const data = await response.json();
+            console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
+            return data.id;
+        };
+
+
+        // Function to enroll user in Thinkific course
+        const enrollInThinkificCourse = async (courseId, userId) => {
+            const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                    'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                },
+                body: JSON.stringify({
+                    course_id: courseId,
+                    user_id: userId,
+                    activated_at: new Date().toISOString(),
+                    expiry_date: null
+                })
             });
 
-            const response = await updateContact.json();
-            console.log("Buyer Not Participant Update Response:", response);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
+            }
+
+            const data = await response.json();
+            console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+            return data;
         };
 
-        // Function to search for a HubSpot contact using Thinkific email
-        const hubspotSearchContact = async () => {
-            const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
+        // Create Thinkific users and enroll them in courses
+        for (const participant of participants) {
             try {
-                const hubspotSearchProperties = {
-                    after: "0",
-                    filterGroups: [
-                        { filters: [{ operator: "EQ", propertyName: "email", value: billingUserEmail }] },
-                        { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: billingUserEmail }] },
-                    ],
-                    limit: "100",
-                    properties: ["email", "buyer_not_participant", "id"], // Include id for updating
-                    sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-                };
+                const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
-                // Make a POST request to search for HubSpot contacts
-                const searchContact = await fetch(hubspotBaseURL, {
-                    method: "POST",
+                for (const courseId of selectedCourseIds) {
+                    await enrollInThinkificCourse(courseId, userId);
+                }
+
+                // Create or update contact in HubSpot
+                await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
+                    method: 'POST',
                     headers: {
-                        "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                        "Content-Type": "application/json",
+                        "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(hubspotSearchProperties),
+                    body: JSON.stringify({
+                        properties: [
+                            { property: 'firstname', value: participant.firstName },
+                            { property: 'lastname', value: participant.lastName },
+                            { property: 'email', value: participant.email }
+                        ]
+                    })
                 });
 
-                // Parse the response from HubSpot contact search by email
-                const hubspotContactResponse = await searchContact.json();
-                const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
-                const buyNotPart = hubspotContactResponse.results[0].properties.buyer_not_participant;
-                console.log("SEARCH RESULT:", hsObjectId, buyNotPart)
-
-                // If hsObjectId is found, update the buyer_not_participant property
-                if (hsObjectId) {
-                    await updateBuyerNotParticipantProperty(hsObjectId, true); // Pass boolean true
-                }
+                // Send data to Zapier
+                await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        firstname: participant.firstName,
+                        lastname: participant.lastName,
+                        email: participant.email,
+                        currency: requestBody.currency,
+                        startDate: requestBody.startDate,
+                        unbundledSkuCode: requestBody.unbundledSkuCode,
+                        diplomaSkuCode: requestBody.diplomaSkuCode
+                    })
+                });
             } catch (error) {
-                console.log("HUBSPOT SEARCH ERROR", error.message);
+                console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
             }
-        };
+        }
 
-        await hubspotSearchContact();
+        console.log("Processed participantInfo:", participants);
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Process completed successfully" })
+            body: JSON.stringify({ message: "Data processed successfully", participants })
         };
     } catch (error) {
-        console.error('Handler error:', error.message);
+        console.error('Error processing data:', error.message);
         return {
-            statusCode: 500,
-            body: JSON.stringify({ message: `Error: ${error.message}` })
+            statusCode: 400,
+            body: JSON.stringify({ message: error.message })
         };
     } finally {
         isExecuting = false;
