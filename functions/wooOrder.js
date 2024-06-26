@@ -304,9 +304,9 @@ exports.handler = async (event) => {
                 console.log("DEAL SEARCH RESULT:", data)
                 return data.results;
             };
-        }
 
-        await getDealsByContactId();
+            await getDealsByContactId();
+        }
 
 
 
