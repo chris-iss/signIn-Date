@@ -306,6 +306,8 @@ exports.handler = async (event) => {
             };
         }
 
+        await getDealsByContactId();
+
 
 
         // ENGINE FUNCTION - Extract participant information from order details
