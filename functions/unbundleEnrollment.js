@@ -84,7 +84,7 @@ exports.handler = async (event) => {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ firstname: trimmedFirstname, lastname: trimmedLastname, email: trimmedEmail, currency: currency, startDate: startDate })
+                    body: JSON.stringify({ firstname: trimmedFirstname, lastname: trimmedLastname, email:trimmedEmail, currency: currency, startDate: startDate })
                 });
 
                 if (!sendResponseToZapier.ok) {
