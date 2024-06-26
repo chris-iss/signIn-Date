@@ -29,6 +29,7 @@ exports.handler = async (event) => {
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
+        const billingUserEmail = requestBody.billing_user_email
 
         if (!orderId) {
             return {
@@ -244,8 +245,8 @@ exports.handler = async (event) => {
                     const hubspotSearchProperties = {
                         after: "0",
                         filterGroups: [
-                            { filters: [{ operator: "EQ", propertyName: "email", value: rawData.billing.email }] },
-                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: rawData.billing.email }] },
+                            { filters: [{ operator: "EQ", propertyName: "email", value: billingUserEmail }] },
+                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: billingUserEmail }] },
                         ],
                         limit: "100",
                         properties: ["email", "buyer_not_participant", "id"], // Include id for updating
