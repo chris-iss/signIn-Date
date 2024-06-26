@@ -239,7 +239,7 @@ exports.handler = async (event) => {
 
              // Function to search for a HubSpot contact using Thinkific email
             const hubspotSearchContact = async () => {
-                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/deals/search`;
 
                 try {
                     const hubspotSearchProperties = {
