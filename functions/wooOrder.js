@@ -208,7 +208,7 @@ exports.handler = async (event) => {
         }
 
 
-        //Function to set Buyer hubspot contact propertty to Yes
+        //Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else
         if (extractedData.length > 0) {
 
             //Update Buyer not Participant Conatct Property
@@ -232,7 +232,7 @@ exports.handler = async (event) => {
                 });
     
                 const response = await updateContact.json();
-                console.log("Buy Not Participant Update", response);
+                console.log("Buyer Not Participant Update Response:", response);
             };
 
 
@@ -264,16 +264,17 @@ exports.handler = async (event) => {
 
                     // Parse the response from HubSpot contact search by email
                     const hubspotContactResponse = await searchContact.json();
-                    const hubspotExtractedData = hubspotContactResponse.results[0].properties
-                    console.log("SEARCH RESULT:", hubspotExtractedData)
+                    const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
+                    const buyNotPart = hubspotContactResponse.results[0].properties.buyer_not_participant;
+                    console.log("SEARCH RESULT:", hsObjectId, buyNotPart)
 
             
 
-                    // If Thinkific access date is empty or null, update the property
-                    //if (extractThinkificAccessDate === "" || extractThinkificAccessDate === null) {
-                        //let buyerNotParticipant = "Yes"
-                        //await updateBuyerNotParticipantProperty(extractHubspotUserId, buyerNotParticipant);
-                    //}
+                    // If hubspotId and buyerNotParticipant, update the property
+                    if (hsObjectId) {
+                        let buyerNotParticipant = "Yes"
+                        await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
+                    }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
                 }
