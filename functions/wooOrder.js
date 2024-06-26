@@ -209,7 +209,7 @@ exports.handler = async (event) => {
         }
 
 
-        //Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else
+        ////////////////Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else//////////////////////////
         if (extractedData.length > 0) {
 
             //Update Buyer not Participant Conatct Property
@@ -366,6 +366,7 @@ exports.handler = async (event) => {
                 const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                 for (const courseId of selectedCourseIds) {
+                    console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`)
                     await enrollInThinkificCourse(courseId, userId);
                 }
 
