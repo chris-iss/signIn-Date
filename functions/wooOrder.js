@@ -312,6 +312,7 @@ exports.handler = async (event) => {
 
                 // Loop through the extractedData array and enroll each participant into the Thinkific courses
                 for (const participant of extractedData) {
+                    console.log("WHAT IS HERE", participant)
                     const participantEmail = participant.value;
                     const participantFirstName = participant.key.split('_')[1];
                     const participantLastName = participant.key.split('_')[1];
