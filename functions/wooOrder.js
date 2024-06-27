@@ -237,6 +237,33 @@ exports.handler = async (event) => {
             };
 
 
+            // Function to create a deal in HubSpot
+            const createHubSpotDeal = async (contactId) => {
+                const dealData = {
+                    properties: {
+                        dealname: `Deal for ${billingUserEmail}`,
+                        hubspot_owner_id: contactId,
+                        pipeline: "default",
+                        dealstage: "appointmentscheduled",
+                        buyer_not_participant: true
+                    }
+                };
+
+                const createDeal = await fetch(`https://api.hubapi.com/crm/v3/objects/deals`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(dealData)
+                });
+
+                const response = await createDeal.json();
+                console.log("Deal Created Response:", response);
+                return response.id;
+            };
+
+
              // Function to search for a HubSpot contact using Thinkific email //
             const hubspotSearchContact = async () => {
                 const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
@@ -274,6 +301,7 @@ exports.handler = async (event) => {
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
                         let buyerNotParticipant = true
+                        await createHubSpotDeal(hsObjectId);
                         await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
                     }
                 } catch (error) {
