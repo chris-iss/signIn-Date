@@ -302,9 +302,9 @@ exports.handler = async (event) => {
                         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
                         const updatePropertyWithDelay = async (hsObjectId, buyerNotParticipantYes) => {
-                            console.log("RUNNING NOW")
                             try {
-                                await delay(60000); 
+                                await delay(60000);
+                                console.log("RUNNING NOW")
 
                                 // Trigger first to set Buyer Not Partticipant to Yes after 1 minute delay
                                 await updateBuyerNotParticipantPropertyYes(hsObjectId, buyerNotParticipantYes);
