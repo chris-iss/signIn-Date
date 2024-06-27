@@ -302,6 +302,7 @@ exports.handler = async (event) => {
                         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
                         const updatePropertyWithDelay = async (hsObjectId, buyerNotParticipantYes) => {
+                            console.log("RUNNING NOW")
                             try {
                                 await delay(60000); 
 
