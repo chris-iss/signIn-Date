@@ -212,8 +212,8 @@ exports.handler = async (event) => {
         ////////////////Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else//////////////////////////
         if (extractedData.length > 0) {
 
-            //Update Buyer not Participant Conatct Property
-            const updateBuyerNotParticipantProperty = async (contactId, setToYes) => {
+            //Update Buyer not Participant Conatct Property to Yes
+            const updateBuyerNotParticipantPropertyYes = async (contactId, setToYes) => {
     
                 // Define the properties object for updating HubSpot contact
                 const thinkificSignDateProperty = {
@@ -236,35 +236,32 @@ exports.handler = async (event) => {
                 console.log("Buyer Not Participant Update Response:", response);
             };
 
-
-            // Function to create a deal in HubSpot
-            const createHubSpotDeal = async (contactId) => {
-                const dealData = {
-                    properties: {
-                        dealname: `Deal for ${billingUserEmail}`,
-                        hubspot_owner_id: contactId,
-                        pipeline: "default",
-                        dealstage: "appointmentscheduled",
-                        buyer_not_participant: true
-                    }
+            //Update Buyer not Participant Conatct Property to No
+            const updateBuyerNotParticipantPropertyNo = async (contactId, setToNo) => {
+    
+                // Define the properties object for updating HubSpot contact
+                const thinkificSignDateProperty = {
+                    "properties": {
+                        "buyer_not_participant": setToNo,
+                    }  
                 };
-
-                const createDeal = await fetch(`https://api.hubapi.com/crm/v3/objects/deals`, {
-                    method: "POST",
+    
+                // Make a PATCH request to update the HubSpot contact
+                const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
+                    method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(dealData)
+                    body: JSON.stringify(thinkificSignDateProperty)
                 });
-
-                const response = await createDeal.json();
-                console.log("Deal Created Response:", response);
-                return response.id;
+    
+                const response = await updateContact.json();
+                console.log("Buyer Not Participant Update Response:", response);
             };
 
 
-             // Function to search for a HubSpot contact using Thinkific email //
+             // Function to search for a HubSpot contact using Thinkific email
             const hubspotSearchContact = async () => {
                 const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
@@ -293,16 +290,30 @@ exports.handler = async (event) => {
                     // Parse the response from HubSpot contact search by email
                     const hubspotContactResponse = await searchContact.json();
                     const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
-                    const buyNotPart = hubspotContactResponse.results[0].properties.buyer_not_participant;
-                    console.log("SEARCH RESULT:", hsObjectId, buyNotPart)
-
-            
 
                     // If hubspotId and buyerNotParticipant, update the property
                     if (hsObjectId) {
-                        let buyerNotParticipant = true
-                        await createHubSpotDeal(hsObjectId);
-                        //await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
+                        let buyerNotParticipantYes = true
+                        let buyerNotParticipantNo = false
+
+                        // Trigger first to set Buyer Not Partticipant to No
+                        await updateBuyerNotParticipantPropertyNo(hsObjectId, buyerNotParticipantNo);
+
+                        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+                        const updatePropertyWithDelay = async (hsObjectId, buyerNotParticipantYes) => {
+                            try {
+                                await delay(60000); 
+
+                                // Trigger first to set Buyer Not Partticipant to Yes after 1 minute delay
+                                await updateBuyerNotParticipantPropertyYes(hsObjectId, buyerNotParticipantYes);
+                            } catch (error) {
+                                console.error('Error updating property:', error);
+                            }
+                        };
+                        
+                        // Call this function wherever you need to perform the delayed update
+                        updatePropertyWithDelay(hsObjectId, buyerNotParticipantYes);
                     }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
