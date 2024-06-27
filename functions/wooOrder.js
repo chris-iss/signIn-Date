@@ -209,33 +209,8 @@ exports.handler = async (event) => {
         }
 
 
-        ////////////////Function to set BuyerNotParicipant hubspot contact property to Yes when buying the modules for someone else//////////////////////////
+        ////////////////Function to set BuyerNotParicipant hubspot contact property to No: Set to Yes using Zapier//////////////////////////
         if (extractedData.length > 0) {
-
-            //Update Buyer not Participant Conatct Property to Yes
-            const updateBuyerNotParticipantPropertyYes = async (contactId, setToYes) => {
-    
-                // Define the properties object for updating HubSpot contact
-                const thinkificSignDateProperty = {
-                    "properties": {
-                        "buyer_not_participant": setToYes,
-                    }  
-                };
-    
-                // Make a PATCH request to update the HubSpot contact
-                const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
-                    method: "PATCH",
-                    headers: {
-                        Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(thinkificSignDateProperty)
-                });
-    
-                const response = await updateContact.json();
-                console.log("Buyer Not Participant Update Response:", response);
-            };
-
             //Update Buyer not Participant Conatct Property to No
             const updateBuyerNotParticipantPropertyNo = async (contactId, setToNo) => {
     
@@ -298,23 +273,6 @@ exports.handler = async (event) => {
 
                         // Trigger first to set Buyer Not Partticipant to No
                         await updateBuyerNotParticipantPropertyNo(hsObjectId, buyerNotParticipantNo);
-
-                        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-                        const updatePropertyWithDelay = async (hsObjectId, buyerNotParticipantYes) => {
-                            try {
-                                await delay(60000);
-                                console.log("RUNNING NOW")
-
-                                // Trigger first to set Buyer Not Partticipant to Yes after 1 minute delay
-                                await updateBuyerNotParticipantPropertyYes(hsObjectId, buyerNotParticipantYes);
-                            } catch (error) {
-                                console.error('Error updating property:', error);
-                            }
-                        };
-                        
-                        // Call this function wherever you need to perform the delayed update
-                        updatePropertyWithDelay(hsObjectId, buyerNotParticipantYes);
                     }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
