@@ -302,7 +302,7 @@ exports.handler = async (event) => {
                     if (hsObjectId) {
                         let buyerNotParticipant = true
                         await createHubSpotDeal(hsObjectId);
-                        await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
+                        //await updateBuyerNotParticipantProperty(hsObjectId, buyerNotParticipant);
                     }
                 } catch (error) {
                     console.log("HUBSPOT SEARCH ERROR", error.message);
