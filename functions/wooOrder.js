@@ -299,7 +299,7 @@ exports.handler = async (event) => {
                     });
 
                     //3.6 - Send data to Zapier to Process other Task
-                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/2onxbma/', {
+                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
