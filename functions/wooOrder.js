@@ -123,26 +123,23 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                let resultArray = [];
                 const diplomaCourse = "Diploma in Business Sustainability 2024";
 
-                // Check if the diploma course is in the array
                 const hasDiploma = courses.includes(diplomaCourse);
 
-                // Check if there are other courses apart from the diploma course
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
-                    resultArray.push("Diploma");
+                    courseType.push("Diploma");
                 }
 
                 if (hasOtherCourses) {
-                    resultArray.push("Unbundled");
+                    courseType.push("Unbundled");
                 }
 
                 // Count occurrences of "Diploma" and "Unbundled" in the resultArray
-                const diplomaCount = resultArray.filter(item => item === "Diploma").length;
-                const unbundledCount = resultArray.filter(item => item === "Unbundled").length;
+                const diplomaCount = courseType.filter(item => item === "Diploma").length;
+                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
 
                 // Create a new array to hold the counts
                 countsArray = [
