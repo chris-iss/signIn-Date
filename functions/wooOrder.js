@@ -145,8 +145,15 @@ exports.handler = async (event) => {
                 countsArray = [
                     `Unbundled: ${unbundledCount}`,
                     `Diploma: ${diplomaCount}`,
-                    `Both: diploma: ${diplomaCount}, unbundled: ${unbundledCount}`
                 ];
+
+                // if both unbundled and diploma are selected 
+                if (diplomaCount > 0 && unbundledCount > 0) {
+                    countsArray = [
+                        `Unbundled: ${unbundledCount}`,
+                        `Diploma: ${diplomaCount}`,
+                    ];
+                }
 
                 return { extractedData, selectedCourseIds };
             } catch (error) {
