@@ -134,16 +134,16 @@ exports.handler = async (event) => {
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
-                    resultArray.push("Diploma");
+                    courses.push("Diploma");
                 }
 
                 if (hasOtherCourses) {
-                    resultArray.push("Unbundled");
+                    courseType.push("Unbundled");
                 }
 
                 // Count occurrences of "Diploma" and "Unbundled" in the resultArray
-                const diplomaCount = resultArray.filter(item => item === "Diploma").length;
-                const unbundledCount = resultArray.filter(item => item === "Unbundled").length;
+                const diplomaCount = courseType.filter(item => item === "Diploma").length;
+                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
 
                 // Check if both are present
                 const bothCount = (diplomaCount > 0 && unbundledCount > 0) ? 1 : 0;
@@ -158,7 +158,7 @@ exports.handler = async (event) => {
             }
         };
 
-        const { extractedData, selectedCourseIds, selectedCourse } = await getOrderDetails();
+        const { extractedData, selectedCourseIds } = await getOrderDetails();
 
         // Format Participants Payload
         const participants = [];
