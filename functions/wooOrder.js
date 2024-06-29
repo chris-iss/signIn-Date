@@ -143,7 +143,7 @@ exports.handler = async (event) => {
 
 
         if (participants.length > 0) {
-            console.data("Participant Info is Available")
+            console.log("Participant Info is Available")
         }
 
         
