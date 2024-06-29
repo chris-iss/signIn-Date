@@ -107,11 +107,13 @@ exports.handler = async (event) => {
 
                 // Holds course IDs
                 const selectedCourseIds = [];
+                const selectedCourse = [];
 
                 // Select course IDs based on the courses bought
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
                         selectedCourseIds.push(moduleCourseIdMap[course]);
+                        selectedCourse.push(course)
                     } else {
                         console.log(`Course ID not found for '${course}'`);
                     }
@@ -126,7 +128,7 @@ exports.handler = async (event) => {
             }
         };
 
-        const { extractedData, selectedCourseIds } = await getOrderDetails();
+        const { extractedData, selectedCourseIds, selectedCourse } = await getOrderDetails();
 
         // Format Participants Payload
         const participants = [];
@@ -307,6 +309,7 @@ exports.handler = async (event) => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
+                            selectdCourses: selectedCourse,
                             thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
                             firstname: participant.firstName,
