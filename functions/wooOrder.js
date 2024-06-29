@@ -52,6 +52,8 @@ exports.handler = async (event) => {
             };
         }
 
+        let courseType = []
+
         // Step 1: Fetch order details from WooCommerce
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
@@ -73,7 +75,6 @@ exports.handler = async (event) => {
                 const data = await response.json();
 
                 let buyerData = data
-                let courseType = []
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
