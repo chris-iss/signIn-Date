@@ -334,7 +334,7 @@ exports.handler = async (event) => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            selectdCoursesType: resultArray,
+                            selectdCoursesType: courseType,
                             selectedCourseCout: countsArray,
                             thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
