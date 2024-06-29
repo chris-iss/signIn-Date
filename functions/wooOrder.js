@@ -4,7 +4,6 @@ require("dotenv").config();
 let isExecuting = false;
 
 exports.handler = async (event) => {
-    // Prevents function from executing multiple times simultaneously
     if (isExecuting) {
         return {
             statusCode: 409,
@@ -20,6 +19,7 @@ exports.handler = async (event) => {
         const getValidationKey = process.env.Netlify_API_KEY;
 
         if (getNetlifyKey !== getValidationKey) {
+            isExecuting = false;
             return {
                 statusCode: 401,
                 body: JSON.stringify({ message: "Unauthorized Access" })
@@ -29,31 +29,33 @@ exports.handler = async (event) => {
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
         const orderId = requestBody.orderId;
-        const billingUserEmail = requestBody.billing_user_email
+        const billingUserEmail = requestBody.billing_user_email;
 
         if (!orderId) {
+            isExecuting = false;
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: "Missing orderId in the request body" })
             };
         }
 
-
-        /////////////////////// Step 1: Function to get order details from WooCommerce //////////////////////////////////
+        // WooCommerce credentials
         const consumerKey = process.env.CONSUMERKEY;
         const consumerSecret = process.env.CONSUMERSECRET;
         const baseUrl = 'https://www.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
 
         if (!consumerKey || !consumerSecret) {
+            isExecuting = false;
             return {
                 statusCode: 500,
                 body: JSON.stringify({ message: "Missing WooCommerce credentials" })
             };
         }
 
+        // Fetch order details from WooCommerce
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
-            const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
+            const auth = 'Basic ' + Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
 
             try {
                 const response = await fetch(url, {
@@ -70,8 +72,6 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
-                let rawData = data
-
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
@@ -80,7 +80,7 @@ exports.handler = async (event) => {
 
                 console.log("EXTRACTED-DATA", extractedData);
 
-                // Mapping of course names to Thinkific course IDss
+                // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
                     "Sustainability Plan Development": "2755219",
@@ -99,11 +99,11 @@ exports.handler = async (event) => {
                 };
 
                 let courses = [];
-                const getCourseBought = data.line_items.map((course) => {
+                data.line_items.forEach(course => {
                     courses.push(course.name);
                 });
 
-                // Holds course ID
+                // Holds course IDs
                 const selectedCourseIds = [];
 
                 // Select course IDs based on the courses bought
@@ -117,14 +117,14 @@ exports.handler = async (event) => {
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
-                return { rawData, extractedData, selectedCourseIds };
+                return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
-                return null;
+                throw error;
             }
         };
 
-        const {rawData, extractedData, selectedCourseIds } = await getOrderDetails();
+        const { extractedData, selectedCourseIds } = await getOrderDetails();
 
         // Format Participants Payload
         const participants = [];
@@ -141,27 +141,22 @@ exports.handler = async (event) => {
             }
         }
 
-
         if (participants.length > 0) {
-            console.log("Participant Info is Available")
+            console.log("Participants:", participants);
+            console.log("Selected Course IDs:", selectedCourseIds);
         }
 
-        
-
-
-        if (!extractedData) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "Failed to fetch order details" })
-            };
-        }
+        isExecuting = false;
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Success", participants, selectedCourseIds })
+        };
     } catch (error) {
         console.error('Error processing data:', error.message);
+        isExecuting = false;
         return {
             statusCode: 400,
             body: JSON.stringify({ message: error.message })
         };
-    } finally {
-        isExecuting = false;
     }
 };
