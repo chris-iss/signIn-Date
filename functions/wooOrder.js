@@ -273,6 +273,7 @@ exports.handler = async (event) => {
             };
 
             //3.5 - Create Thinkific users and enroll them in courses
+            let thinkificCourseId;
             for (const participant of participants) {
                 try {
                     const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
@@ -280,6 +281,7 @@ exports.handler = async (event) => {
                     for (const courseId of selectedCourseIds) {
                         console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`)
                         await enrollInThinkificCourse(courseId, userId);
+                        thinkificCourseId = courseId
                     }
 
                     // Create or update contact in HubSpot
@@ -305,7 +307,7 @@ exports.handler = async (event) => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            thinkificCourseId: courseId,
+                            thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
                             firstname: participant.firstName,
                             lastname: participant.lastName,
