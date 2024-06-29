@@ -52,7 +52,7 @@ exports.handler = async (event) => {
             };
         }
 
-        let courseType = []
+        let courseType = [];
         let countsArray;
 
         // Step 1: Fetch order details from WooCommerce
@@ -75,7 +75,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
-                let buyerData = data
+                let buyerData = data;
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -122,8 +122,7 @@ exports.handler = async (event) => {
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
-                
-                // Function to deetermine if course is Unbundled or Diploma or even both
+                // Function to determine if course is Unbundled or Diploma or even both
                 let resultArray = [];
                 const diplomaCourse = "Diploma in Business Sustainability 2024";
 
@@ -134,23 +133,24 @@ exports.handler = async (event) => {
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
-                    courses.push("Diploma");
+                    resultArray.push("Diploma");
                 }
 
                 if (hasOtherCourses) {
-                    courseType.push("Unbundled");
+                    resultArray.push("Unbundled");
                 }
 
                 // Count occurrences of "Diploma" and "Unbundled" in the resultArray
-                const diplomaCount = courseType.filter(item => item === "Diploma").length;
-                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
-
-                // Check if both are present
-                const bothCount = (diplomaCount > 0 && unbundledCount > 0) ? 1 : 0;
+                const diplomaCount = resultArray.filter(item => item === "Diploma").length;
+                const unbundledCount = resultArray.filter(item => item === "Unbundled").length;
 
                 // Create a new array to hold the counts
-                countsArray = [diplomaCount, unbundledCount, bothCount];
-                
+                countsArray = [
+                    `Unbundled: ${unbundledCount}`,
+                    `Diploma: ${diplomaCount}`,
+                    `Both: diploma: ${diplomaCount}, unbundled: ${unbundledCount}`
+                ];
+
                 return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
@@ -175,7 +175,7 @@ exports.handler = async (event) => {
             }
         }
 
-        //Step 2: If participant array is empty: BNP === Participant is Buyer
+        // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
             console.log(`Participant is Buyer - Firstname: ${buyerData.billing.first_name}, lastName: ${buyerData.billing.last_name}, Email: ${buyerData.billing.email}`);
             console.log("Selected Course IDs:", selectedCourseIds);
@@ -183,18 +183,17 @@ exports.handler = async (event) => {
 
         // Step 3: If participant array is not empty: BNP === Buyer is buying for participants
         if (participants.length > 0) {
-            console.log("Participants Details", participants)
-            console.log("Course-ID", selectedCourseIds)
+            console.log("Participants Details", participants);
+            console.log("Course-ID", selectedCourseIds);
 
-            //3.1 - Function to set BNP to No then Yes via Zapier
+            // 3.1 - Function to set BNP to No then Yes via Zapier
             const updateBuyerNotParticipantPropertyNo = async (contactId, setToNo) => {
-
                 const thinkificSignDateProperty = {
                     "properties": {
                         "buyer_not_participant": setToNo,
-                    }  
+                    }
                 };
-    
+
                 const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${contactId}`, {
                     method: "PATCH",
                     headers: {
@@ -203,12 +202,12 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify(thinkificSignDateProperty)
                 });
-    
+
                 const response = await updateContact.json();
                 console.log("Buyer Not Participant Update Response:", response);
             };
 
-             //3.2 - Function to search for a HubSpot contact using Thinkific email
+            // 3.2 - Function to search for a HubSpot contact using Thinkific email
             const hubspotSearchContact = async () => {
                 const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
@@ -237,7 +236,7 @@ exports.handler = async (event) => {
                     const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
 
                     if (hsObjectId) {
-                        let buyerNotParticipantNo = false
+                        let buyerNotParticipantNo = false;
                         await updateBuyerNotParticipantPropertyNo(hsObjectId, buyerNotParticipantNo);
                     }
                 } catch (error) {
@@ -247,7 +246,7 @@ exports.handler = async (event) => {
 
             await hubspotSearchContact();
 
-            //3.3 - Function to create Thinkific user
+            // 3.3 - Function to create Thinkific user
             const createThinkificUser = async (firstName, lastName, email) => {
                 const url = 'https://api.thinkific.com/api/public/v1/users';
                 const response = await fetch(url, {
@@ -263,20 +262,19 @@ exports.handler = async (event) => {
                         email: email
                     })
                 });
-            
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
                     throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
                 }
-            
+
                 const data = await response.json();
                 console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
                 return data.id;
             };
 
-
-             //3.4 - Function to enroll user in Thinkific course
+            // 3.4 - Function to enroll user in Thinkific course
             const enrollInThinkificCourse = async (courseId, userId) => {
                 const url = 'https://api.thinkific.com/api/public/v1/enrollments';
                 const response = await fetch(url, {
@@ -304,16 +302,16 @@ exports.handler = async (event) => {
                 return data;
             };
 
-            //3.5 - Create Thinkific users and enroll them in courses
+            // 3.5 - Create Thinkific users and enroll them in courses
             let thinkificCourseId;
             for (const participant of participants) {
                 try {
                     const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                     for (const courseId of selectedCourseIds) {
-                        console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`)
+                        console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
                         await enrollInThinkificCourse(courseId, userId);
-                        thinkificCourseId = courseId
+                        thinkificCourseId = courseId;
                     }
 
                     // Create or update contact in HubSpot
@@ -332,14 +330,14 @@ exports.handler = async (event) => {
                         })
                     });
 
-                    //3.6 - Send data to Zapier to Process other Task
+                    // 3.6 - Send data to Zapier to Process other Task
                     await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            selectdCoursesType: courseType,
+                            selectdCoursesType: resultArray,
                             selectedCourseCout: countsArray,
                             thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
