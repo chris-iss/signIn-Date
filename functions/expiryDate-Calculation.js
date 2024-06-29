@@ -28,6 +28,7 @@ exports.handler = async (event) => {
 
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
+        console.log("DATA", requestBody)
         
 
         isExecuting = false;
