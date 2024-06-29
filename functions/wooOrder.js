@@ -52,7 +52,7 @@ exports.handler = async (event) => {
             };
         }
 
-        // Fetch order details from WooCommerce
+        // Step 1: Fetch order details from WooCommerce
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
@@ -71,6 +71,8 @@ exports.handler = async (event) => {
                 }
 
                 const data = await response.json();
+
+                let buyerData = data
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -141,10 +143,18 @@ exports.handler = async (event) => {
             }
         }
 
-        if (participants.length > 0) {
-            console.log("Participants:", participants);
+        //Step 2: If participant array is empty: BNP === Participant is Buyer
+        if (participants.length === 0) {
+            console.log(`Participant is Buyer - Firstname: ${buyerData.billing.first_name}, lastName: ${buyerData.billing.last_name}, Email: ${buyerData.billing.email}`);
             console.log("Selected Course IDs:", selectedCourseIds);
         }
+
+        // Step 3: If participant array is not empty: BNP === Buyer is buying for participants
+        if (participants.length > 0) {
+            console.log("Participannts", participants)
+            console.log("Course-ID", selectedCourseIds)
+        }
+
 
         isExecuting = false;
         return {
