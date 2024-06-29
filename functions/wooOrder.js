@@ -73,6 +73,7 @@ exports.handler = async (event) => {
                 const data = await response.json();
 
                 let buyerData = data
+                let courseType = []
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -121,7 +122,6 @@ exports.handler = async (event) => {
 
                 
                 // Function to deetermine if course is Unbundled or Diploma or even both
-                let courseType = [];
                 const diplomaCourse = "Diploma in Business Sustainability 2024";
                 
                 const hasDiploma = courses.includes(diplomaCourse);
