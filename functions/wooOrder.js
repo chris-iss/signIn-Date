@@ -53,6 +53,7 @@ exports.handler = async (event) => {
         }
 
         let courseType = []
+        let countsArray;
 
         // Step 1: Fetch order details from WooCommerce
         const getOrderDetails = async () => {
@@ -123,21 +124,32 @@ exports.handler = async (event) => {
 
                 
                 // Function to deetermine if course is Unbundled or Diploma or even both
+                let resultArray = [];
                 const diplomaCourse = "Diploma in Business Sustainability 2024";
-                
+
+                // Check if the diploma course is in the array
                 const hasDiploma = courses.includes(diplomaCourse);
-                
+
+                // Check if there are other courses apart from the diploma course
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
-                
+
                 if (hasDiploma) {
-                    courseType.push("Diploma");
+                    resultArray.push("Diploma");
                 }
-                
+
                 if (hasOtherCourses) {
-                    courseType.push("Unbundled");
+                    resultArray.push("Unbundled");
                 }
-                
-                console.log(courseType);
+
+                // Count occurrences of "Diploma" and "Unbundled" in the resultArray
+                const diplomaCount = resultArray.filter(item => item === "Diploma").length;
+                const unbundledCount = resultArray.filter(item => item === "Unbundled").length;
+
+                // Check if both are present
+                const bothCount = (diplomaCount > 0 && unbundledCount > 0) ? 1 : 0;
+
+                // Create a new array to hold the counts
+                countsArray = [diplomaCount, unbundledCount, bothCount];
                 
                 return { extractedData, selectedCourseIds };
             } catch (error) {
@@ -328,6 +340,7 @@ exports.handler = async (event) => {
                         },
                         body: JSON.stringify({
                             selectdCoursesType: courseType,
+                            selectedCourseCout: countsArray,
                             thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
                             firstname: participant.firstName,
