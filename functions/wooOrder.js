@@ -120,6 +120,7 @@ exports.handler = async (event) => {
                 });
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
+                console.log("Enrolling user with course:", selectedCourse);
 
                 return { extractedData, selectedCourseIds };
             } catch (error) {
