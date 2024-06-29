@@ -107,21 +107,37 @@ exports.handler = async (event) => {
 
                 // Holds course IDs
                 const selectedCourseIds = [];
-                const selectedCourse = [];
 
                 // Select course IDs based on the courses bought
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
                         selectedCourseIds.push(moduleCourseIdMap[course]);
-                        selectedCourse.push(course)
                     } else {
                         console.log(`Course ID not found for '${course}'`);
                     }
                 });
 
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
-                console.log("Enrolling user with course:", selectedCourse);
 
+                
+                // Function to deetermine if course is Unbundled or Diploma or even both
+                let courseType = [];
+                const diplomaCourse = "Diploma in Business Sustainability 2024";
+                
+                const hasDiploma = courses.includes(diplomaCourse);
+                
+                const hasOtherCourses = courses.some(course => course !== diplomaCourse);
+                
+                if (hasDiploma) {
+                    courseType.push("Diploma");
+                }
+                
+                if (hasOtherCourses) {
+                    courseType.push("Unbundled");
+                }
+                
+                console.log(courseType);
+                
                 return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
@@ -310,7 +326,7 @@ exports.handler = async (event) => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            selectdCourses: selectedCourse,
+                            selectdCoursesType: courseType,
                             thinkificCourseId: thinkificCourseId,
                             thnkificUserId: userId,
                             firstname: participant.firstName,
