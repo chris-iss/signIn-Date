@@ -39,7 +39,18 @@ exports.handler = async (event) => {
         }
 
 
-        /////////////////////// Function to get order details from WooCommerce //////////////////////////////////
+        /////////////////////// Step 1: Function to get order details from WooCommerce //////////////////////////////////
+        const consumerKey = process.env.CONSUMERKEY;
+        const consumerSecret = process.env.CONSUMERSECRET;
+        const baseUrl = 'https://www.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
+
+        if (!consumerKey || !consumerSecret) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: "Missing WooCommerce credentials" })
+            };
+        }
+
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(consumerKey + ':' + consumerSecret).toString('base64');
