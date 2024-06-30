@@ -50,33 +50,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Missing courseId, expiryDate, or userId in the request body" })
             };
         }
-
-        // Ensure expiryDate is in the correct ISO 8601 format
-        let formattedExpiryDate;
-        try {
-            // Convert expiryDate to a valid ISO 8601 string
-            const date = new Date(expiryDate);
-            if (isNaN(date.getTime())) {
-                throw new Error('Invalid Date');
-            }
-            // Format date as YYYY-MM-DDTHH:MM:SSZ
-            formattedExpiryDate = date.toISOString().slice(0, 19) + 'Z';
-        } catch (error) {
-            isExecuting = false;
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format" })
-            };
-        }
-
-        if (isNaN(Date.parse(formattedExpiryDate))) {
-            isExecuting = false;
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format" })
-            };
-        }
-
+        
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
