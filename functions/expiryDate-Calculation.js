@@ -50,7 +50,17 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Missing courseId, expiryDate, or userId in the request body" })
             };
         }
-        
+
+        // Validate the expiryDate format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+\-]\d{2}:\d{2})$/;
+        if (!dateRegex.test(expiryDate)) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format." })
+            };
+        }
+
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
@@ -97,7 +107,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         activated_at: new Date().toISOString(),
-                        expiry_date: "2019-01-01T01:01:00Z"
+                        expiry_date: expiryDate
                     })
                 });
 
