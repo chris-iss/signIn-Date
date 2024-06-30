@@ -28,6 +28,7 @@ exports.handler = async (event) => {
 
         // Parse request body and check for required fields
         const requestBodyArray = JSON.parse(event.body);
+        let correctedExpiryDate = expiryDate;
         console.log("Request Body:", requestBodyArray);
 
         if (!Array.isArray(requestBodyArray) || requestBodyArray.length === 0) {
@@ -51,31 +52,21 @@ exports.handler = async (event) => {
             };
         }
 
-        // Ensure expiryDate is in the correct ISO 8601 format
-        let formattedExpiryDate;
-        try {
-            // Convert expiryDate to a valid ISO 8601 string
-            const date = new Date(expiryDate);
-            if (isNaN(date.getTime())) {
-                throw new Error('Invalid Date');
-            }
-            // Format date as YYYY-MM-DDTHH:MM:SSZ
-            formattedExpiryDate = date.toISOString().slice(0, 19) + 'Z';
-        } catch (error) {
-            isExecuting = false;
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format" })
-            };
-        }
-
-        if (isNaN(Date.parse(formattedExpiryDate))) {
-            isExecuting = false;
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format" })
-            };
-        }
+         if (!expiryDate.endsWith('Z')) {
+             correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
+         }
+ 
+         // Validate the corrected expiryDate format
+         const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+         if (!dateRegex.test(correctedExpiryDate)) {
+             isExecuting = false;
+             return {
+                 statusCode: 400,
+                 body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
+             };
+         }
+ 
+         console.log("Corrected expiryDate:", correctedExpiryDate);
 
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
@@ -110,7 +101,7 @@ exports.handler = async (event) => {
         };
 
         // Function to update Thinkific user expiry date
-        const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
+        const updateThinkificUserExpiryDate = async (enrollmentId, correctedExpiryDate) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
 
             try {
