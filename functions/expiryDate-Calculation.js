@@ -28,7 +28,6 @@ exports.handler = async (event) => {
 
         // Parse request body and check for required fields
         const requestBodyArray = JSON.parse(event.body);
-        let correctedExpiryDate = expiryDate;
         console.log("Request Body:", requestBodyArray);
 
         if (!Array.isArray(requestBodyArray) || requestBodyArray.length === 0) {
@@ -39,6 +38,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Extract the required fields from the request body
         const { courseId, expiryDate, userId } = requestBodyArray[0];
         console.log("courseId:", courseId);
         console.log("expiryDate:", expiryDate);
@@ -52,21 +52,27 @@ exports.handler = async (event) => {
             };
         }
 
-         if (!expiryDate.endsWith('Z')) {
-             correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
-         }
- 
-         // Validate the corrected expiryDate format
-         const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-         if (!dateRegex.test(correctedExpiryDate)) {
-             isExecuting = false;
-             return {
-                 statusCode: 400,
-                 body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
-             };
-         }
- 
-         console.log("Corrected expiryDate:", correctedExpiryDate);
+        // Normalize expiryDate to end with 'Z' and be in ISO 8601 format
+        let correctedExpiryDate;
+
+        if (expiryDate.endsWith('Z')) {
+            correctedExpiryDate = expiryDate;  // Already in correct format
+        } else {
+            // Replace any trailing non-date characters with 'Z'
+            correctedExpiryDate = `${expiryDate.replace(/[^0-9T:]/g, '')}Z`;
+        }
+
+        // Validate the corrected expiryDate format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+        if (!dateRegex.test(correctedExpiryDate)) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
+            };
+        }
+
+        console.log("Corrected expiryDate:", correctedExpiryDate);
 
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
@@ -114,7 +120,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         activated_at: new Date().toISOString(),
-                        expiry_date: expiryDate
+                        expiry_date: correctedExpiryDate
                     })
                 });
 
@@ -137,7 +143,7 @@ exports.handler = async (event) => {
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
         // Update the Thinkific user expiry date
-        await updateThinkificUserExpiryDate(enrollmentId, formattedExpiryDate);
+        await updateThinkificUserExpiryDate(enrollmentId, correctedExpiryDate);
 
         isExecuting = false;
         return {
