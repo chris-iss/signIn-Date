@@ -51,6 +51,16 @@ exports.handler = async (event) => {
             };
         }
 
+        // Ensure expiryDate is in the correct ISO 8601 format
+        const formattedExpiryDate = new Date(expiryDate).toISOString();
+        if (isNaN(Date.parse(formattedExpiryDate))) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format" })
+            };
+        }
+
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
@@ -120,7 +130,7 @@ exports.handler = async (event) => {
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
         // Update the Thinkific user expiry date
-        await updateThinkificUserExpiryDate(enrollmentId, expiryDate);
+        await updateThinkificUserExpiryDate(enrollmentId, formattedExpiryDate);
 
         isExecuting = false;
         return {
