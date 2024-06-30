@@ -51,13 +51,19 @@ exports.handler = async (event) => {
             };
         }
 
-        // Validate the expiryDate format
-        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+\-]\d{2}:\d{2})$/;
-        if (!dateRegex.test(expiryDate)) {
+        // Ensure expiryDate ends with 'Z'
+        let correctedExpiryDate = expiryDate;
+        if (!expiryDate.endsWith('Z')) {
+            correctedExpiryDate = `${expiryDate}Z`;  // Append 'Z' to make it ISO 8601 format
+        }
+
+        // Validate the corrected expiryDate format
+        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+        if (!dateRegex.test(correctedExpiryDate)) {
             isExecuting = false;
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format." })
+                body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
             };
         }
 
@@ -107,7 +113,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         activated_at: new Date().toISOString(),
-                        expiry_date: expiryDate
+                        expiry_date: correctedExpiryDate
                     })
                 });
 
@@ -126,7 +132,7 @@ exports.handler = async (event) => {
             }
         };
 
-        // Fetch the enrollment Id
+        // Fetch the enrollment ID
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
         // Update the Thinkific user expiry date
