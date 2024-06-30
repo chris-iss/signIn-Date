@@ -85,9 +85,9 @@ exports.handler = async (event) => {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error(`Failed to fetch enrollments: ${response.status} - ${JSON.stringify(errorData)}`);
-                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData.error}`);
+                    const errorData = await response.text(); // Capture the raw response text
+                    console.error(`Failed to fetch enrollments: ${response.status} - ${errorData}`);
+                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData}`);
                 }
 
                 const data = await response.json();
@@ -121,6 +121,7 @@ exports.handler = async (event) => {
                 });
 
                 const responseText = await response.text(); // Capture the raw response text
+                console.log("Raw response text:", responseText); // Log the raw response text
                 if (!response.ok) {
                     console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
                     throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
