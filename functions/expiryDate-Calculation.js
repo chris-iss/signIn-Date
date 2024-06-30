@@ -28,7 +28,11 @@ exports.handler = async (event) => {
 
         // Parse request body and check for required fields
         const requestBody = JSON.parse(event.body);
+        console.log("Request Body:", requestBody);
+
         const { courseId, expiryDate } = requestBody;
+        console.log("courseId:", courseId);
+        console.log("expiryDate:", expiryDate);
 
         if (!courseId || !expiryDate) {
             isExecuting = false;
