@@ -84,13 +84,22 @@ exports.handler = async (event) => {
                     }
                 });
 
+                const responseText = await response.text(); // Capture the raw response text
+                console.log("Fetch Enrollment Response Text:", responseText); // Log the raw response text
+
                 if (!response.ok) {
-                    const errorData = await response.text(); // Capture the raw response text
-                    console.error(`Failed to fetch enrollments: ${response.status} - ${errorData}`);
-                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData}`);
+                    console.error(`Failed to fetch enrollments: ${response.status} - ${responseText}`);
+                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${responseText}`);
                 }
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = JSON.parse(responseText); // Attempt to parse the response text as JSON
+                } catch (error) {
+                    console.error('Error parsing JSON response:', error.message);
+                    throw new Error('Error parsing JSON response');
+                }
+
                 if (data.items.length === 0) {
                     throw new Error('Enrollment not found');
                 }
@@ -121,7 +130,8 @@ exports.handler = async (event) => {
                 });
 
                 const responseText = await response.text(); // Capture the raw response text
-                console.log("Raw response text:", responseText); // Log the raw response text
+                console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
+
                 if (!response.ok) {
                     console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
                     throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
