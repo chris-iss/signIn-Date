@@ -43,121 +43,110 @@ exports.handler = async (event) => {
         console.log("expiryDate:", expiryDate);
         console.log("userId:", userId);
 
-        // if (!courseId || !expiryDate || !userId) {
-        //     isExecuting = false;
-        //     return {
-        //         statusCode: 400,
-        //         body: JSON.stringify({ message: "Missing courseId, expiryDate, or userId in the request body" })
-        //     };
-        // }
+        if (!courseId || !expiryDate || !userId) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Missing courseId, expiryDate, or userId in the request body" })
+            };
+        }
 
-        // // Ensure expiryDate ends with 'Z' and is in ISO 8601 format
-        // let correctedExpiryDate = expiryDate;
+        // Ensure expiryDate is in the correct ISO 8601 format
+        let formattedExpiryDate;
+        try {
+            // Convert expiryDate to a valid ISO 8601 string
+            const date = new Date(expiryDate);
+            if (isNaN(date.getTime())) {
+                throw new Error('Invalid Date');
+            }
+            // Format date as YYYY-MM-DDTHH:MM:SSZ
+            formattedExpiryDate = date.toISOString().slice(0, 19) + 'Z';
+        } catch (error) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format" })
+            };
+        }
 
-        // if (!expiryDate.endsWith('Z')) {
-        //     correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
-        // }
+        if (isNaN(Date.parse(formattedExpiryDate))) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format" })
+            };
+        }
 
-        // // Validate the corrected expiryDate format
-        // const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-        // if (!dateRegex.test(correctedExpiryDate)) {
-        //     isExecuting = false;
-        //     return {
-        //         statusCode: 400,
-        //         body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
-        //     };
-        // }
+        // Function to fetch the enrollment ID
+        const fetchEnrollmentId = async (userId, courseId) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
 
-        // console.log("Corrected expiryDate:", correctedExpiryDate);
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    }
+                });
 
-        // // Function to fetch the enrollment ID
-        // const fetchEnrollmentId = async (userId, courseId) => {
-        //     const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to fetch enrollments: ${response.status} - ${JSON.stringify(errorData)}`);
+                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData.error}`);
+                }
 
-        //     try {
-        //         const response = await fetch(url, {
-        //             method: 'GET',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-        //                 'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-        //             }
-        //         });
+                const data = await response.json();
+                if (data.items.length === 0) {
+                    throw new Error('Enrollment not found');
+                }
 
-        //         const responseText = await response.text(); // Capture the raw response text
-        //         console.log("Fetch Enrollment Response Text:", responseText); // Log the raw response text
+                return data.items[0].id; // Return the first matching enrollment ID
+            } catch (error) {
+                console.error('Error fetching enrollment ID:', error.message);
+                throw error;
+            }
+        };
 
-        //         if (!response.ok) {
-        //             console.error(`Failed to fetch enrollments: ${response.status} - ${responseText}`);
-        //             throw new Error(`Failed to fetch enrollments: ${response.status} - ${responseText}`);
-        //         }
+        // Function to update Thinkific user expiry date
+        const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
 
-        //         let data;
-        //         try {
-        //             data = JSON.parse(responseText); // Attempt to parse the response text as JSON
-        //         } catch (error) {
-        //             console.error('Error parsing JSON response:', error.message);
-        //             throw new Error('Error parsing JSON response');
-        //         }
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    },
+                    body: JSON.stringify({
+                        activated_at: new Date().toISOString(),
+                        expiry_date: expiryDate
+                    })
+                });
 
-        //         if (data.items.length === 0) {
-        //             throw new Error('Enrollment not found');
-        //         }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${JSON.stringify(errorData)}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData.message}`);
+                }
 
-        //         return data.items[0].id; // Return the first matching enrollment ID
-        //     } catch (error) {
-        //         console.error('Error fetching enrollment ID:', error.message);
-        //         throw error;
-        //     }
-        // };
+                const data = await response.json();
+                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
+                return data;
+            } catch (error) {
+                console.error('Error updating Thinkific user expiry date:', error.message);
+                throw error;
+            }
+        };
 
-        // // Function to update Thinkific user expiry date
-        // const updateThinkificUserExpiryDate = async (enrollmentId) => {
-        //     const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
+        // Fetch the enrollment ID
+        const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
-        //     try {
-        //         const response = await fetch(url, {
-        //             method: 'PUT',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-        //                 'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-        //             },
-        //             body: JSON.stringify({
-        //                 activated_at: new Date().toISOString(),
-        //                 expiry_date: correctedExpiryDate
-        //             })
-        //         });
-
-        //         const responseText = await response.text(); // Capture the raw response text
-        //         console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
-
-        //         if (!response.ok) {
-        //             console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
-        //             throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
-        //         }
-
-        //         let data;
-        //         try {
-        //             data = JSON.parse(responseText); // Attempt to parse the response text as JSON
-        //         } catch (error) {
-        //             console.error('Error parsing JSON response:', error.message);
-        //             throw new Error('Error parsing JSON response');
-        //         }
-
-        //         console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
-        //         return data;
-        //     } catch (error) {
-        //         console.error('Error updating Thinkific user expiry date:', error.message);
-        //         throw error;
-        //     }
-        // };
-
-        // // Fetch the enrollment ID
-        // const enrollmentId = await fetchEnrollmentId(userId, courseId);
-
-        // // Update the Thinkific user expiry date
-        // await updateThinkificUserExpiryDate(enrollmentId);
+        // Update the Thinkific user expiry date
+        await updateThinkificUserExpiryDate(enrollmentId, formattedExpiryDate);
 
         isExecuting = false;
         return {
