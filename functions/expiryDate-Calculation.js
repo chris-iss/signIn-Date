@@ -27,10 +27,18 @@ exports.handler = async (event) => {
         }
 
         // Parse request body and check for required fields
-        const requestBody = JSON.parse(event.body);
-        console.log("Request Body:", requestBody);
+        const requestBodyArray = JSON.parse(event.body);
+        console.log("Request Body:", requestBodyArray);
 
-        const { courseId, expiryDate } = requestBody;
+        if (!Array.isArray(requestBodyArray) || requestBodyArray.length === 0) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Request body should be a non-empty array" })
+            };
+        }
+
+        const { courseId, expiryDate } = requestBodyArray[0];
         console.log("courseId:", courseId);
         console.log("expiryDate:", expiryDate);
 
