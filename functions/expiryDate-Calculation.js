@@ -54,7 +54,13 @@ exports.handler = async (event) => {
         // Ensure expiryDate is in the correct ISO 8601 format
         let formattedExpiryDate;
         try {
-            formattedExpiryDate = new Date(expiryDate).toISOString();
+            // Convert expiryDate to a valid ISO 8601 string
+            const date = new Date(expiryDate);
+            if (isNaN(date.getTime())) {
+                throw new Error('Invalid Date');
+            }
+            // Format date as YYYY-MM-DDTHH:MM:SSZ
+            formattedExpiryDate = date.toISOString().slice(0, 19) + 'Z';
         } catch (error) {
             isExecuting = false;
             return {
