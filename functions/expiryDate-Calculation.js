@@ -38,22 +38,55 @@ exports.handler = async (event) => {
             };
         }
 
-        const { courseId, expiryDate } = requestBodyArray[0];
+        const { courseId, expiryDate, userId } = requestBodyArray[0];
         console.log("courseId:", courseId);
         console.log("expiryDate:", expiryDate);
+        console.log("userId:", userId);
 
-        if (!courseId || !expiryDate) {
+        if (!courseId || !expiryDate || !userId) {
             isExecuting = false;
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Missing courseId or expiryDate in the request body" })
+                body: JSON.stringify({ message: "Missing courseId, expiryDate, or userId in the request body" })
             };
         }
 
+        // Function to fetch the enrollment ID
+        const fetchEnrollmentId = async (userId, courseId) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to fetch enrollments: ${response.status} - ${JSON.stringify(errorData)}`);
+                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData.error}`);
+                }
+
+                const data = await response.json();
+                if (data.items.length === 0) {
+                    throw new Error('Enrollment not found');
+                }
+
+                return data.items[0].id; // Return the first matching enrollment ID
+            } catch (error) {
+                console.error('Error fetching enrollment ID:', error.message);
+                throw error;
+            }
+        };
+
         // Function to update Thinkific user expiry date
-        const updateThinkificUserExpiryDate = async () => {
-            const url = `https://api.thinkific.com/api/public/v1/enrollments/${courseId}`;
-            
+        const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
+
             try {
                 const response = await fetch(url, {
                     method: 'PUT',
@@ -67,24 +100,27 @@ exports.handler = async (event) => {
                         expiry_date: expiryDate
                     })
                 });
-        
+
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${JSON.stringify(errorData)}`);
                     throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData.message}`);
                 }
-        
+
                 const data = await response.json();
-                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${courseId}`);
+                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
                 return data;
             } catch (error) {
                 console.error('Error updating Thinkific user expiry date:', error.message);
                 throw error;
             }
         };
-        
-        // Call the updateThinkificUserExpiryDate function
-        await updateThinkificUserExpiryDate();
+
+        // Fetch the enrollment ID
+        const enrollmentId = await fetchEnrollmentId(userId, courseId);
+
+        // Update the Thinkific user expiry date
+        await updateThinkificUserExpiryDate(enrollmentId, expiryDate);
 
         isExecuting = false;
         return {
