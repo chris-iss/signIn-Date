@@ -97,7 +97,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         activated_at: new Date().toISOString(),
-                        expiry_date: expiryDate
+                        expiry_date: "2019-01-01T01:01:00Z"
                     })
                 });
 
