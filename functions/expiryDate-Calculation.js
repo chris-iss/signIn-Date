@@ -26,12 +26,21 @@ exports.handler = async (event) => {
             };
         }
 
-        // Parse request body and check for orderId
+        // Parse request body and check for required fields
         const requestBody = JSON.parse(event.body);
-        
+        const { courseId, expiryDate } = requestBody;
 
+        if (!courseId || !expiryDate) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Missing courseId or expiryDate in the request body" })
+            };
+        }
+
+        // Function to update Thinkific user expiry date
         const updateThinkificUserExpiryDate = async () => {
-            const url = `https://api.thinkific.com/api/public/v1/enrollments/${requestBody.courseId}`;
+            const url = `https://api.thinkific.com/api/public/v1/enrollments/${courseId}`;
             
             try {
                 const response = await fetch(url, {
@@ -42,8 +51,8 @@ exports.handler = async (event) => {
                         'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
                     },
                     body: JSON.stringify({
-                        activated_at:  new Date().toISOString(),
-                        expiry_date: requestBody.expiryDate
+                        activated_at: new Date().toISOString(),
+                        expiry_date: expiryDate
                     })
                 });
         
@@ -54,7 +63,7 @@ exports.handler = async (event) => {
                 }
         
                 const data = await response.json();
-                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
+                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${courseId}`);
                 return data;
             } catch (error) {
                 console.error('Error updating Thinkific user expiry date:', error.message);
@@ -62,10 +71,8 @@ exports.handler = async (event) => {
             }
         };
         
-        updateThinkificUserExpiryDate(enrollmentId, activatedAt, expiryDate)
-            .then(data => console.log('Update successful:', data))
-            .catch(error => console.error('Update failed:', error.message));
-        
+        // Call the updateThinkificUserExpiryDate function
+        await updateThinkificUserExpiryDate();
 
         isExecuting = false;
         return {
