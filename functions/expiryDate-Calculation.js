@@ -126,7 +126,7 @@ exports.handler = async (event) => {
             }
         };
 
-        // Fetch the enrollment ID
+        // Fetch the enrollment Id
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
         // Update the Thinkific user expiry date
