@@ -84,7 +84,7 @@ exports.handler = async (event) => {
         };
 
         // Function to update Thinkific user expiry date
-        const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
+        const updateThinkificUserExpiryDate = async (enrollmentId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
 
             try {
@@ -120,7 +120,7 @@ exports.handler = async (event) => {
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
         // Update the Thinkific user expiry date
-        await updateThinkificUserExpiryDate(enrollmentId, formattedExpiryDate);
+        await updateThinkificUserExpiryDate(enrollmentId);
 
         isExecuting = false;
         return {
