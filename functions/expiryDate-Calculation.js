@@ -120,13 +120,20 @@ exports.handler = async (event) => {
                     })
                 });
 
+                const responseText = await response.text(); // Capture the raw response text
                 if (!response.ok) {
-                    const errorText = await response.text(); // Capture the raw response text
-                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorText}`);
-                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorText}`);
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
                 }
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = JSON.parse(responseText); // Attempt to parse the response text as JSON
+                } catch (error) {
+                    console.error('Error parsing JSON response:', error.message);
+                    throw new Error('Error parsing JSON response');
+                }
+
                 console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
                 return data;
             } catch (error) {
