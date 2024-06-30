@@ -121,9 +121,9 @@ exports.handler = async (event) => {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.text(); // Use text() instead of json() to capture the raw response
-                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData}`);
-                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData}`);
+                    const errorText = await response.text(); // Capture the raw response text
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorText}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorText}`);
                 }
 
                 const data = await response.json();
@@ -138,7 +138,7 @@ exports.handler = async (event) => {
         // Fetch the enrollment ID
         const enrollmentId = await fetchEnrollmentId(userId, courseId);
 
-        // Update the Thinkific user expiry dateS
+        // Update the Thinkific user expiry date
         await updateThinkificUserExpiryDate(enrollmentId);
 
         isExecuting = false;
