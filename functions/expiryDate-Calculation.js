@@ -51,8 +51,9 @@ exports.handler = async (event) => {
             };
         }
 
-        // Ensure expiryDate ends with 'Z'
+        // Ensure expiryDate ends with 'Z' and is in ISO 8601 format
         let correctedExpiryDate = expiryDate;
+
         if (!expiryDate.endsWith('Z')) {
             correctedExpiryDate = `${expiryDate}Z`;  // Append 'Z' to make it ISO 8601 format
         }
@@ -66,6 +67,8 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
             };
         }
+
+        console.log("Corrected expiryDate:", correctedExpiryDate);
 
         // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
