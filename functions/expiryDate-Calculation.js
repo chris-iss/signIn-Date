@@ -52,7 +52,17 @@ exports.handler = async (event) => {
         }
 
         // Ensure expiryDate is in the correct ISO 8601 format
-        const formattedExpiryDate = new Date(expiryDate).toISOString();
+        let formattedExpiryDate;
+        try {
+            formattedExpiryDate = new Date(expiryDate).toISOString();
+        } catch (error) {
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Invalid expiryDate format" })
+            };
+        }
+
         if (isNaN(Date.parse(formattedExpiryDate))) {
             isExecuting = false;
             return {
