@@ -55,7 +55,7 @@ exports.handler = async (event) => {
         let correctedExpiryDate = expiryDate;
 
         if (!expiryDate.endsWith('Z')) {
-            correctedExpiryDate = `${expiryDate}Z`;  // Append 'Z' to make it ISO 8601 format
+            correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
         }
 
         // Validate the corrected expiryDate format
@@ -121,9 +121,9 @@ exports.handler = async (event) => {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${JSON.stringify(errorData)}`);
-                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData.message}`);
+                    const errorData = await response.text(); // Use text() instead of json() to capture the raw response
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData}`);
                 }
 
                 const data = await response.json();
