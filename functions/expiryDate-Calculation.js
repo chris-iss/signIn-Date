@@ -28,7 +28,43 @@ exports.handler = async (event) => {
 
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
-        console.log("DATA", requestBody)
+        
+
+        const updateThinkificUserExpiryDate = async () => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments/${requestBody.courseId}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    },
+                    body: JSON.stringify({
+                        activated_at:  new Date().toISOString(),
+                        expiry_date: requestBody.expiryDate
+                    })
+                });
+        
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${JSON.stringify(errorData)}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData.message}`);
+                }
+        
+                const data = await response.json();
+                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
+                return data;
+            } catch (error) {
+                console.error('Error updating Thinkific user expiry date:', error.message);
+                throw error;
+            }
+        };
+        
+        updateThinkificUserExpiryDate(enrollmentId, activatedAt, expiryDate)
+            .then(data => console.log('Update successful:', data))
+            .catch(error => console.error('Update failed:', error.message));
         
 
         isExecuting = false;

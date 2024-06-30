@@ -52,6 +52,7 @@ exports.handler = async (event) => {
             };
         }
 
+        let buyerBillingData;
         let courseType = [];
         let countsArray;
 
@@ -75,7 +76,7 @@ exports.handler = async (event) => {
 
                 const data = await response.json();
 
-                let buyerData = data;
+                buyerBillingData = data;
 
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
@@ -181,7 +182,7 @@ exports.handler = async (event) => {
 
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
-            console.log(`Participant is Buyer - Firstname: ${buyerData.billing.first_name}, lastName: ${buyerData.billing.last_name}, Email: ${buyerData.billing.email}`);
+            console.log(`Participant is Buyer - Firstname: ${buyerBillingData.billing.first_name}, lastName: ${buyerBillingData.billing.last_name}, Email: ${buyerBillingData.billing.email}`);
             console.log("Selected Course IDs:", selectedCourseIds);
         }
 
