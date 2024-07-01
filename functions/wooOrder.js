@@ -319,7 +319,7 @@ exports.handler = async (event) => {
                         thinkificCourseId = courseId;s
                     }
 
-                    // Create or update contact in HubSpot
+                    // Create or update contact in HubSpotc
                     await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
                         method: 'POST',
                         headers: {
