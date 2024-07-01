@@ -58,15 +58,15 @@ exports.handler = async (event) => {
             correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
         }
 
-        // Validate the corrected expiryDate format
-        const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
-        if (!dateRegex.test(correctedExpiryDate)) {
-            isExecuting = false;
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
-            };
-        }
+        // // Validate the corrected expiryDate format
+        // const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+        // if (!dateRegex.test(correctedExpiryDate)) {
+        //     isExecuting = false;
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({ message: "Invalid expiryDate format. Should be ISO 8601 date-time format ending with 'Z'." })
+        //     };
+        // }
 
         console.log("Corrected expiryDate:", correctedExpiryDate);
 
