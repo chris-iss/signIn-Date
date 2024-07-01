@@ -97,8 +97,7 @@ exports.handler = async (event) => {
             }
         };
 
-
-        // // Function to update Thinkific user expiry date
+        // Function to update Thinkific user expiry date
         const updateThinkificUserExpiryDate = async (enrollmentId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
 
@@ -124,6 +123,11 @@ exports.handler = async (event) => {
                     throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
                 }
 
+                if (!responseText) {
+                    console.error('Empty response text');
+                    throw new Error('Empty response text');
+                }
+
                 let data;
                 try {
                     data = JSON.parse(responseText); // Attempt to parse the response text as JSON
@@ -139,7 +143,6 @@ exports.handler = async (event) => {
                 throw error;
             }
         };
-
 
         // Fetch the enrollment ID
         const enrollmentId = await fetchEnrollmentId(user_id, course_id);
