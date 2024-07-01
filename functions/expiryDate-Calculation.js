@@ -27,18 +27,20 @@ exports.handler = async (event) => {
         }
 
         // Parse request body and check for required fields
-        const requestBodyArray = JSON.parse(event.body);
-        console.log("Request Body:", requestBodyArray);
-
-        if (!Array.isArray(requestBodyArray) || requestBodyArray.length === 0) {
+        let requestBody;
+        try {
+            requestBody = JSON.parse(event.body);
+        } catch (e) {
             isExecuting = false;
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Request body should be a non-empty array" })
+                body: JSON.stringify({ message: "Invalid JSON format in request body" })
             };
         }
 
-        const {courseId, expiryDate, userId} = requestBodyArray
+        console.log("Request Body:", requestBody);
+
+        const { courseId, expiryDate, userId } = requestBody;
 
         if (!courseId || !expiryDate || !userId) {
             isExecuting = false;
@@ -60,10 +62,10 @@ exports.handler = async (event) => {
         }
 
         console.log("CourseId:", course_id);
-        console.log("UserId:", user_id)
+        console.log("UserId:", user_id);
         console.log("Corrected ExpiryDate:", correctedExpiryDate);
 
-        // // Function to fetch the enrollment ID
+        // Function to fetch the enrollment ID
         const fetchEnrollmentId = async (userId, courseId) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
 
@@ -95,47 +97,11 @@ exports.handler = async (event) => {
             }
         };
 
-        // // Function to update Thinkific user expiry date
-        // const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
-        //     const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
-
-        //     try {
-        //         const response = await fetch(url, {
-        //             method: 'PUT',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-        //                 'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-        //             },
-        //             body: JSON.stringify({
-        //                 activated_at: new Date().toISOString(),
-        //                 expiry_date: expiryDate
-        //             })
-        //         });
-
-        //         if (!response.ok) {
-        //             const errorData = await response.json();
-        //             console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${JSON.stringify(errorData)}`);
-        //             throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${errorData.message}`);
-        //         }
-
-        //         const data = await response.json();
-        //         console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
-        //         return data;
-        //     } catch (error) {
-        //         console.error('Error updating Thinkific user expiry date:', error.message);
-        //         throw error;
-        //     }
-        // };
-
-        // // Fetch the enrollment ID
+        // Fetch the enrollment ID
         const enrollmentId = await fetchEnrollmentId(user_id, course_id);
-        console.log("Enrollment ID:", enrollmentId)
+        console.log("Enrollment ID:", enrollmentId);
 
-        // // Update the Thinkific user expiry date
-        // await updateThinkificUserExpiryDate(enrollmentId, correctedExpiryDate);
-
-         isExecuting = false;
+        isExecuting = false;
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Success" })
