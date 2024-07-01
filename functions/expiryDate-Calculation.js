@@ -97,9 +97,56 @@ exports.handler = async (event) => {
             }
         };
 
+
+        // // Function to update Thinkific user expiry date
+        const updateThinkificUserExpiryDate = async (enrollmentId) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    },
+                    body: JSON.stringify({
+                        activated_at: new Date().toISOString(),
+                        expiry_date: correctedExpiryDate
+                    })
+                });
+
+                const responseText = await response.text(); // Capture the raw response text
+                console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
+
+                if (!response.ok) {
+                    console.error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
+                    throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(responseText); // Attempt to parse the response text as JSON
+                } catch (error) {
+                    console.error('Error parsing JSON response:', error.message);
+                    throw new Error('Error parsing JSON response');
+                }
+
+                console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
+                return data;
+            } catch (error) {
+                console.error('Error updating Thinkific user expiry date:', error.message);
+                throw error;
+            }
+        };
+
+
         // Fetch the enrollment ID
         const enrollmentId = await fetchEnrollmentId(user_id, course_id);
         console.log("Enrollment ID:", enrollmentId);
+
+        // Update the Thinkific user expiry date
+        await updateThinkificUserExpiryDate(enrollmentId);
 
         isExecuting = false;
         return {
