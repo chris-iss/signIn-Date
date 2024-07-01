@@ -118,6 +118,11 @@ exports.handler = async (event) => {
                 console.log("Response Status:", response.status);
                 console.log("Response Headers:", response.headers);
 
+                if (response.status === 204) {
+                    console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
+                    return;
+                }
+
                 const responseText = await response.text(); // Capture the raw response text
                 console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
 
