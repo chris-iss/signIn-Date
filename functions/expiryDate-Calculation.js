@@ -115,6 +115,9 @@ exports.handler = async (event) => {
                     })
                 });
 
+                console.log("Response Status:", response.status);
+                console.log("Response Headers:", response.headers);
+
                 const responseText = await response.text(); // Capture the raw response text
                 console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
 
