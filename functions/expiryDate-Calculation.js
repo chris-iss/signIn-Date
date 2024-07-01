@@ -116,12 +116,7 @@ exports.handler = async (event) => {
                 });
 
                 console.log("Response Status:", response.status);
-                console.log("Response Headers:", response.headers);
-
-                if (response.status === 204) {
-                    console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
-                    return;
-                }
+                console.log("Response Headers:", JSON.stringify(response.headers.raw()));
 
                 const responseText = await response.text(); // Capture the raw response text
                 console.log("Update Enrollment Response Text:", responseText); // Log the raw response text
@@ -131,17 +126,19 @@ exports.handler = async (event) => {
                     throw new Error(`Failed to update Thinkific user expiry date: ${response.status} - ${responseText}`);
                 }
 
-                if (!responseText) {
-                    console.error('Empty response text');
-                    throw new Error('Empty response text');
+                if (!responseText && response.status !== 204) {
+                    console.error('Empty response text for status other than 204');
+                    throw new Error('Empty response text for status other than 204');
                 }
 
-                let data;
-                try {
-                    data = JSON.parse(responseText); // Attempt to parse the response text as JSON
-                } catch (error) {
-                    console.error('Error parsing JSON response:', error.message);
-                    throw new Error('Error parsing JSON response');
+                let data = null;
+                if (responseText) {
+                    try {
+                        data = JSON.parse(responseText); // Attempt to parse the response text as JSON
+                    } catch (error) {
+                        console.error('Error parsing JSON response:', error.message);
+                        throw new Error('Error parsing JSON response');
+                    }
                 }
 
                 console.log(`Thinkific user expiry date updated successfully for enrollmentId: ${enrollmentId}`);
@@ -157,7 +154,8 @@ exports.handler = async (event) => {
         console.log("Enrollment ID:", enrollmentId);
 
         // Update the Thinkific user expiry date
-        await updateThinkificUserExpiryDate(enrollmentId);
+        const updateResponse = await updateThinkificUserExpiryDate(enrollmentId);
+        console.log("Update Response:", updateResponse);
 
         isExecuting = false;
         return {
