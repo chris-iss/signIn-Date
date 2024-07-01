@@ -42,7 +42,7 @@ exports.handler = async (event) => {
         // WooCommerce credentials
         const consumerKey = process.env.CONSUMERKEY;
         const consumerSecret = process.env.CONSUMERSECRET;
-        const baseUrl = 'https://www.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
+        const baseUrl = 'https://www.stg.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders';
 
         if (!consumerKey || !consumerSecret) {
             isExecuting = false;
