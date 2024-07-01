@@ -316,7 +316,7 @@ exports.handler = async (event) => {
                     for (const courseId of selectedCourseIds) {
                         console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
                         //await enrollInThinkificCourse(courseId, userId);
-                        thinkificCourseId = courseId;s
+                        thinkificCourseId = courseId;
                     }
 
                     // Create or update contact in HubSpotc
