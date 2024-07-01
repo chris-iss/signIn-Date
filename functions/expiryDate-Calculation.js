@@ -38,10 +38,10 @@ exports.handler = async (event) => {
             };
         }
 
-        const { courseId, expiryDate, userId } = requestBodyArray[0];
-        console.log("courseId:", courseId);
-        console.log("expiryDate:", expiryDate);
-        console.log("userId:", userId);
+        // const { courseId, expiryDate, userId } = requestBodyArray[0];
+        // console.log("courseId:", courseId);
+        // console.log("expiryDate:", expiryDate);
+        // console.log("userId:", userId);
 
         if (!courseId || !expiryDate || !userId) {
             isExecuting = false;
