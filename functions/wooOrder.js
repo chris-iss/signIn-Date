@@ -315,8 +315,29 @@ exports.handler = async (event) => {
 
                     for (const courseId of selectedCourseIds) {
                         console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
-                        //await enrollInThinkificCourse(courseId, userId);
-                        thinkificCourseId = courseId;
+                            //await enrollInThinkificCourse(courseId, userId);
+                            thinkificCourseId = courseId;
+
+                            await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                selectdCoursesType: courseType,
+                                selectedCourseCout: countsArray,
+                                thinkificCourseId: thinkificCourseId,
+                                thnkificUserId: userId,
+                                firstname: participant.firstName,
+                                lastname: participant.lastName,
+                                email: participant.email,
+                                currency: requestBody.currency,
+                                startDate: requestBody.startDate,
+                                unbundledSkuCode: requestBody.unbundledSkuCode,
+                                diplomaSkuCode: requestBody.diplomaSkuCode,
+                                BNP: "Yes"
+                            })
+                        });
                     }
 
                     // Create or update contact in HubSpotc
@@ -336,26 +357,26 @@ exports.handler = async (event) => {
                     });
 
                     // 3.6 - Send data to Zapier to Process other Task
-                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            selectdCoursesType: courseType,
-                            selectedCourseCout: countsArray,
-                            thinkificCourseId: thinkificCourseId,
-                            thnkificUserId: userId,
-                            firstname: participant.firstName,
-                            lastname: participant.lastName,
-                            email: participant.email,
-                            currency: requestBody.currency,
-                            startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode,
-                            diplomaSkuCode: requestBody.diplomaSkuCode,
-                            BNP: "Yes"
-                        })
-                    });
+                    // await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
+                    //     method: "POST",
+                    //     headers: {
+                    //         "Content-Type": "application/json"
+                    //     },
+                    //     body: JSON.stringify({
+                    //         selectdCoursesType: courseType,
+                    //         selectedCourseCout: countsArray,
+                    //         thinkificCourseId: thinkificCourseId,
+                    //         thnkificUserId: userId,
+                    //         firstname: participant.firstName,
+                    //         lastname: participant.lastName,
+                    //         email: participant.email,
+                    //         currency: requestBody.currency,
+                    //         startDate: requestBody.startDate,
+                    //         unbundledSkuCode: requestBody.unbundledSkuCode,
+                    //         diplomaSkuCode: requestBody.diplomaSkuCode,
+                    //         BNP: "Yes"
+                    //     })
+                    // });
                 } catch (error) {
                     console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
                 }
