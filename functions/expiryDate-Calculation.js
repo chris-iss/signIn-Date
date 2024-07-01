@@ -38,10 +38,7 @@ exports.handler = async (event) => {
             };
         }
 
-        // const { courseId, expiryDate, userId } = requestBodyArray[0];
-        // console.log("courseId:", courseId);
-        // console.log("expiryDate:", expiryDate);
-        // console.log("userId:", userId);
+        const {courseId, expiryDate, userId} = requestBodyArray
 
         if (!courseId || !expiryDate || !userId) {
             isExecuting = false;
@@ -51,46 +48,52 @@ exports.handler = async (event) => {
             };
         }
 
-        // Ensure expiryDate ends with 'Z' and is in ISO 8601 format
-        let correctedExpiryDate = expiryDate;
+        const course_id = courseId;
+        const expiry_date = expiryDate;
+        const user_id = userId;
 
-        if (!expiryDate.endsWith('Z')) {
-            correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
+        // Ensure expiryDate ends with 'Z' and is in ISO 8601 format
+        let correctedExpiryDate = expiry_date;
+
+        if (!expiry_date.endsWith('Z')) {
+            correctedExpiryDate = `${expiry_date.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
         }
 
-        console.log("Corrected expiryDate:", correctedExpiryDate);
+        console.log("CourseId:", course_id);
+        console.log("UserId:", user_id)
+        console.log("Corrected ExpiryDate:", correctedExpiryDate);
 
         // // Function to fetch the enrollment ID
-        // const fetchEnrollmentId = async (userId, courseId) => {
-        //     const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
+        const fetchEnrollmentId = async (userId, courseId) => {
+            const url = `https://api.thinkific.com/api/public/v1/enrollments?user_id=${userId}&course_id=${courseId}`;
 
-        //     try {
-        //         const response = await fetch(url, {
-        //             method: 'GET',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-        //                 'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-        //             }
-        //         });
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    }
+                });
 
-        //         if (!response.ok) {
-        //             const errorData = await response.json();
-        //             console.error(`Failed to fetch enrollments: ${response.status} - ${JSON.stringify(errorData)}`);
-        //             throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData.error}`);
-        //         }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to fetch enrollments: ${response.status} - ${JSON.stringify(errorData)}`);
+                    throw new Error(`Failed to fetch enrollments: ${response.status} - ${errorData.error}`);
+                }
 
-        //         const data = await response.json();
-        //         if (data.items.length === 0) {
-        //             throw new Error('Enrollment not found');
-        //         }
+                const data = await response.json();
+                if (data.items.length === 0) {
+                    throw new Error('Enrollment not found');
+                }
 
-        //         return data.items[0].id; // Return the first matching enrollment ID
-        //     } catch (error) {
-        //         console.error('Error fetching enrollment ID:', error.message);
-        //         throw error;
-        //     }
-        // };
+                return data.items[0].id; // Return the first matching enrollment ID
+            } catch (error) {
+                console.error('Error fetching enrollment ID:', error.message);
+                throw error;
+            }
+        };
 
         // // Function to update Thinkific user expiry date
         // const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
@@ -126,8 +129,8 @@ exports.handler = async (event) => {
         // };
 
         // // Fetch the enrollment ID
-        //const enrollmentId = await fetchEnrollmentId(userId, courseId);
-        //console.log("Enrollment ID:", enrollmentId)
+        const enrollmentId = await fetchEnrollmentId(user_id, course_id);
+        console.log("Enrollment ID:", enrollmentId)
 
         // // Update the Thinkific user expiry date
         // await updateThinkificUserExpiryDate(enrollmentId, correctedExpiryDate);
