@@ -38,7 +38,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // Extract the required fields from the request body
         const { courseId, expiryDate, userId } = requestBodyArray[0];
         console.log("courseId:", courseId);
         console.log("expiryDate:", expiryDate);
@@ -52,14 +51,11 @@ exports.handler = async (event) => {
             };
         }
 
-        // Normalize expiryDate to end with 'Z' and be in ISO 8601 format
-        let correctedExpiryDate;
+        // Ensure expiryDate ends with 'Z' and is in ISO 8601 format
+        let correctedExpiryDate = expiryDate;
 
-        if (expiryDate.endsWith('Z')) {
-            correctedExpiryDate = expiryDate;  // Already in correct format
-        } else {
-            // Replace any trailing non-date characters with 'Z'
-            correctedExpiryDate = `${expiryDate.replace(/[^0-9T:]/g, '')}Z`;
+        if (!expiryDate.endsWith('Z')) {
+            correctedExpiryDate = `${expiryDate.slice(0, -1)}Z`;  // Remove the last character and append 'Z'
         }
 
         // Validate the corrected expiryDate format
@@ -107,7 +103,7 @@ exports.handler = async (event) => {
         };
 
         // Function to update Thinkific user expiry date
-        const updateThinkificUserExpiryDate = async (enrollmentId, correctedExpiryDate) => {
+        const updateThinkificUserExpiryDate = async (enrollmentId, expiryDate) => {
             const url = `https://api.thinkific.com/api/public/v1/enrollments/${enrollmentId}`;
 
             try {
@@ -120,7 +116,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         activated_at: new Date().toISOString(),
-                        expiry_date: correctedExpiryDate
+                        expiry_date: expiryDate
                     })
                 });
 
