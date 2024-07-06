@@ -506,11 +506,10 @@ exports.handler = async (event) => {
                     await  hubspotParticipantSearchContact(participant.email);
 
                     if (existThinkificUserId) {
-                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${thinkificCourseId} - userId: ${existThinkificUserId}`);
 
                         for (const courseId of selectedCourseIds) {
                             console.log(`Enrollment:, courseId: ${courseId} userId: ${existThinkificUserId}`);
-
+                            
                                 thinkificCourseId = courseId;
     
                                 await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
