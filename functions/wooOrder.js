@@ -380,7 +380,7 @@ exports.handler = async (event) => {
 
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -411,7 +411,7 @@ exports.handler = async (event) => {
                                 //await enrollInThinkificCourse(courseId, userId);
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
