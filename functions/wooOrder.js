@@ -256,7 +256,7 @@ exports.handler = async (event) => {
             let thinkificCourseId;
 
             // Create Thinkific users and enroll them in courses else If user exist dont create thinkific user again
-            for (const participant of participants) {
+            //for (const participant of participants) {
                 try {
 
                     // Create or update contact in HubSpotc
@@ -285,7 +285,7 @@ exports.handler = async (event) => {
 
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23ieysi/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23s3wnv/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -316,7 +316,7 @@ exports.handler = async (event) => {
                                 //await enrollInThinkificCourse(courseId, userId);
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23ieysi/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23s3wnv/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -341,7 +341,7 @@ exports.handler = async (event) => {
                 } catch (error) {
                     console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
                 }
-            }
+            //}
 
             console.log("Processed participantInfo:", buyerBillingData.billing);
         }
