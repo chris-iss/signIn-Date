@@ -315,6 +315,23 @@ exports.handler = async (event) => {
             for (const participant of participants) {
                 try {
 
+                    // Create or update contact in HubSpotc
+                    await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
+                        method: 'POST',
+                        headers: {
+                            "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            properties: [
+                                { property: 'firstname', value: participant.firstName },
+                                { property: 'lastname', value: participant.lastName },
+                                { property: 'email', value: participant.email }
+                            ]
+                        })
+                    });
+
+
                     if (thinkificUserId) {
                         console.log(`"Yes Thinnkifc User Exist Already" - Enrollment:, courseId: ${courseId} userId: ${thinkificUserId}`);
                        
@@ -368,23 +385,6 @@ exports.handler = async (event) => {
                             });
                         }
                     }
-
-                    // Create or update contact in HubSpotc
-                    await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
-                        method: 'POST',
-                        headers: {
-                            "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            properties: [
-                                { property: 'firstname', value: participant.firstName },
-                                { property: 'lastname', value: participant.lastName },
-                                { property: 'email', value: participant.email }
-                            ]
-                        })
-                    });
-
                 } catch (error) {
                     console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
                 }
