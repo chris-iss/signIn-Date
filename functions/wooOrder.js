@@ -241,7 +241,9 @@ exports.handler = async (event) => {
 
                     const hubspotContactResponse = await searchContact.json();
                     const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
-                    thinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
+                    const existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
+
+                    console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
 
                     if (hsObjectId) {
                         let buyerNotParticipantNo = false;
