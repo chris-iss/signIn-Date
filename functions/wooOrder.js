@@ -124,7 +124,7 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                const diplomaCourse = "Diploma in Business Sustainability 2024";
+                const diplomaCourse = "Diploma in Business Sustainability";
 
                 const hasDiploma = courses.includes(diplomaCourse);
 
