@@ -165,7 +165,7 @@ exports.handler = async (event) => {
 
         const { extractedData, selectedCourseIds } = await getOrderDetails();
 
-        let thinkificUserId;
+        let existThinkificUserId;
 
         // Format Participants Payload
         const participants = [];
@@ -243,6 +243,7 @@ exports.handler = async (event) => {
                     const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
                     const existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
 
+                    console.log(`HS PROPERTIES: ${hubspotContactResponse.results[0].properties}`)
                     console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
 
                     if (hsObjectId) {
@@ -284,33 +285,69 @@ exports.handler = async (event) => {
                 return data.id;
             };
 
-            // 3.4 - Function to fetch user in Thinkific 
-            const enrollInThinkificCourse = async (courseId, userId) => {
-                const url = 'https://api.thinkific.com/api/public/v1/enrollments';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-                    },
-                    body: JSON.stringify({
-                        course_id: courseId,
-                        user_id: userId,
-                        activated_at: new Date().toISOString(),
-                        expiry_date: null
-                    })
-                });
+            // // 3.4 - Function to fetch user in Thinkific 
+            // const enrollInThinkificCourse = async (courseId, userId) => {
+            //     const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+            //     const response = await fetch(url, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+            //             'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+            //         },
+            //         body: JSON.stringify({
+            //             course_id: courseId,
+            //             user_id: userId,
+            //             activated_at: new Date().toISOString(),
+            //             expiry_date: null
+            //         })
+            //     });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
+            //     if (!response.ok) {
+            //         const errorData = await response.json();
+            //         throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
+            //     }
+
+            //     const data = await response.json();
+            //     console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+            //     return data;
+            // };
+
+             // 3.2 - Function to search existing user Thinkific userID
+             const hubspotParticipantSearchContact = async (email) => {
+                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+
+                try {
+                    const hubspotSearchProperties = {
+                        after: "0",
+                        filterGroups: [
+                            { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
+                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: email }] },
+                        ],
+                        limit: "100",
+                        properties: ["email", "main_thinkific_user_id", "id"], // Include id for updating
+                        sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
+                    };
+
+                    const searchContact = await fetch(hubspotBaseURL, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(hubspotSearchProperties),
+                    });
+
+                    const hubspotContactResponse = await searchContact.json();
+                    existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
+
+                    console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
+
+                } catch (error) {
+                    console.log("HUBSPOT SEARCH ERROR", error.message);
                 }
-
-                const data = await response.json();
-                console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
-                return data;
             };
+
 
             // 3.5 - Create Thinkific users and enroll them in courses
             let thinkificCourseId;
@@ -333,9 +370,10 @@ exports.handler = async (event) => {
                         })
                     });
 
+                    await  hubspotParticipantSearchContact(participant.email);
 
-                    if (thinkificUserId) {
-                        console.log(`"Yes Thinnkifc User Exist Already" - Enrollment:, courseId: ${courseId} userId: ${thinkificUserId}`);
+                    if (existThinkificUserId) {
+                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${courseId} - userId: ${existThinkificUserId}`);
                        
                         await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
                         method: "POST",
@@ -346,7 +384,7 @@ exports.handler = async (event) => {
                             selectdCoursesType: courseType,
                             selectedCourseCout: countsArray,
                             thinkificCourseId: thinkificCourseId,
-                            thnkificUserId: thinkificUserId,
+                            thnkificUserId: existThinkificUserId,
                             firstname: participant.firstName,
                             lastname: participant.lastName,
                             email: participant.email,
