@@ -356,6 +356,7 @@ exports.handler = async (event) => {
                         })
                     });
                     } else {
+                        console.log("THIS RAN")
                         const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                         for (const courseId of selectedCourseIds) {
