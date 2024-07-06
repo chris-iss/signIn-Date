@@ -157,6 +157,8 @@ exports.handler = async (event) => {
 
         const { extractedData, selectedCourseIds } = await getOrderDetails();
 
+        console.log("PRODUCTS COUNT:", countsArray)
+
         let existThinkificUserId;
 
         // Format Participants Payload
