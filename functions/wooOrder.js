@@ -348,9 +348,9 @@ exports.handler = async (event) => {
                 }
             };
 
-
-            // 3.5 - Create Thinkific users and enroll them in courses
             let thinkificCourseId;
+
+            // Create Thinkific users and enroll them in courses else If user exist dont create thinkific user again
             for (const participant of participants) {
                 try {
 
@@ -373,30 +373,36 @@ exports.handler = async (event) => {
                     await  hubspotParticipantSearchContact(participant.email);
 
                     if (existThinkificUserId) {
-                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${courseId} - userId: ${existThinkificUserId}`);
-                       
-                        await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            selectdCoursesType: courseType,
-                            selectedCourseCout: countsArray,
-                            thinkificCourseId: thinkificCourseId,
-                            thnkificUserId: existThinkificUserId,
-                            firstname: participant.firstName,
-                            lastname: participant.lastName,
-                            email: participant.email,
-                            currency: requestBody.currency,
-                            startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode,
-                            diplomaSkuCode: requestBody.diplomaSkuCode,
-                            BNP: "Yes"
-                        })
-                    });
+                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${thinkificCourseId} - userId: ${existThinkificUserId}`);
+
+                        for (const courseId of selectedCourseIds) {
+                            console.log(`Enrollment:, courseId: ${courseId} userId: ${existThinkificUserId}`);
+
+                                thinkificCourseId = courseId;
+    
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/2b7yprs/', {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    selectdCoursesType: courseType,
+                                    selectedCourseCout: countsArray,
+                                    thinkificCourseId: thinkificCourseId,
+                                    thnkificUserId: existThinkificUserId,
+                                    firstname: participant.firstName,
+                                    lastname: participant.lastName,
+                                    email: participant.email,
+                                    currency: requestBody.currency,
+                                    startDate: requestBody.startDate,
+                                    unbundledSkuCode: requestBody.unbundledSkuCode,
+                                    diplomaSkuCode: requestBody.diplomaSkuCode,
+                                })
+                            });
+                        }
+    
                     } else {
-                        console.log("THIS RAN")
+                        console.log("Thinkific User doesn't exist, hence New User Created")
                         const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                         for (const courseId of selectedCourseIds) {
