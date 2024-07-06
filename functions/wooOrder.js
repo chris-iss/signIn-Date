@@ -106,7 +106,6 @@ exports.handler = async (event) => {
 
                 let courses = [];
                 data.line_items.forEach(course => {
-                    console.log("COURSE:", course)
                     courses.push(course.name);
                 });
 
