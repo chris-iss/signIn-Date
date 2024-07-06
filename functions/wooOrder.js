@@ -60,7 +60,7 @@ exports.handler = async (event) => {
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-
+        
             try {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -68,24 +68,24 @@ exports.handler = async (event) => {
                         'Authorization': auth
                     }
                 });
-
+        
                 if (!response.ok) {
                     const errorDetails = await response.text();
                     throw new Error(`Error fetching order details: ${response.status} - ${response.statusText} - ${errorDetails}`);
                 }
-
+        
                 const data = await response.json();
-
+        
                 buyerBillingData = data;
-
+        
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
                     .filter(meta => keysToExtract.includes(meta.key))
                     .map(meta => ({ key: meta.key, value: meta.value }));
-
+        
                 console.log("EXTRACTED-DATA", extractedData);
-
+        
                 // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
@@ -103,15 +103,15 @@ exports.handler = async (event) => {
                     "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability": "2622273"
                 };
-
+        
                 let courses = [];
                 data.line_items.forEach(course => {
                     courses.push(course.name);
                 });
-
-                // Holds course ID's
+        
+                // Holds course IDs
                 const selectedCourseIds = [];
-
+        
                 // Select course IDs based on the courses bought
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
@@ -120,48 +120,40 @@ exports.handler = async (event) => {
                         console.log(`Course ID not found for '${course}'`);
                     }
                 });
-
+        
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
-
+        
                 // Function to determine if course is Unbundled or Diploma or even both
                 const diplomaCourse = "Diploma in Business Sustainability";
-
+        
                 const hasDiploma = courses.includes(diplomaCourse);
-
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
-
+        
                 if (hasDiploma) {
                     courseType.push("Diploma");
                 }
-
+        
                 if (hasOtherCourses) {
                     courseType.push("Unbundled");
                 }
-
+        
                 // Count occurrences of "Diploma" and "Unbundled" in the resultArray
                 const diplomaCount = courseType.filter(item => item === "Diploma").length;
                 const unbundledCount = courseType.filter(item => item === "Unbundled").length;
-
+        
                 // Create a new array to hold the counts
                 countsArray = [
                     `Unbundled: ${unbundledCount}`,
                     `Diploma: ${diplomaCount}`,
                 ];
-
-                // if both unbundled and diploma are selected 
-                if (diplomaCount > 0 && unbundledCount > 0) {
-                    countsArray = [
-                        `Unbundled: ${unbundledCount}`,
-                        `Diploma: ${diplomaCount}`,
-                    ];
-                }
-
+        
                 return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
             }
         };
+        
 
         const { extractedData, selectedCourseIds } = await getOrderDetails();
 
