@@ -101,7 +101,7 @@ exports.handler = async (event) => {
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
                     "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
-                    "Diploma in Business Sustainability": "2622273"
+                    "Diploma in Business Sustainability 2024": "2622273"
                 };
 
                 let courses = [];
@@ -109,7 +109,7 @@ exports.handler = async (event) => {
                     courses.push(course.name);
                 });
 
-                // Holds course ID's
+                // Holds course IDs
                 const selectedCourseIds = [];
 
                 // Select course IDs based on the courses bought
@@ -124,7 +124,7 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                const diplomaCourse = "Diploma in Business Sustainability";
+                const diplomaCourse = "Diploma in Business Sustainability 2024";
 
                 const hasDiploma = courses.includes(diplomaCourse);
 
@@ -168,7 +168,7 @@ exports.handler = async (event) => {
 
         const { extractedData, selectedCourseIds } = await getOrderDetails();
 
-        let existThinkificUserId;
+        let thinkificUserId;
 
         // Format Participants Payload
         const participants = [];
@@ -185,172 +185,11 @@ exports.handler = async (event) => {
             }
         }
 
-
-         /////////////////////// BUYER IS PARTICIPANT ////////////////////////////////////////////
-
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
             console.log(`Participant is Buyer - Firstname: ${buyerBillingData.billing.first_name}, lastName: ${buyerBillingData.billing.last_name}, Email: ${buyerBillingData.billing.email}`);
             console.log("Selected Course IDs:", selectedCourseIds);
-
-            // 3.3 - Function to create Thinkific user
-            const createThinkificUser = async (firstName, lastName, email) => {
-                const url = 'https://api.thinkific.com/api/public/v1/users';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-                    },
-                    body: JSON.stringify({
-                        first_name: firstName,
-                        last_name: lastName,
-                        email: email
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
-                    throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
-                }
-
-                const data = await response.json();
-                console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
-                return data.id;
-            };
-
-             // 3.2 - Function to search existing user Thinkific userID
-             const hubspotParticipantSearchContact = async (email) => {
-                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
-
-                try {
-                    const hubspotSearchProperties = {
-                        after: "0",
-                        filterGroups: [
-                            { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
-                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: email }] },
-                        ],
-                        limit: "100",
-                        properties: ["email", "main_thinkific_user_id", "id"], // Include id for updating
-                        sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-                    };
-
-                    const searchContact = await fetch(hubspotBaseURL, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(hubspotSearchProperties),
-                    });
-
-                    const hubspotContactResponse = await searchContact.json();
-                    existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
-
-                    console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
-
-                } catch (error) {
-                    console.log("HUBSPOT SEARCH ERROR", error.message);
-                }
-            };
-
-            let thinkificCourseId;
-
-            // Create Thinkific users and enroll them in courses else If user exist dont create thinkific user again
-            for (const participant of participants) {
-                try {
-
-                    // Create or update contact in HubSpotc
-                    await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(buyerBillingData.billing.email), {
-                        method: 'POST',
-                        headers: {
-                            "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            properties: [
-                                { property: 'firstname', value: buyerBillingData.billing.first_name },
-                                { property: 'lastname', value: buyerBillingData.billing.last_name_name },
-                                { property: 'email', value: buyerBillingData.billing.email }
-                            ]
-                        })
-                    });
-
-                    await  hubspotParticipantSearchContact(buyerBillingData.billing.email);
-
-                    if (existThinkificUserId) {
-                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${thinkificCourseId} - userId: ${existThinkificUserId}`);
-
-                        for (const courseId of selectedCourseIds) {
-                            console.log(`Enrollment:, courseId: ${courseId} userId: ${existThinkificUserId}`);
-
-                                thinkificCourseId = courseId;
-    
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    selectdCoursesType: courseType,
-                                    selectedCourseCout: countsArray,
-                                    thinkificCourseId: thinkificCourseId,
-                                    thnkificUserId: existThinkificUserId,
-                                    firstname: buyerBillingData.billing.first_name,
-                                    lastname: buyerBillingData.billing.last_name_name,
-                                    email: buyerBillingData.billing.email,
-                                    currency: requestBody.currency,
-                                    startDate: requestBody.startDate,
-                                    unbundledSkuCode: requestBody.unbundledSkuCode,
-                                    diplomaSkuCode: requestBody.diplomaSkuCode,
-                                    BNP: "No"
-                                })
-                            });
-                        }
-    
-                    } else {
-                        console.log("Thinkific User doesn't exist, hence New User Created")
-                        const userId = await createThinkificUser(buyerBillingData.billing.first_name, buyerBillingData.billing.last_name, participant.email);
-
-                        for (const courseId of selectedCourseIds) {
-                            console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
-                                //await enrollInThinkificCourse(courseId, userId);
-                                thinkificCourseId = courseId;
-    
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    selectdCoursesType: courseType,
-                                    selectedCourseCout: countsArray,
-                                    thinkificCourseId: thinkificCourseId,
-                                    thnkificUserId: userId,
-                                    firstname: participant.firstName,
-                                    lastname: participant.lastName,
-                                    email: participant.email,
-                                    currency: requestBody.currency,
-                                    startDate: requestBody.startDate,
-                                    unbundledSkuCode: requestBody.unbundledSkuCode,
-                                    diplomaSkuCode: requestBody.diplomaSkuCode,
-                                    BNP: "Yes"
-                                })
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
-                }
-            }
-
-            console.log("Processed participantInfo:", participants);
         }
-
-
-        ///////////////////////Buyer Bought for Participants//////////////////////////////////////////////////////////////////////////////
 
         // Step 3: If participant array is not empty: BNP === Buyer is buying for participants
         if (participants.length > 0) {
@@ -405,10 +244,7 @@ exports.handler = async (event) => {
 
                     const hubspotContactResponse = await searchContact.json();
                     const hsObjectId = hubspotContactResponse.results[0].properties.hs_object_id;
-                    const existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
-
-                    console.log(`HS PROPERTIES: ${hubspotContactResponse.results[0].properties}`)
-                    console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
+                    thinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
 
                     if (hsObjectId) {
                         let buyerNotParticipantNo = false;
@@ -449,46 +285,66 @@ exports.handler = async (event) => {
                 return data.id;
             };
 
-             // 3.2 - Function to search existing user Thinkific userID
-             const hubspotParticipantSearchContact = async (email) => {
-                const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+            // 3.4 - Function to fetch user in Thinkific 
+            const enrollInThinkificCourse = async (courseId, userId) => {
+                const url = 'https://api.thinkific.com/api/public/v1/enrollments';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                    },
+                    body: JSON.stringify({
+                        course_id: courseId,
+                        user_id: userId,
+                        activated_at: new Date().toISOString(),
+                        expiry_date: null
+                    })
+                });
 
-                try {
-                    const hubspotSearchProperties = {
-                        after: "0",
-                        filterGroups: [
-                            { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
-                            { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: email }] },
-                        ],
-                        limit: "100",
-                        properties: ["email", "main_thinkific_user_id", "id"], // Include id for updating
-                        sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-                    };
-
-                    const searchContact = await fetch(hubspotBaseURL, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(hubspotSearchProperties),
-                    });
-
-                    const hubspotContactResponse = await searchContact.json();
-                    existThinkificUserId = hubspotContactResponse.results[0].properties.main_thinkific_user_id;
-
-                    console.log("EXISTING THINKIFIC USER ID:", existThinkificUserId)
-
-                } catch (error) {
-                    console.log("HUBSPOT SEARCH ERROR", error.message);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
                 }
+
+                const data = await response.json();
+                console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
+                return data;
             };
 
+            // 3.5 - Create Thinkific users and enroll them in courses
             let thinkificCourseId;
-
-            // Create Thinkific users and enroll them in courses else If user exist dont create thinkific user again
             for (const participant of participants) {
                 try {
+                    const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
+
+                    for (const courseId of selectedCourseIds) {
+                        console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
+                            //await enrollInThinkificCourse(courseId, userId);
+                            thinkificCourseId = courseId;
+
+                            await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                selectdCoursesType: courseType,
+                                selectedCourseCout: countsArray,
+                                thinkificCourseId: thinkificCourseId,
+                                thnkificUserId: userId,
+                                firstname: participant.firstName,
+                                lastname: participant.lastName,
+                                email: participant.email,
+                                currency: requestBody.currency,
+                                startDate: requestBody.startDate,
+                                unbundledSkuCode: requestBody.unbundledSkuCode,
+                                diplomaSkuCode: requestBody.diplomaSkuCode,
+                                BNP: "Yes"
+                            })
+                        });
+                    }
 
                     // Create or update contact in HubSpotc
                     await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
@@ -506,69 +362,6 @@ exports.handler = async (event) => {
                         })
                     });
 
-                    await  hubspotParticipantSearchContact(participant.email);
-
-                    if (existThinkificUserId) {
-                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${thinkificCourseId} - userId: ${existThinkificUserId}`);
-
-                        for (const courseId of selectedCourseIds) {
-                            console.log(`Enrollment:, courseId: ${courseId} userId: ${existThinkificUserId}`);
-
-                                thinkificCourseId = courseId;
-    
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    selectdCoursesType: courseType,
-                                    selectedCourseCout: countsArray,
-                                    thinkificCourseId: thinkificCourseId,
-                                    thnkificUserId: existThinkificUserId,
-                                    firstname: participant.firstName,
-                                    lastname: participant.lastName,
-                                    email: participant.email,
-                                    currency: requestBody.currency,
-                                    startDate: requestBody.startDate,
-                                    unbundledSkuCode: requestBody.unbundledSkuCode,
-                                    diplomaSkuCode: requestBody.diplomaSkuCode,
-                                    BNP: "Yes"
-                                })
-                            });
-                        }
-    
-                    } else {
-                        console.log("Thinkific User doesn't exist, hence New User Created")
-                        const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
-
-                        for (const courseId of selectedCourseIds) {
-                            console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
-                                //await enrollInThinkificCourse(courseId, userId);
-                                thinkificCourseId = courseId;
-    
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    selectdCoursesType: courseType,
-                                    selectedCourseCout: countsArray,
-                                    thinkificCourseId: thinkificCourseId,
-                                    thnkificUserId: userId,
-                                    firstname: participant.firstName,
-                                    lastname: participant.lastName,
-                                    email: participant.email,
-                                    currency: requestBody.currency,
-                                    startDate: requestBody.startDate,
-                                    unbundledSkuCode: requestBody.unbundledSkuCode,
-                                    diplomaSkuCode: requestBody.diplomaSkuCode,
-                                    BNP: "Yes"
-                                })
-                            });
-                        }
-                    }
                 } catch (error) {
                     console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
                 }
