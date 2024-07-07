@@ -101,7 +101,7 @@ exports.handler = async (event) => {
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
                     "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
-                    "Diploma in Business Sustainability 2024": "2622273"
+                    "Diploma in Business Sustainability": "2622273"
                 };
 
                 let courses = [];
