@@ -54,6 +54,7 @@ exports.handler = async (event) => {
 
         let buyerBillingData;
         let courseType = [];
+        let countsArray;
 
         // Step 1: Fetch order details from WooCommerce
         const getOrderDetails = async () => {
@@ -123,37 +124,49 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                const diplomaCourse = "Diploma in Business Sustainability";
+                const diplomaCourse = "Diploma in Business Sustainability 2024";
 
                 const hasDiploma = courses.includes(diplomaCourse);
 
-                const unbundledCourses = courses.filter(course => course !== diplomaCourse);
+                const hasOtherCourses = courses.some(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
                     courseType.push("Diploma");
                 }
 
-                if (unbundledCourses.length > 0) {
+                if (hasOtherCourses) {
                     courseType.push("Unbundled");
                 }
 
+                // Count occurrences of "Diploma" and "Unbundled" in the resultArray
+                const diplomaCount = courseType.filter(item => item === "Diploma").length;
+                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
+
                 // Create a new array to hold the counts
-                const countsArray = [
-                    `Unbundled: ${unbundledCourses.length}`,
-                    `Diploma: ${hasDiploma ? 1 : 0}`
+                countsArray = [
+                    `Unbundled: ${unbundledCount}`,
+                    `Diploma: ${diplomaCount}`,
                 ];
 
-                console.log("NO of Unbundled Selected:", unbundledCourses.length)
-                console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0)
+                console.log("NO of Unbundled Selected:", unbundledCount)
+                console.log("NO of Diplomma Selected:", diplomaCount)
 
-                return { extractedData, selectedCourseIds, countsArray };
+                // if both unbundled and diploma are selected 
+                if (diplomaCount > 0 && unbundledCount > 0) {
+                    countsArray = [
+                        `Unbundled: ${unbundledCount}`,
+                        `Diploma: ${diplomaCount}`,
+                    ];
+                }
+
+                return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
             }
         };
 
-        const { extractedData, selectedCourseIds, countsArray } = await getOrderDetails();
+        const { extractedData, selectedCourseIds } = await getOrderDetails();
 
         let thinkificUserId;
 
@@ -244,35 +257,63 @@ exports.handler = async (event) => {
 
             await hubspotSearchContact();
 
-            // 3.3 - Function to create Thinkific user
-            const createThinkificUser = async (firstName, lastName, email) => {
-                const url = 'https://api.thinkific.com/api/public/v1/users';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-                    },
-                    body: JSON.stringify({
-                        first_name: firstName,
-                        last_name: lastName,
-                        email: email
-                    })
-                });
+            // 3.3 - Function to create Thinkific user or fetch existing user ID
+            const getOrCreateThinkificUser = async (firstName, lastName, email) => {
+                try {
+                    // Check if the user already exists
+                    const existingUserResponse = await fetch(`https://api.thinkific.com/api/public/v1/users?query[email]=${email}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                            'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                        }
+                    });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error(`Failed to create Thinkific user: ${response.status} - ${JSON.stringify(errorData)}`);
-                    throw new Error(`Failed to create Thinkific user: ${response.status} - ${errorData.message}`);
+                    if (!existingUserResponse.ok) {
+                        throw new Error(`Failed to check Thinkific user: ${existingUserResponse.status} - ${existingUserResponse.statusText}`);
+                    }
+
+                    const existingUserData = await existingUserResponse.json();
+
+                    if (existingUserData.items.length > 0) {
+                        // User already exists
+                        const existingUserId = existingUserData.items[0].id;
+                        console.log(`Thinkific user already exists: ${existingUserId}`);
+                        return existingUserId;
+                    } else {
+                        // Create a new user
+                        const createUserResponse = await fetch('https://api.thinkific.com/api/public/v1/users', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
+                                'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
+                            },
+                            body: JSON.stringify({
+                                first_name: firstName,
+                                last_name: lastName,
+                                email: email
+                            })
+                        });
+
+                        if (!createUserResponse.ok) {
+                            const errorData = await createUserResponse.json();
+                            console.error(`Failed to create Thinkific user: ${createUserResponse.status} - ${JSON.stringify(errorData)}`);
+                            throw new Error(`Failed to create Thinkific user: ${createUserResponse.status} - ${errorData.message}`);
+                        }
+
+                        const newUser = await createUserResponse.json();
+                        console.log(`Thinkific user created successfully: ${newUser.id}`);
+                        return newUser.id;
+                    }
+                } catch (error) {
+                    console.error(`Error getting or creating Thinkific user: ${error.message}`);
+                    throw error;
                 }
-
-                const data = await response.json();
-                console.log(`Thinkific user created successfully for ${firstName} ${lastName} userId: ${data.id}`);
-                return data.id;
             };
 
-            // 3.4 - Function to fetch user in Thinkific 
+            // 3.4 - Function to enroll user in Thinkific course
             const enrollInThinkificCourse = async (courseId, userId) => {
                 const url = 'https://api.thinkific.com/api/public/v1/enrollments';
                 const response = await fetch(url, {
@@ -300,18 +341,18 @@ exports.handler = async (event) => {
                 return data;
             };
 
-            // 3.5 - Create Thinkific users and enroll them in courses
+            // 3.5 - Create or get Thinkific users and enroll them in courses
             let thinkificCourseId;
             for (const participant of participants) {
                 try {
-                    const userId = await createThinkificUser(participant.firstName, participant.lastName, participant.email);
+                    const userId = await getOrCreateThinkificUser(participant.firstName, participant.lastName, participant.email);
 
                     for (const courseId of selectedCourseIds) {
                         console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
-                            //await enrollInThinkificCourse(courseId, userId);
-                            thinkificCourseId = courseId;
+                        //await enrollInThinkificCourse(courseId, userId);
+                        thinkificCourseId = courseId;
 
-                            await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
+                        await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"
@@ -355,7 +396,6 @@ exports.handler = async (event) => {
             }
 
             console.log("Processed participantInfo:", participants);
-
         }
 
         isExecuting = false;
