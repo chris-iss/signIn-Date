@@ -54,7 +54,6 @@ exports.handler = async (event) => {
 
         let buyerBillingData;
         let courseType = [];
-        let countsArray;
 
         // Step 1: Fetch order details from WooCommerce
         const getOrderDetails = async () => {
@@ -124,49 +123,37 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                const diplomaCourse = "Diploma in Business Sustainability 2024";
+                const diplomaCourse = "Diploma in Business Sustainability";
 
                 const hasDiploma = courses.includes(diplomaCourse);
 
-                const hasOtherCourses = courses.some(course => course !== diplomaCourse);
+                const unbundledCourses = courses.filter(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
                     courseType.push("Diploma");
                 }
 
-                if (hasOtherCourses) {
+                if (unbundledCourses.length > 0) {
                     courseType.push("Unbundled");
                 }
 
-                // Count occurrences of "Diploma" and "Unbundled" in the resultArray
-                const diplomaCount = courseType.filter(item => item === "Diploma").length;
-                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
-
                 // Create a new array to hold the counts
-                countsArray = [
-                    `Unbundled: ${unbundledCount}`,
-                    `Diploma: ${diplomaCount}`,
+                const countsArray = [
+                    `Unbundled: ${unbundledCourses.length}`,
+                    `Diploma: ${hasDiploma ? 1 : 0}`
                 ];
 
-                console.log("NO of Unbundled Selected:", unbundledCount)
-                console.log("NO of Diplomma Selected:", diplomaCount)
+                console.log("NO of Unbundled Selected:", unbundledCourses.length)
+                console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0)
 
-                // if both unbundled and diploma are selected 
-                if (diplomaCount > 0 && unbundledCount > 0) {
-                    countsArray = [
-                        `Unbundled: ${unbundledCount}`,
-                        `Diploma: ${diplomaCount}`,
-                    ];
-                }
-
-                return { extractedData, selectedCourseIds };
+                return { extractedData, selectedCourseIds, countsArray };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
             }
         };
 
-        const { extractedData, selectedCourseIds } = await getOrderDetails();
+        const { extractedData, selectedCourseIds, countsArray } = await getOrderDetails();
 
         let thinkificUserId;
 
