@@ -259,7 +259,7 @@ exports.handler = async (event) => {
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
-                            BNP: "Yes"
+                            BNP: "No"
                         })
                     });
                 }
@@ -372,7 +372,7 @@ exports.handler = async (event) => {
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
-                            BNP: "No"
+                            BNP: "Yes"
                         })
                     });
                 }
