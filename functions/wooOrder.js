@@ -109,7 +109,7 @@ exports.handler = async (event) => {
                     courses.push(course.name);
                 });
 
-                // Holds course IDs
+                // Holds course ID
                 const selectedCourseIds = [];
 
                 // Select course IDs based on the courses bought
