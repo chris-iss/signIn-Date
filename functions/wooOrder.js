@@ -139,15 +139,15 @@ exports.handler = async (event) => {
                 }
 
                 // Create a new array to hold the counts
-                const countsArray = [
+                countsArray = [
                     `Unbundled: ${unbundledCourses.length}`,
                     `Diploma: ${hasDiploma ? 1 : 0}`
                 ];
 
-                console.log("NO of Unbundled Selected:", unbundledCourses.length)
-                console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0)
+                console.log("NO of Unbundled Selected:", unbundledCourses.length);
+                console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0);
 
-                return { extractedData, selectedCourseIds, countsArray };
+                return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
@@ -334,7 +334,7 @@ exports.handler = async (event) => {
                         });
                     }
 
-                    // Create or update contact in HubSpotc
+                    // Create or update contact in HubSpot
                     await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
                         method: 'POST',
                         headers: {
