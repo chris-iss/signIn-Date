@@ -124,42 +124,30 @@ exports.handler = async (event) => {
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
 
                 // Function to determine if course is Unbundled or Diploma or even both
-                const diplomaCourse = "Diploma in Business Sustainability 2024";
+                const diplomaCourse = "Diploma in Business Sustainability";
 
                 const hasDiploma = courses.includes(diplomaCourse);
 
-                const hasOtherCourses = courses.some(course => course !== diplomaCourse);
+                const unbundledCourses = courses.filter(course => course !== diplomaCourse);
 
                 if (hasDiploma) {
                     courseType.push("Diploma");
                 }
 
-                if (hasOtherCourses) {
+                if (unbundledCourses.length > 0) {
                     courseType.push("Unbundled");
                 }
 
-                // Count occurrences of "Diploma" and "Unbundled" in the resultArray
-                const diplomaCount = courseType.filter(item => item === "Diploma").length;
-                const unbundledCount = courseType.filter(item => item === "Unbundled").length;
-
                 // Create a new array to hold the counts
-                countsArray = [
-                    `Unbundled: ${unbundledCount}`,
-                    `Diploma: ${diplomaCount}`,
+                const countsArray = [
+                    `Unbundled: ${unbundledCourses.length}`,
+                    `Diploma: ${hasDiploma ? 1 : 0}`
                 ];
 
-                console.log("NO of Unbundled Selected:", unbundledCount)
-                console.log("NO of Diplomma Selected:", diplomaCount)
+                console.log("NO of Unbundled Selected:", unbundledCourses.length)
+                console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0)
 
-                // if both unbundled and diploma are selected 
-                if (diplomaCount > 0 && unbundledCount > 0) {
-                    countsArray = [
-                        `Unbundled: ${unbundledCount}`,
-                        `Diploma: ${diplomaCount}`,
-                    ];
-                }
-
-                return { extractedData, selectedCourseIds };
+                return { extractedData, selectedCourseIds, countsArray };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
@@ -313,34 +301,6 @@ exports.handler = async (event) => {
                 }
             };
 
-            // 3.4 - Function to enroll user in Thinkific course
-            const enrollInThinkificCourse = async (courseId, userId) => {
-                const url = 'https://api.thinkific.com/api/public/v1/enrollments';
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Auth-API-Key': process.env.THINKIFIC_API_KEY,
-                        'X-Auth-Subdomain': process.env.THINKIFIC_SUB_DOMAIN
-                    },
-                    body: JSON.stringify({
-                        course_id: courseId,
-                        user_id: userId,
-                        activated_at: new Date().toISOString(),
-                        expiry_date: null
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Failed to enroll in Thinkific course: ${response.status} - ${errorData.message}`);
-                }
-
-                const data = await response.json();
-                console.log(`User enrolled in Thinkific course successfully: ${courseId}`);
-                return data;
-            };
-
             // 3.5 - Create or get Thinkific users and enroll them in courses
             let thinkificCourseId;
             for (const participant of participants) {
@@ -349,7 +309,7 @@ exports.handler = async (event) => {
 
                     for (const courseId of selectedCourseIds) {
                         console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
-                        //await enrollInThinkificCourse(courseId, userId);
+                        
                         thinkificCourseId = courseId;
 
                         await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
