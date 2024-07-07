@@ -60,7 +60,7 @@ exports.handler = async (event) => {
         const getOrderDetails = async () => {
             const url = `${baseUrl}/${orderId}`;
             const auth = 'Basic ' + Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-        
+
             try {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -68,24 +68,24 @@ exports.handler = async (event) => {
                         'Authorization': auth
                     }
                 });
-        
+
                 if (!response.ok) {
                     const errorDetails = await response.text();
                     throw new Error(`Error fetching order details: ${response.status} - ${response.statusText} - ${errorDetails}`);
                 }
-        
+
                 const data = await response.json();
-        
+
                 buyerBillingData = data;
-        
+
                 // Extract specific metadata from order details
                 const keysToExtract = ['name_', 'email_', 'name2_', 'email2_', 'name3_', 'email3_'];
                 const extractedData = data.meta_data
                     .filter(meta => keysToExtract.includes(meta.key))
                     .map(meta => ({ key: meta.key, value: meta.value }));
-        
+
                 console.log("EXTRACTED-DATA", extractedData);
-        
+
                 // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
                     "Introduction to Business Sustainability": "2755212",
@@ -103,15 +103,15 @@ exports.handler = async (event) => {
                     "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability": "2622273"
                 };
-        
+
                 let courses = [];
                 data.line_items.forEach(course => {
                     courses.push(course.name);
                 });
-        
-                // Holds course IDs
+
+                // Holds course ID's
                 const selectedCourseIds = [];
-        
+
                 // Select course IDs based on the courses bought
                 courses.forEach(course => {
                     if (moduleCourseIdMap.hasOwnProperty(course)) {
@@ -120,44 +120,53 @@ exports.handler = async (event) => {
                         console.log(`Course ID not found for '${course}'`);
                     }
                 });
-        
+
                 console.log("Enrolling user with course IDs:", selectedCourseIds);
-        
+
                 // Function to determine if course is Unbundled or Diploma or even both
                 const diplomaCourse = "Diploma in Business Sustainability";
-        
+
                 const hasDiploma = courses.includes(diplomaCourse);
+
                 const hasOtherCourses = courses.some(course => course !== diplomaCourse);
-        
+
                 if (hasDiploma) {
                     courseType.push("Diploma");
                 }
-        
+
                 if (hasOtherCourses) {
                     courseType.push("Unbundled");
                 }
-        
+
                 // Count occurrences of "Diploma" and "Unbundled" in the resultArray
                 const diplomaCount = courseType.filter(item => item === "Diploma").length;
                 const unbundledCount = courseType.filter(item => item === "Unbundled").length;
-        
+
                 // Create a new array to hold the counts
                 countsArray = [
                     `Unbundled: ${unbundledCount}`,
                     `Diploma: ${diplomaCount}`,
                 ];
-        
+
+                console.log("NO of Unbundled Selected:", unbundledCount)
+                console.log("NO of Diplomma Selected:", diplomaCount)
+
+                // if both unbundled and diploma are selected 
+                if (diplomaCount > 0 && unbundledCount > 0) {
+                    countsArray = [
+                        `Unbundled: ${unbundledCount}`,
+                        `Diploma: ${diplomaCount}`,
+                    ];
+                }
+
                 return { extractedData, selectedCourseIds };
             } catch (error) {
                 console.error('Fetch error:', error.message);
                 throw error;
             }
         };
-        
 
         const { extractedData, selectedCourseIds } = await getOrderDetails();
-
-        console.log("PRODUCTS COUNT:", countsArray)
 
         let existThinkificUserId;
 
@@ -250,7 +259,7 @@ exports.handler = async (event) => {
             let thinkificCourseId;
 
             // Create Thinkific users and enroll them in courses else If user exist dont create thinkific user again
-            //for (const participant of participants) {
+            for (const participant of participants) {
                 try {
 
                     // Create or update contact in HubSpotc
@@ -279,7 +288,7 @@ exports.handler = async (event) => {
 
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23s3wnv/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -303,14 +312,14 @@ exports.handler = async (event) => {
     
                     } else {
                         console.log("Thinkific User doesn't exist, hence New User Created")
-                        const userId = await createThinkificUser(buyerBillingData.billing.first_name, buyerBillingData.billing.last_name, buyerBillingData.billing.email);
+                        const userId = await createThinkificUser(buyerBillingData.billing.first_name, buyerBillingData.billing.last_name, participant.email);
 
                         for (const courseId of selectedCourseIds) {
                             console.log(`Enrollment:, courseId: ${courseId} userId: ${userId}`);
                                 //await enrollInThinkificCourse(courseId, userId);
                                 thinkificCourseId = courseId;
     
-                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23s3wnv/', {
+                                await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -320,14 +329,14 @@ exports.handler = async (event) => {
                                     selectedCourseCout: countsArray,
                                     thinkificCourseId: thinkificCourseId,
                                     thnkificUserId: userId,
-                                    firstname: buyerBillingData.billing.first_name,
-                                    lastname: buyerBillingData.billing.last_name,
-                                    email: buyerBillingData.billing.email,
+                                    firstname: participant.firstName,
+                                    lastname: participant.lastName,
+                                    email: participant.email,
                                     currency: requestBody.currency,
                                     startDate: requestBody.startDate,
                                     unbundledSkuCode: requestBody.unbundledSkuCode,
                                     diplomaSkuCode: requestBody.diplomaSkuCode,
-                                    BNP: "No"
+                                    BNP: "Yes"
                                 })
                             });
                         }
@@ -335,9 +344,9 @@ exports.handler = async (event) => {
                 } catch (error) {
                     console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
                 }
-            //}
+            }
 
-            console.log("Processed participantInfo:", buyerBillingData.billing);
+            console.log("Processed participantInfo:", participants);
         }
 
 
@@ -500,10 +509,11 @@ exports.handler = async (event) => {
                     await  hubspotParticipantSearchContact(participant.email);
 
                     if (existThinkificUserId) {
+                        console.log(`"Yes Thinnkifc User Exist Already" - New Enrollment: courseId: ${thinkificCourseId} - userId: ${existThinkificUserId}`);
 
                         for (const courseId of selectedCourseIds) {
                             console.log(`Enrollment:, courseId: ${courseId} userId: ${existThinkificUserId}`);
-                            
+
                                 thinkificCourseId = courseId;
     
                                 await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
