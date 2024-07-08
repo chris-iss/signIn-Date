@@ -267,7 +267,7 @@ exports.handler = async (event) => {
                 }
 
                 // Create or update contact in HubSpot
-                await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(billingUserEmail), {
+                const hubSpotResponse = await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(billingUserEmail), {
                     method: 'POST',
                     headers: {
                         "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -281,6 +281,13 @@ exports.handler = async (event) => {
                         ]
                     })
                 });
+
+                if (!hubSpotResponse.ok) {
+                    const errorDetails = await hubSpotResponse.text();
+                    throw new Error(`Failed to create/update HubSpot contact: ${hubSpotResponse.status} - ${hubSpotResponse.statusText} - ${errorDetails}`);
+                }
+
+                console.log("HubSpot contact created/updated successfully");
 
             } catch (error) {
                 console.error('Error creating HubSpot contact, enrolling in Thinkific, or sending data to Zapier:', error.message);
@@ -381,7 +388,7 @@ exports.handler = async (event) => {
                 }
 
                 // Create or update contact in HubSpot
-                await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
+                const hubSpotResponse = await fetch('https://api.hubapi.com/contacts/v1/contact/createOrUpdate/email/' + encodeURIComponent(participant.email), {
                     method: 'POST',
                     headers: {
                         "AUTHORIZATION": `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -396,6 +403,13 @@ exports.handler = async (event) => {
                         ]
                     })
                 });
+
+                if (!hubSpotResponse.ok) {
+                    const errorDetails = await hubSpotResponse.text();
+                    throw new Error(`Failed to create/update HubSpot contact: ${hubSpotResponse.status} - ${hubSpotResponse.statusText} - ${errorDetails}`);
+                }
+
+                console.log("HubSpot contact created/updated successfully for participant:", participant.email);
             }
 
             console.log("Processed participants:", participants);
