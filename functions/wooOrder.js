@@ -398,8 +398,7 @@ exports.handler = async (event) => {
                         properties: [
                             { property: 'firstname', value: participant.firstName },
                             { property: 'lastname', value: participant.lastName },
-                            { property: 'email', value: participant.email },
-                            { property: 'buyer_not_participant', value: false }
+                            { property: 'email', value: participant.email }
                         ]
                     })
                 });

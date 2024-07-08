@@ -66,7 +66,10 @@ exports.handler = async (event) => {
             };
         }
 
-        const { email, responseDataId } = extractParameters;
+        const { email, responseDataId, coursesSelected } = extractParameters;
+
+        console.log("COURSES SELECTED:", coursesSelected)
+        console.log("COURSE-SELECTED: - TYPEOF OF DATA", typeof (coursesSelected))
 
         // Check if responseDataId matches any productId in thinkificProductIdMap
         const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
