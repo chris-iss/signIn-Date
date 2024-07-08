@@ -38,8 +38,7 @@ const coursesMap = [
     "Diploma in Business Sustainability 2024"
 ];
 
-
-// This codebase Thinkific Product ID in real-time and updates Produc id HubSpot propertIESS
+// This codebase Thinkific Product ID in real-time and updates Product id HubSpot properties
 exports.handler = async (event) => {
     try {
         // Check if the function is already executing
@@ -68,8 +67,10 @@ exports.handler = async (event) => {
 
         const { email, responseDataId, coursesSelected } = extractParameters;
 
-        console.log("COURSES SELECTED:", coursesSelected)
-        console.log("COURSE-SELECTED: - TYPEOF OF DATA", typeof (coursesSelected))
+        console.log("COURSES SELECTED:", coursesSelected);
+        console.log("COURSE-SELECTED: - TYPEOF OF DATA", typeof (coursesSelected));
+
+        const selectedCoursesData = coursesSelected.split(",");
 
         // Check if responseDataId matches any productId in thinkificProductIdMap
         const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
@@ -146,6 +147,92 @@ exports.handler = async (event) => {
                 };
 
                 await updateCoursePrdId();
+
+                // NEW CODE TO UPDATE SPECIFIED HUBSPOT CONTACT PROPERTY BASED ON SELECTED COURSES
+                
+                const selectedCoursesArray = coursesSelected.split(",");
+                const matchedCourses = [];
+
+                for (let course of coursesMap) {
+                    if (selectedCoursesArray.includes(course)) {
+                        const enrolled = "Enrolled";
+                        let updateContactProperty;
+                        switch(course) {
+                            case "Introduction to Business Sustainability":
+                                updateContactProperty = "unbundled_module_1";
+                                break;
+                            case "Sustainable Plan Development":
+                                updateContactProperty = "unbundled_module_2";
+                                break;
+                            case "Sustainability Plan Implementation":
+                                updateContactProperty = "unbundled_module_3";
+                                break;
+                            case "Decarbonisation: Achieving Net Zero":
+                                updateContactProperty = "unbundled_module_4";
+                                break;
+                            case "Circular Economy":
+                                updateContactProperty = "unbundled_module_5";
+                                break;
+                            case "Business with Biodiversity":
+                                updateContactProperty = "unbundled_module_6";
+                                break;
+                            case "Diversity, Equity, and Inclusion":
+                                updateContactProperty = "unbundled_module_7";
+                                break;
+                            case "Sustainable Finance":
+                                updateContactProperty = "unbundled_module_8";
+                                break;
+                            case "Sustainable Operations":
+                                updateContactProperty = "unbundled_module_9";
+                                break;
+                            case "Sustainable Supply Chain":
+                                updateContactProperty = "unbundled_module_10";
+                                break;
+                            case "Green Marketing":
+                                updateContactProperty = "unbundled_module_11";
+                                break;
+                            case "ESG Reporting and Auditing":
+                                updateContactProperty = "unbundled_module_12";
+                                break;
+                            case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
+                                updateContactProperty = "unbundled_csrd";
+                                break;
+                            case "Diploma in Business Sustainability 2024":
+                                updateContactProperty = "diploma_enrolment";
+                                break;
+                            default:
+                                console.log("No contact Property defined for:", course);
+                        }
+                        if (updateContactProperty) {
+                            matchedCourses.push({ course, updateContactProperty, status: enrolled });
+                        }
+                    }
+                }
+
+                if (matchedCourses.length > 0) {
+                    matchedCourses.forEach(async ({ course, updateContactProperty, status }) => {
+                        try {
+                            const updateContactPropertyObject = {};
+                            updateContactPropertyObject[updateContactProperty] = status;
+
+                            const updateCourseStatus = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                                method: "PATCH",
+                                headers: {
+                                    Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ properties: updateContactPropertyObject })
+                            });
+
+                            const response = await updateCourseStatus.json();
+                            console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, response);
+                        } catch (error) {
+                            console.log(`Error updating ${course} status:`, error.message);
+                        }
+                    });
+                } else {
+                    console.log("No courses matched the update criteria.");
+                }
             } catch (error) {
                 // Log any errors during the HubSpot contact search
                 console.log("HUBSPOT SEARCH ERROR", error.message);
