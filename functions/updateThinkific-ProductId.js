@@ -21,6 +21,24 @@ const thinkificProductIdMap = {
     "2822347": "bs_diploma_course_id"
 };
 
+const coursesMap = [
+    "Introduction to Business Sustainability",
+    "Sustainability Plan Development",
+    "Sustainability Plan Implementation",
+    "Decarbonisation: Achieving Net Zero",
+    "Circular Economy",
+    "Business with Biodiversity",
+    "Diversity, Equity, and Inclusion",
+    "Sustainable Finance",
+    "Sustainable Operations",
+    "Sustainable Supply Chain",
+    "Green Marketing",
+    "ESG Reporting and Auditing",
+    "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
+    "Diploma in Business Sustainability 2024"
+];
+
+
 // This codebase Thinkific Product ID in real-time and updates Produc id HubSpot propertIESS
 exports.handler = async (event) => {
     try {

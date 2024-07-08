@@ -53,6 +53,7 @@ exports.handler = async (event) => {
         }
 
         let buyerBillingData;
+        let courses = [];
         let courseType = [];
         let countsArray;
 
@@ -104,7 +105,7 @@ exports.handler = async (event) => {
                     "Diploma in Business Sustainability": "2622273"
                 };
 
-                let courses = [];
+             
                 data.line_items.forEach(course => {
                     courses.push(course.name);
                 });
@@ -361,6 +362,7 @@ exports.handler = async (event) => {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
+                            selectedCourses: courses,
                             selectdCoursesType: courseType,
                             selectedCourseCout: countsArray,
                             thinkificCourseId: thinkificCourseId,
