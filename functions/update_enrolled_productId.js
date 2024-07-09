@@ -16,7 +16,7 @@ const thinkificProductIdMap = {
     "2965534": "unbundled_module_9_course_id",
     "2965541": "unbundled_module_10_course_id",
     "2965546": "unbundled_module_11_course_id",
-    "2965548": "unbundled_module_12_course_id",
+    "2965538": "unbundled_module_12_course_id",
     "2937008": "unbundled_csrd_product_id",
     "2822347": "bs_diploma_course_id"
 };
