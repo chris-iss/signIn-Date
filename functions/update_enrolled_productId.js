@@ -161,7 +161,7 @@ exports.handler = async (event) => {
                             case "Introduction to Business Sustainability":
                                 updateContactProperty = "unbundled_module_1";
                                 break;
-                            case "Sustainable Plan Development":
+                            case "Sustainability Plan Development":
                                 updateContactProperty = "unbundled_module_2";
                                 break;
                             case "Sustainability Plan Implementation":
@@ -179,13 +179,13 @@ exports.handler = async (event) => {
                             case "Diversity, Equity, and Inclusion":
                                 updateContactProperty = "unbundled_module_7";
                                 break;
-                            case "Sustainable Finance":
+                            case "Sustainability Finance":
                                 updateContactProperty = "unbundled_module_8";
                                 break;
-                            case "Sustainable Operations":
+                            case "Sustainability Operations":
                                 updateContactProperty = "unbundled_module_9";
                                 break;
-                            case "Sustainable Supply Chain":
+                            case "Sustainability Supply Chain":
                                 updateContactProperty = "unbundled_module_10";
                                 break;
                             case "Green Marketing":
