@@ -300,7 +300,7 @@ exports.handler = async (event) => {
         // Step 3: Participants array isn't empty
         if (participants.length > 0) {
         
-            //Function to update buyer not participant contact property to Yes
+            //Function to update buyer not participant contact property to Yes and Order Id
             await fetch('https://hooks.zapier.com/hooks/catch/14129819/2blsx1o/', {
                         method: "POST",
                         headers: {
@@ -308,6 +308,7 @@ exports.handler = async (event) => {
                         },
                         body: JSON.stringify({
                             email: billingUserEmail,
+                            orderId: orderId,
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode || null,
                             diplomaSkuCode: requestBody.diplomaSkuCode || null,
@@ -398,6 +399,7 @@ exports.handler = async (event) => {
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
+                            orderId: orderId,
                             BNP: "Yes"
                         })
                     });
