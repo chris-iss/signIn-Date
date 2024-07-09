@@ -96,7 +96,7 @@ exports.handler = async (event) => {
                     properties: [
                         "id",
                         "email",
-                        contactPropertyToUpdate // Include contact property to update
+                        contactPropertyToUpdate // Include contact property to updates
                     ],
                     sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                 };
