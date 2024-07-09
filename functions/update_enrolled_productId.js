@@ -3,7 +3,6 @@ require("dotenv").config();
 
 let isExecuting = false;
 
-// These are course product Id's
 const thinkificProductIdMap = {
     "2965465": "unbundled_module_1_course_id",
     "2965473": "unbundled_module_2_course_id",
@@ -38,10 +37,30 @@ const coursesMap = [
     "Diploma in Business Sustainability"
 ];
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+
+async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    } catch (error) {
+        if (retries > 0) {
+            console.log(`Retrying... (${retries} retries left)`);
+            await new Promise(res => setTimeout(res, RETRY_DELAY_MS));
+            return fetchWithRetry(url, options, retries - 1);
+        } else {
+            throw new Error(`Max retries reached. ${error.message}`);
+        }
+    }
+}
+
 // This codebase Thinkific Product ID in real-time and updates Product id HubSpot properties
 exports.handler = async (event) => {
     try {
-        // Check if the function is already executing
         if (isExecuting) {
             return {
                 statusCode: 409,
@@ -57,7 +76,6 @@ exports.handler = async (event) => {
 
         console.log("Request Body:", extractParameters);
 
-        // Validate API key
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
@@ -72,7 +90,6 @@ exports.handler = async (event) => {
 
         const selectedCoursesData = coursesSelected.split(",");
 
-        // Check if responseDataId matches any productId in thinkificProductIdMap
         const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
         if (!contactPropertyToUpdate) {
             return {
@@ -81,12 +98,10 @@ exports.handler = async (event) => {
             };
         }
 
-        // Search for the Contact on HubSpot
         const hubspotSearchContact = async () => {
             const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
             try {
-                // Define properties for searching HubSpot contacts by email
                 const hubspotSearchProperties = {
                     filterGroups: [
                         { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
@@ -96,13 +111,12 @@ exports.handler = async (event) => {
                     properties: [
                         "id",
                         "email",
-                        contactPropertyToUpdate // Include contact property to updates
+                        contactPropertyToUpdate
                     ],
                     sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                 };
 
-                // Make a POST request to search for HubSpot contacts
-                const searchContact = await fetch(hubspotBaseURL, {
+                const searchContact = await fetchWithRetry(hubspotBaseURL, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -111,23 +125,18 @@ exports.handler = async (event) => {
                     body: JSON.stringify(hubspotSearchProperties),
                 });
 
-                // Parse the response from HubSpot contact search by email
-                const hubspotContactResponse = await searchContact.json();
-                if (!hubspotContactResponse.results.length) {
+                if (!searchContact.results.length) {
                     throw new Error("No contact found");
                 }
 
-                const extractHubspotUserId = hubspotContactResponse.results[0].id;
+                const extractHubspotUserId = searchContact.results[0].id;
 
-                // Update Unbundled Product ID Contact Property
                 const updateCoursePrdId = async () => {
                     try {
-                        // Define the properties object for updating HubSpot contact
                         const unbundledProductIdProperty = {};
                         unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
 
-                        // Make a PATCH request to update the HubSpot contact
-                        const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                        const updateContact = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
                             headers: {
                                 Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -136,20 +145,15 @@ exports.handler = async (event) => {
                             body: JSON.stringify({ properties: unbundledProductIdProperty })
                         });
 
-                        // Parse the response and log it
-                        const response = await updateContact.json();
-                        console.log("Course Product Id Updated:", response);
+                        console.log("Course Product Id Updated:", updateContact);
 
                     } catch (error) {
-                        // Log any errors during the HubSpot contact update
                         console.log("Error updating module completion:", error.message);
                     }
                 };
 
                 await updateCoursePrdId();
 
-                // NEW CODE TO UPDATE SPECIFIED HUBSPOT CONTACT PROPERTY BASED ON SELECTED COURSES
-                
                 const matchedCourses = [];
 
                 for (let course of coursesMap) {
@@ -214,7 +218,7 @@ exports.handler = async (event) => {
                             const updateContactPropertyObject = {};
                             updateContactPropertyObject[updateContactProperty] = status;
 
-                            const updateCourseStatus = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                            const updateCourseStatus = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                                 method: "PATCH",
                                 headers: {
                                     Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -223,8 +227,7 @@ exports.handler = async (event) => {
                                 body: JSON.stringify({ properties: updateContactPropertyObject })
                             });
 
-                            const response = await updateCourseStatus.json();
-                            console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, response);
+                            console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, updateCourseStatus);
                         } catch (error) {
                             console.log(`Error updating ${course} status:`, error.message);
                         }
@@ -233,7 +236,6 @@ exports.handler = async (event) => {
                     console.log("No courses matched the update criteria.");
                 }
             } catch (error) {
-                // Log any errors during the HubSpot contact search
                 console.log("HUBSPOT SEARCH ERROR", error.message);
             }
         };
