@@ -34,7 +34,7 @@ const coursesMap = [
     "Sustainable Supply Chain",
     "Green Marketing",
     "ESG Reporting and Auditing",
-    "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
+    "Corporate Sustainability Reporting Directive - (CSRD)",
     "Diploma in Business Sustainability 2024"
 ];
 
