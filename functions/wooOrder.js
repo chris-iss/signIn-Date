@@ -309,8 +309,8 @@ exports.handler = async (event) => {
                         body: JSON.stringify({
                             email: billingUserEmail,
                             startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode,
-                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            unbundledSkuCode: requestBody.unbundledSkuCode || null,
+                            diplomaSkuCode: requestBody.diplomaSkuCode || null,
                             setBuyerNotParticipant: "Yes"
                         })
             });
