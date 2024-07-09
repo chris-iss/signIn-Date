@@ -174,6 +174,7 @@ exports.handler = async (event) => {
             }
         }
 
+
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
             console.log(`Participant is Buyer - Firstname: ${buyerBillingData.billing.first_name}, lastName: ${buyerBillingData.billing.last_name}, Email: ${buyerBillingData.billing.email}`);
@@ -298,7 +299,22 @@ exports.handler = async (event) => {
 
         // Step 3: Participants array isn't empty
         if (participants.length > 0) {
-            console.log("Participants exist:", participants);
+        
+            //Function to update buyer not participant contact property to Yes
+            await fetch('https://hooks.zapier.com/hooks/catch/14129819/2blsx1o/', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: billingUserEmail,
+                            startDate: requestBody.startDate,
+                            unbundledSkuCode: requestBody.unbundledSkuCode,
+                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            setBuyerNotParticipant: "Yes"
+                        })
+            });
+
 
             // Function to create Thinkific user or fetch existing user ID
             const getOrCreateThinkificUser = async (firstName, lastName, email) => {
