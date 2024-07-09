@@ -194,7 +194,7 @@ exports.handler = async (event) => {
                             case "ESG Reporting and Auditing":
                                 updateContactProperty = "unbundled_module_12";
                                 break;
-                            case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
+                            case "Corporate Sustainability Reporting Directive - (CSRD)":
                                 updateContactProperty = "unbundled_csrd";
                                 break;
                             case "Diploma in Business Sustainability 2024":
