@@ -96,12 +96,12 @@ exports.handler = async (event) => {
                     "Circular Economy": "2755243",
                     "Business with Biodiversity": "2755260",
                     "Diversity, Equity, and Inclusion": "2755264",
-                    "Sustainable Finance": "2755272",
-                    "Sustainable Operations": "2755276",
-                    "Sustainable Supply Chain": "2755278",
+                    "Sustainability Finance": "2755272",
+                    "Sustainability Operations": "2755276",
+                    "Sustainability Supply Chain": "2755278",
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
-                    "Corporate Sustainability Reporting Directive - (CSRD)": "2730358",
+                    "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability": "2622273"
                 };
 
