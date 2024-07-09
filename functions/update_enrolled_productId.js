@@ -35,7 +35,7 @@ const coursesMap = [
     "Green Marketing",
     "ESG Reporting and Auditing",
     "Corporate Sustainability Reporting Directive - (CSRD)",
-    "Diploma in Business Sustainability 2024"
+    "Diploma in Business Sustainability"
 ];
 
 // This codebase Thinkific Product ID in real-time and updates Product id HubSpot properties
@@ -197,7 +197,7 @@ exports.handler = async (event) => {
                             case "Corporate Sustainability Reporting Directive - (CSRD)":
                                 updateContactProperty = "unbundled_csrd";
                                 break;
-                            case "Diploma in Business Sustainability 2024":
+                            case "Diploma in Business Sustainability":
                                 updateContactProperty = "diploma_enrolment";
                                 break;
                             default:
