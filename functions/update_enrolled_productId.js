@@ -29,9 +29,9 @@ const coursesMap = [
     "Circular Economy",
     "Business with Biodiversity",
     "Diversity, Equity, and Inclusion",
-    "Sustainability Finance",
-    "Sustainability Operations",
-    "Sustainability Supply Chain",
+    "Sustainable Finance",
+    "Sustainable Operations",
+    "Sustainable Supply Chain",
     "Green Marketing",
     "ESG Reporting and Auditing",
     "Corporate Sustainability Reporting Directive - (CSRD)",
@@ -150,11 +150,10 @@ exports.handler = async (event) => {
 
                 // NEW CODE TO UPDATE SPECIFIED HUBSPOT CONTACT PROPERTY BASED ON SELECTED COURSES
                 
-                const selectedCoursesArray = coursesSelected.split(",");
                 const matchedCourses = [];
 
                 for (let course of coursesMap) {
-                    if (selectedCoursesArray.includes(course)) {
+                    if (selectedCoursesData.includes(course)) {
                         const enrolled = "Enrolled";
                         let updateContactProperty;
                         switch(course) {
@@ -179,13 +178,13 @@ exports.handler = async (event) => {
                             case "Diversity, Equity, and Inclusion":
                                 updateContactProperty = "unbundled_module_7";
                                 break;
-                            case "Sustainability Finance":
+                            case "Sustainable Finance":
                                 updateContactProperty = "unbundled_module_8";
                                 break;
-                            case "Sustainability Operations":
+                            case "Sustainable Operations":
                                 updateContactProperty = "unbundled_module_9";
                                 break;
-                            case "Sustainability Supply Chain":
+                            case "Sustainable Supply Chain":
                                 updateContactProperty = "unbundled_module_10";
                                 break;
                             case "Green Marketing":
@@ -210,7 +209,7 @@ exports.handler = async (event) => {
                 }
 
                 if (matchedCourses.length > 0) {
-                    matchedCourses.forEach(async ({ course, updateContactProperty, status }) => {
+                    await Promise.all(matchedCourses.map(async ({ course, updateContactProperty, status }) => {
                         try {
                             const updateContactPropertyObject = {};
                             updateContactPropertyObject[updateContactProperty] = status;
@@ -229,7 +228,7 @@ exports.handler = async (event) => {
                         } catch (error) {
                             console.log(`Error updating ${course} status:`, error.message);
                         }
-                    });
+                    }));
                 } else {
                     console.log("No courses matched the update criteria.");
                 }
