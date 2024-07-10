@@ -29,7 +29,7 @@ const coursesMap = [
     "Business with Biodiversity",
     "Diversity, Equity, and Inclusion",
     "Sustainable Finance",
-    "Sustainable Operations",
+    "Sustainability Operations",
     "Sustainable Supply Chain",
     "Green Marketing",
     "ESG Reporting and Auditing",

@@ -178,7 +178,6 @@ exports.handler = async (event) => {
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
             console.log(`Participant is Buyer - Firstname: ${buyerBillingData.billing.first_name}, lastName: ${buyerBillingData.billing.last_name}, Email: ${buyerBillingData.billing.email}`);
-            console.log("Selected Course IDs:", selectedCourseIds);
 
             // Function to create Thinkific user or fetch existing user ID
             const getOrCreateThinkificUser = async (firstName, lastName, email) => {
