@@ -27,7 +27,7 @@ const coursesMap = [
     "Decarbonisation: Achieving Net Zero",
     "Circular Economy",
     "Business with Biodiversity",
-    "Diversity, Equity, and Inclusion",
+    "Diversity Equity and Inclusion",
     "Sustainability Finance",
     "Sustainability Operations",
     "Sustainability Supply Chain",
@@ -180,7 +180,7 @@ exports.handler = async (event) => {
                             case "Business with Biodiversity":
                                 updateContactProperty = "unbundled_module_6";
                                 break;
-                            case "Diversity, Equity, and Inclusion":
+                            case "Diversity Equity and Inclusion":
                                 updateContactProperty = "unbundled_module_7";
                                 break;
                             case "Sustainability Finance":
