@@ -136,6 +136,13 @@ exports.handler = async (event) => {
                         const unbundledProductIdProperty = {};
                         unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
 
+                        //Test Case
+                        let productIds = [];
+                        productId.push(unbundledProductIdProperty);
+
+                        console.log("CHECKING PRODUCT ID'S:", productIds)
+
+
                         const updateContact = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
                             headers: {
