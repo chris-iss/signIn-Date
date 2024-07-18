@@ -85,8 +85,8 @@ exports.handler = async (event) => {
 
         const { email, responseDataId, coursesSelected } = extractParameters;
 
-        console.log("COURSES SELECTED:", coursesSelected);
-        console.log("COURSE-SELECTED: - TYPEOF OF DATA", typeof (coursesSelected));
+        console.log("SELECTED PRODUCID:", responseDataId);
+        console.log("COURSE-SELECTED:", coursesSelected);
 
         const selectedCoursesData = coursesSelected.split(",");
 
