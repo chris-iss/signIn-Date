@@ -138,7 +138,7 @@ exports.handler = async (event) => {
 
                         //Test Case
                         let productIds = [];
-                        productId.push(unbundledProductIdProperty);
+                        productIds.push(unbundledProductIdProperty);
 
                         console.log("CHECKING PRODUCT ID'S:", productIds)
 
