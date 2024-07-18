@@ -95,7 +95,7 @@ exports.handler = async (event) => {
                     "Decarbonisation: Achieving Net Zero": "2755233",
                     "Circular Economy": "2755243",
                     "Business with Biodiversity": "2755260",
-                    "Diversity, Equity, and Inclusion": "2755264",
+                    "Diversity Equity and Inclusion": "2755264",
                     "Sustainability Finance": "2755272",
                     "Sustainability Operations": "2755276",
                     "Sustainability Supply Chain": "2755278",
