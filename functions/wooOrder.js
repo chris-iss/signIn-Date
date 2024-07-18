@@ -264,6 +264,29 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
+
+                    //Used in creating Xero Invoice
+                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            selectedCourses: courses,
+                            selectdCoursesType: courseType,
+                            selectedCourseCout: countsArray,
+                            thinkificCourseId: thinkificCourseId,
+                            thnkificUserId: userId,
+                            firstname: buyerBillingData.billing.first_name,
+                            lastname: buyerBillingData.billing.last_name,
+                            email: billingUserEmail,
+                            currency: requestBody.currency,
+                            startDate: requestBody.startDate,
+                            unbundledSkuCode: requestBody.unbundledSkuCode,
+                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            BNP: "No"
+                        })
+                    });
                 }
 
                 // Create or update contact in HubSpot
@@ -381,6 +404,30 @@ exports.handler = async (event) => {
                     const thinkificCourseId = courseId;
 
                     await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            selectedCourses: courses,
+                            selectdCoursesType: courseType,
+                            selectedCourseCout: countsArray,
+                            thinkificCourseId: thinkificCourseId,
+                            thnkificUserId: userId,
+                            firstname: participant.firstName,
+                            lastname: participant.lastName,
+                            email: participant.email,
+                            currency: requestBody.currency,
+                            startDate: requestBody.startDate,
+                            unbundledSkuCode: requestBody.unbundledSkuCode,
+                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            orderId: orderId,
+                            BNP: "Yes"
+                        })
+                    });
+
+                    //Used in creating Xero Invoice
+                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
