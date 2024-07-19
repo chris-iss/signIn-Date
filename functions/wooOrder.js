@@ -31,6 +31,14 @@ exports.handler = async (event) => {
         const orderId = requestBody.orderId;
         const billingUserEmail = requestBody.billing_user_email;
 
+        //For Xero Account & Invoice Creation
+        const addressOne = requestBody.address_1;
+        const addressTwo = requestBody.address_2;
+        const city = requestBody.addressCity;
+        const state = requestBody.state;
+        const country = requestBody.country;
+
+
         if (!orderId) {
             isExecuting = false;
             return {
@@ -285,6 +293,11 @@ exports.handler = async (event) => {
                             unbundledSkuCode: requestBody.unbundledSkuCode || null,
                             diplomaSkuCode: requestBody.diplomaSkuCode || null,
                             orderId: orderId,
+                            addresss_1: addressOne,
+                            address_2: addressTwo,
+                            city: city,
+                            state: state,
+                            country: country,
                             BNP: "No"
                         })
                     });
@@ -447,6 +460,11 @@ exports.handler = async (event) => {
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
                             orderId: orderId,
+                            addresss_1: addressOne,
+                            address_2: addressTwo,
+                            city: city,
+                            state: state,
+                            country: country,
                             BNP: "Yes"
                         })
                     });
