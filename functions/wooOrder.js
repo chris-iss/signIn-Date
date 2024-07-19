@@ -284,6 +284,7 @@ exports.handler = async (event) => {
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
+                            orderId: orderId,
                             BNP: "No"
                         })
                     });
