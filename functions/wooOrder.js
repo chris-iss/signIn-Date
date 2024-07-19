@@ -283,7 +283,7 @@ exports.handler = async (event) => {
                             currency: requestBody.currency,
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
-                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            diplomaSkuCode: requestBody.diplomaSkuCode || null,
                             orderId: orderId,
                             BNP: "No"
                         })
