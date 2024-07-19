@@ -37,6 +37,7 @@ exports.handler = async (event) => {
         const city = requestBody.addressCity;
         const state = requestBody.state;
         const country = requestBody.country;
+        const amount = requestBody.amount
 
 
         if (!orderId) {
@@ -182,6 +183,33 @@ exports.handler = async (event) => {
             }
         }
 
+         //Used in creating Xero Invoice
+         await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                selectedCourses: courses,
+                selectdCoursesType: courseType,
+                selectedCourseCout: countsArray,
+                firstname: buyerBillingData.billing.first_name,
+                lastname: buyerBillingData.billing.last_name,
+                email: billingUserEmail,
+                currency: requestBody.currency,
+                startDate: requestBody.startDate,
+                unbundledSkuCode: requestBody.unbundledSkuCode || null,
+                diplomaSkuCode: requestBody.diplomaSkuCode || null,
+                orderId: orderId,
+                addresss_1: addressOne || null,
+                address_2: addressTwo || null,
+                city: city || null,
+                state: state || null,
+                country: country || null,
+                amount: amount || null,
+            })
+        });
+
 
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
@@ -269,35 +297,6 @@ exports.handler = async (event) => {
                             startDate: requestBody.startDate,
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
-                            BNP: "No"
-                        })
-                    });
-
-                    //Used in creating Xero Invoice
-                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            selectedCourses: courses,
-                            selectdCoursesType: courseType,
-                            selectedCourseCout: countsArray,
-                            thinkificCourseId: thinkificCourseId,
-                            thnkificUserId: userId,
-                            firstname: buyerBillingData.billing.first_name,
-                            lastname: buyerBillingData.billing.last_name,
-                            email: billingUserEmail,
-                            currency: requestBody.currency,
-                            startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode || null,
-                            diplomaSkuCode: requestBody.diplomaSkuCode || null,
-                            orderId: orderId,
-                            addresss_1: addressOne || null,
-                            address_2: addressTwo || null,
-                            city: city || null,
-                            state: state || null,
-                            country: country || null,
                             BNP: "No"
                         })
                     });
@@ -436,35 +435,6 @@ exports.handler = async (event) => {
                             unbundledSkuCode: requestBody.unbundledSkuCode,
                             diplomaSkuCode: requestBody.diplomaSkuCode,
                             orderId: orderId,
-                            BNP: "Yes"
-                        })
-                    });
-
-                    //Used in creating Xero Invoice
-                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            selectedCourses: courses,
-                            selectdCoursesType: courseType,
-                            selectedCourseCout: countsArray,
-                            thinkificCourseId: thinkificCourseId,
-                            thnkificUserId: userId,
-                            firstname: participant.firstName,
-                            lastname: participant.lastName,
-                            email: participant.email,
-                            currency: requestBody.currency,
-                            startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode,
-                            diplomaSkuCode: requestBody.diplomaSkuCode,
-                            orderId: orderId,
-                            addresss_1: addressOne || null,
-                            address_2: addressTwo || null,
-                            city: city || null,
-                            state: state || null,
-                            country: country || null,
                             BNP: "Yes"
                         })
                     });
