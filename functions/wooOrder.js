@@ -293,11 +293,11 @@ exports.handler = async (event) => {
                             unbundledSkuCode: requestBody.unbundledSkuCode || null,
                             diplomaSkuCode: requestBody.diplomaSkuCode || null,
                             orderId: orderId,
-                            addresss_1: addressOne,
-                            address_2: addressTwo,
-                            city: city,
-                            state: state,
-                            country: country,
+                            addresss_1: addressOne || null,
+                            address_2: addressTwo || null,
+                            city: city || null,
+                            state: state || null,
+                            country: country || null,
                             BNP: "No"
                         })
                     });
