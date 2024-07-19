@@ -282,7 +282,7 @@ exports.handler = async (event) => {
                             email: billingUserEmail,
                             currency: requestBody.currency,
                             startDate: requestBody.startDate,
-                            unbundledSkuCode: requestBody.unbundledSkuCode,
+                            unbundledSkuCode: requestBody.unbundledSkuCode || null,
                             diplomaSkuCode: requestBody.diplomaSkuCode || null,
                             orderId: orderId,
                             BNP: "No"
