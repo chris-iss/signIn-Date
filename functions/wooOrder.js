@@ -37,7 +37,8 @@ exports.handler = async (event) => {
         const city = requestBody.addressCity;
         const state = requestBody.state;
         const country = requestBody.country;
-        const amount = requestBody.amount
+        const amount = requestBody.amount;
+        const paymentintentId = requestBody.paymentIntent_Id;
 
 
         if (!orderId) {
@@ -207,6 +208,7 @@ exports.handler = async (event) => {
                 state: state || null,
                 country: country || null,
                 amount: amount || null,
+                paymentintent: paymentintentId || null
             })
         });
 
