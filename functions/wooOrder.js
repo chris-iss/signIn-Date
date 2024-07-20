@@ -184,7 +184,7 @@ exports.handler = async (event) => {
             }
         }
 
-         //Used in creating Xero Invoice
+         //This function is used to create Xero contacts, Invoices and payment
          await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
             method: "POST",
             headers: {
