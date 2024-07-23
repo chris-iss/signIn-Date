@@ -106,9 +106,9 @@ exports.handler = async (event) => {
                     "Circular Economy": "2755243",
                     "Business with Biodiversity": "2755260",
                     "Diversity Equity and Inclusion": "2755264",
-                    "Sustainability Finance": "2755272",
-                    "Sustainability Operations": "2755276",
-                    "Sustainability Supply Chain": "2755278",
+                    "Sustainable Finance": "2755272",
+                    "Sustainable Business Operations": "2755276",
+                    "Sustainable Supply Chain": "2755278",
                     "Green Marketing": "2755281",
                     "ESG Reporting and Auditing": "2755283",
                     "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
@@ -184,7 +184,7 @@ exports.handler = async (event) => {
             }
         }
 
-         //This function is used to create Xero contacts, Invoices and payment
+         //This function is used to create Xero contacts, Invoices and payment in Xero
          await fetch('https://hooks.zapier.com/hooks/catch/14129819/22s08uv/', {
             method: "POST",
             headers: {

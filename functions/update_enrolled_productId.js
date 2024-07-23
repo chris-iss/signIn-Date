@@ -28,9 +28,9 @@ const coursesMap = [
     "Circular Economy",
     "Business with Biodiversity",
     "Diversity Equity and Inclusion",
-    "Sustainability Finance",
-    "Sustainability Operations",
-    "Sustainability Supply Chain",
+    "Sustainable Finance",
+    "Sustainable Business Operations",
+    "Sustainable Supply Chain",
     "Green Marketing",
     "ESG Reporting and Auditing",
     "Corporate Sustainability Reporting Directive (CSRD)",
@@ -190,13 +190,13 @@ exports.handler = async (event) => {
                             case "Diversity Equity and Inclusion":
                                 updateContactProperty = "unbundled_module_7";
                                 break;
-                            case "Sustainability Finance":
+                            case "Sustainable Finance":
                                 updateContactProperty = "unbundled_module_8";
                                 break;
-                            case "Sustainability Operations":
+                            case "Sustainable Business Operations":
                                 updateContactProperty = "unbundled_module_9";
                                 break;
-                            case "Sustainability Supply Chain":
+                            case "Sustainable Supply Chain":
                                 updateContactProperty = "unbundled_module_10";
                                 break;
                             case "Green Marketing":
