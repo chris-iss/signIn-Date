@@ -55,40 +55,40 @@ exports.handler = async (event) => {
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
                 switch (surveyName) {
-                    case "End-of-Course Survey - Module 1":
+                    case "End-of-Course Survey (Cert 1)":
                         contactPropertyToUpdate = "unbundled_module_1";
                         break;
-                    case "End of Course Survey - Module 2":
+                    case "End-of-Course Survey (Cert 2)":
                         contactPropertyToUpdate = "unbundled_module_2";
                         break;
-                    case "End of Course Survey - Module 3":
+                    case "End-of-Course Survey (Cert 3)":
                         contactPropertyToUpdate = "unbundled_module_3";
                         break;
-                    case "End of Course Survey - Module 4":
+                    case "End-of-Course Survey (Cert 4)":
                         contactPropertyToUpdate = "unbundled_module_4";
                         break;
-                    case "End of Course Survey - Module 5":
+                    case "End-of-Course Survey (Cert 5)":
                         contactPropertyToUpdate = "unbundled_module_5";
                         break;
-                    case "End of Course Survey - Module 6":
+                    case "End-of-Course Survey (Cert 6)":
                         contactPropertyToUpdate = "unbundled_module_6";
                         break;
-                    case "End of Course Survey - Module 7":
+                    case "End-of-Course Survey (Cert 7)":
                         contactPropertyToUpdate = "unbundled_module_7";
                         break;
-                    case "End of Course Survey - Module 8":
+                    case "End-of-Course Survey (Cert 8)":
                         contactPropertyToUpdate = "unbundled_module_8";
                         break;
-                    case "End of Course Survey - Module 9":
+                    case "End-of-Course Survey (Cert 9)":
                         contactPropertyToUpdate = "unbundled_module_9";
                         break;
-                    case "End of Course Survey - Module 10":
+                    case "End-of-Course Survey (Cert 10)":
                         contactPropertyToUpdate = "unbundled_module_10";
                         break;
-                    case "End of Course Survey - Module 11":
+                    case "End-of-Course Survey (Cert 11)":
                         contactPropertyToUpdate = "unbundled_module_11";
                         break;
-                    case "End of Course Survey - Module 12":
+                    case "End-of-`Course Survey (Cert 12)":
                         contactPropertyToUpdate = "unbundled_module_12";
                         break;
                     case "End-of-Course Survey":
