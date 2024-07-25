@@ -158,7 +158,7 @@ exports.handler = async (event) => {
                                 const response = await updateContact.json();
                                 console.log("Module Completion Updated:", response);
 
-                                const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/37etiyy/', {
+                                const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2u3ts5t/', {
                                         method: "POST",
                                         headers: {
                                             "Content-Type": "application/json"
