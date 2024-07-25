@@ -418,7 +418,7 @@ exports.handler = async (event) => {
 
                     const thinkificCourseId = courseId;
 
-                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/23iagm1/', {
+                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/2u3wbzw/', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
