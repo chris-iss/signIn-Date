@@ -337,7 +337,7 @@ exports.handler = async (event) => {
         // Step 3: Participants array isn't empty
         if (participants.length > 0) {
         
-            //Function to update buyer not participant contact property to Yes and Order Id
+            //Function to update buyer not participant_ contact property to Yes and Order Id
             await fetch('https://hooks.zapier.com/hooks/catch/14129819/2blsx1o/', {
                         method: "POST",
                         headers: {
