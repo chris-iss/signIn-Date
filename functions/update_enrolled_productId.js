@@ -21,7 +21,7 @@ const thinkificProductIdMap = {
 };
 
 const coursesMap = [
-    "Introduction to Business Sustainability",
+    "Business Sustainability",
     "Sustainability Plan Development",
     "Sustainability Plan Implementation",
     "Decarbonisation: Achieving Net Zero",
@@ -169,7 +169,7 @@ exports.handler = async (event) => {
                         const enrolled = "Enrolled";
                         let updateContactProperty;
                         switch(course) {
-                            case "Introduction to Business Sustainability":
+                            case "Business Sustainability":
                                 updateContactProperty = "unbundled_module_1";
                                 break;
                             case "Sustainability Plan Development":

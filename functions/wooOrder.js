@@ -99,7 +99,7 @@ exports.handler = async (event) => {
 
                 // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
-                    "Introduction to Business Sustainability": "2755212",
+                    "Business Sustainability": "2755212",
                     "Sustainability Plan Development": "2755219",
                     "Sustainability Plan Implementation": "2755224",
                     "Decarbonisation: Achieving Net Zero": "2755233",
