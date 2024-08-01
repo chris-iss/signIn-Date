@@ -21,19 +21,19 @@ const thinkificProductIdMap = {
 };
 
 const coursesMap = [
-    "Business Sustainability",
-    "Sustainability Plan Development",
-    "Sustainability Plan Implementation",
-    "Decarbonisation: Achieving Net Zero",
-    "Circular Economy",
-    "Business with Biodiversity",
-    "Diversity Equity and Inclusion",
-    "Sustainable Finance",
-    "Sustainable Business Operations",
-    "Sustainable Supply Chain",
-    "Green Marketing",
-    "ESG Reporting and Auditing",
-    "Corporate Sustainability Reporting Directive (CSRD)",
+    "Certificate in Business Sustainability",
+    "Certificate in Sustainability Plan Development",
+    "Certificate in Sustainability Plan Implementation",
+    "Certificate in Decarbonisation: Achieving Net Zero",
+    "Certificate in Circular Economy",
+    "Certificate in Business with Biodiversity",
+    "Certificate in Diversity Equity and Inclusion",
+    "Certificate in Sustainable Finance",
+    "Certificate in Sustainable Business Operations",
+    "Certificate in Sustainable Supply Chain",
+    "Certificate in Green Marketing",
+    "Certificate in ESG Reporting and Auditing",
+    "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
     "Diploma in Business Sustainability"
 ];
 
@@ -169,43 +169,43 @@ exports.handler = async (event) => {
                         const enrolled = "Enrolled";
                         let updateContactProperty;
                         switch(course) {
-                            case "Business Sustainability":
+                            case "Certificate in Business Sustainability":
                                 updateContactProperty = "unbundled_module_1";
                                 break;
-                            case "Sustainability Plan Development":
+                            case "Certificate in Sustainability Plan Development":
                                 updateContactProperty = "unbundled_module_2";
                                 break;
-                            case "Sustainability Plan Implementation":
+                            case "Certificate in Sustainability Plan Implementation":
                                 updateContactProperty = "unbundled_module_3";
                                 break;
-                            case "Decarbonisation: Achieving Net Zero":
+                            case "Certificate in Decarbonisation: Achieving Net Zero":
                                 updateContactProperty = "unbundled_module_4";
                                 break;
-                            case "Circular Economy":
+                            case "Certificate in Circular Economy":
                                 updateContactProperty = "unbundled_module_5";
                                 break;
-                            case "Business with Biodiversity":
+                            case "Certificate in Business with Biodiversity":
                                 updateContactProperty = "unbundled_module_6";
                                 break;
-                            case "Diversity Equity and Inclusion":
+                            case "Certificate in Diversity Equity and Inclusion":
                                 updateContactProperty = "unbundled_module_7";
                                 break;
-                            case "Sustainable Finance":
+                            case "Certificate in Sustainable Finance":
                                 updateContactProperty = "unbundled_module_8";
                                 break;
-                            case "Sustainable Business Operations":
+                            case "Certificate in Sustainable Business Operations":
                                 updateContactProperty = "unbundled_module_9";
                                 break;
-                            case "Sustainable Supply Chain":
+                            case "Certificate in Sustainable Supply Chain":
                                 updateContactProperty = "unbundled_module_10";
                                 break;
-                            case "Green Marketing":
+                            case "Certificate in Green Marketing":
                                 updateContactProperty = "unbundled_module_11";
                                 break;
-                            case "ESG Reporting and Auditing":
+                            case "Certificate in ESG Reporting and Auditing":
                                 updateContactProperty = "unbundled_module_12";
                                 break;
-                            case "Corporate Sustainability Reporting Directive (CSRD)":
+                            case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
                                 updateContactProperty = "unbundled_csrd";
                                 break;
                             case "Diploma in Business Sustainability":

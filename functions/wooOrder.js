@@ -99,19 +99,19 @@ exports.handler = async (event) => {
 
                 // Mapping of course names to Thinkific course IDs
                 const moduleCourseIdMap = {
-                    "Business Sustainability": "2755212",
-                    "Sustainability Plan Development": "2755219",
-                    "Sustainability Plan Implementation": "2755224",
-                    "Decarbonisation: Achieving Net Zero": "2755233",
-                    "Circular Economy": "2755243",
-                    "Business with Biodiversity": "2755260",
-                    "Diversity Equity and Inclusion": "2755264",
-                    "Sustainable Finance": "2755272",
-                    "Sustainable Business Operations": "2755276",
-                    "Sustainable Supply Chain": "2755278",
-                    "Green Marketing": "2755281",
-                    "ESG Reporting and Auditing": "2755283",
-                    "Corporate Sustainability Reporting Directive (CSRD)": "2730358",
+                    "Certificate in Business Sustainability": "2755212",
+                    "Certificate in Sustainability Plan Development": "2755219",
+                    "Certificate in Sustainability Plan Implementation": "2755224",
+                    "Certificate in Decarbonisation: Achieving Net Zero": "2755233",
+                    "Certificate in Circular Economy": "2755243",
+                    "Certificate in Business with Biodiversity": "2755260",
+                    "Certificate in Diversity Equity and Inclusion": "2755264",
+                    "Certificate in Sustainable Finance": "2755272",
+                    "Certificate in Sustainable Business Operations": "2755276",
+                    "Certificate in Sustainable Supply Chain": "2755278",
+                    "Certificate in Green Marketing": "2755281",
+                    "Certificate in ESG Reporting and Auditing": "2755283",
+                    "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
                     "Diploma in Business Sustainability": "2622273"
                 };
 
