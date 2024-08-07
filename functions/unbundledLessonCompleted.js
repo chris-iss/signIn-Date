@@ -39,6 +39,8 @@ exports.handler = async (event) => {
         const getUser = extractParameteres?.payload?.user
         const courseCompleted = extractParameteres?.action;
 
+        console.log("LESSON NAME:", extractLessonName)
+
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
             return {
@@ -49,7 +51,7 @@ exports.handler = async (event) => {
 
         for (let surveyName of courseWrapUp) {
     
-            if (extractLessonName === surveyName && courseCompleted === "completed") {
+            if (extractLessonName === surveyName) {
                 console.log("SHOWS ITS WORKINNG")
                 const capitalizedCourseCompleted = "Complete"; 
 
