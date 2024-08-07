@@ -28,7 +28,8 @@ exports.handler = async (event) => {
             "Sustainable Operations End-of-Course Survey",
             "Supply Chain End-of-Course Survey",
             "Green Marketing End-of-Course Survey",
-            "ESG Reporting and Auditing End-of-Course Survey"
+            "ESG Reporting and Auditing End-of-Course Survey",
+            "CSRD End-of-Course Survey"
         ];
         
         const getNetlifyKey =  event.queryStringParameters && event.queryStringParameters.API_KEY;
