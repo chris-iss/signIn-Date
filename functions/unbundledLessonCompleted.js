@@ -17,21 +17,20 @@ exports.handler = async (event) => {
         isExecuting = true;
 
         const courseWrapUp = [
-            "End-of-Course Survey - Module 1",
-            "End of Course Survey - Module 2",
-            "End of Course Survey - Module 3",
-            "End of Course Survey - Module 4",
-            "End of Course Survey - Module 5",
-            "End of Course Survey - Module 6",
-            "End of Course Survey - Module 7",
-            "End of Course Survey - Module 8",
-            "End of Course Survey - Module 9",
-            "End of Course Survey - Module 10",
-            "End of Course Survey - Module 11",
-            "End of Course Survey - Module 12",
-            "End-of-Course Survey"
-        ]; 
-
+            "Business Sustainability End-of-Course Survey",
+            "Sustainability Plan Development End-of-Course Survey",
+            "Sustainability Plan Implementation End-of-Course Survey",
+            "Decarbonisation End-of-Course Survey",
+            "Circular Economy and Sustainable Products End-of-Course Survey",
+            "Business with Biodiversity End-of-Course Survey",
+            "DEI End-of-Course Survey",
+            "Sustainable Finance End-of-Course Survey",
+            "Sustainable Operations End-of-Course Survey",
+            "Supply Chain End-of-Course Survey",
+            "Green Marketing End-of-Course Survey",
+            "ESG Reporting and Auditing End-of-Course Survey"
+        ];
+        
         const getNetlifyKey =  event.queryStringParameters && event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameteres = JSON.parse(event.body);
@@ -55,43 +54,43 @@ exports.handler = async (event) => {
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
                 switch (surveyName) {
-                    case "End-of-Course Survey (Cert 1)":
+                    case "Business Sustainability End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_1";
                         break;
-                    case "End-of-Course Survey (Cert 2)":
+                    case "Sustainability Plan Development End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_2";
                         break;
-                    case "End-of-Course Survey (Cert 3)":
+                    case "Sustainability Plan Implementation End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_3";
                         break;
-                    case "End-of-Course Survey (Cert 4)":
+                    case "Decarbonisation End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_4";
                         break;
-                    case "End-of-Course Survey (Cert 5)":
+                    case "Circular Economy and Sustainable Products End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_5";
                         break;
-                    case "End-of-Course Survey (Cert 6)":
+                    case "Business with Biodiversity End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_6";
                         break;
-                    case "End-of-Course Survey (Cert 7)":
+                    case "DEI End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_7";
                         break;
-                    case "End-of-Course Survey (Cert 8)":
+                    case "Sustainable Finance End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_8";
                         break;
-                    case "End-of-Course Survey (Cert 9)":
+                    case "Sustainable Operations End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_9";
                         break;
-                    case "End-of-Course Survey (Cert 10)":
+                    case "Supply Chain End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_10";
                         break;
-                    case "End-of-Course Survey (Cert 11)":
+                    case "Green Marketing End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_11";
                         break;
-                    case "End-of-`Course Survey (Cert 12)":
+                    case "ESG Reporting and Auditing End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_12";
                         break;
-                    case "End-of-Course Survey":
+                    case "CSRD End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
                         break;
                     // Add other cases for modules if need be
