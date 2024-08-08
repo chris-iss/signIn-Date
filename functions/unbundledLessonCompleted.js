@@ -51,7 +51,6 @@ exports.handler = async (event) => {
 
         for (let surveyName of courseWrapUp) {
             
-            console.log("COURSE WRAP[DUMMY]:", surveyName);
 
             if (extractLessonName === surveyName) {
                 
