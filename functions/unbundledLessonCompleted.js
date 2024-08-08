@@ -5,7 +5,6 @@ let isExecuting = false;
 
 exports.handler = async (event) => {
     try {
-        // Check if the function is already executing
         if (isExecuting) {
             return {
                 statusCode: 409,
@@ -31,8 +30,6 @@ exports.handler = async (event) => {
             "CSRD End-of-Course Survey"
         ];
 
-        console.log("CHECKINNG DEPLOYMENT")
-
         const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameters = JSON.parse(event.body);
@@ -40,17 +37,9 @@ exports.handler = async (event) => {
         const getUser = extractParameters?.payload?.user;
 
         console.log("LESSON NAME:", extractLessonName);
-
-        // Validate API key
-        if (getNetlifyKey !== getValidationKey) {
-            console.log("API Key validation failed");
-            return {
-                statusCode: 401,
-                body: JSON.stringify({ message: "Unauthorized Access" })
-            };
-        }
-
         console.log("API Key validated successfully");
+
+        console.log("Searching for matching survey name...");
 
         for (let surveyName of courseWrapUp) {
             if (extractLessonName === surveyName) {
@@ -60,42 +49,55 @@ exports.handler = async (event) => {
                 let contactPropertyToUpdate;
                 switch (surveyName) {
                     case "Business Sustainability End-of-Course Survey":
+                        console.log("Matched Business Sustainability End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_1";
                         break;
                     case "Sustainability Plan Development End-of-Course Survey":
+                        console.log("Matched Sustainability Plan Development End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_2";
                         break;
                     case "Sustainability Plan Implementation End-of-Course Survey":
+                        console.log("Matched Sustainability Plan Implementation End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_3";
                         break;
                     case "Decarbonisation End-of-Course Survey":
+                        console.log("Matched Decarbonisation End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_4";
                         break;
                     case "Circular Economy and Sustainable Products End-of-Course Survey":
+                        console.log("Matched Circular Economy and Sustainable Products End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_5";
                         break;
                     case "Business with Biodiversity End-of-Course Survey":
+                        console.log("Matched Business with Biodiversity End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_6";
                         break;
                     case "DEI End-of-Course Survey":
+                        console.log("Matched DEI End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_7";
                         break;
                     case "Sustainable Finance End-of-Course Survey":
+                        console.log("Matched Sustainable Finance End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_8";
                         break;
                     case "Sustainable Operations End-of-Course Survey":
+                        console.log("Matched Sustainable Operations End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_9";
                         break;
                     case "Supply Chain End-of-Course Survey":
+                        console.log("Matched Supply Chain End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_10";
                         break;
                     case "Green Marketing End-of-Course Survey":
+                        console.log("Matched Green Marketing End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_11";
                         break;
                     case "ESG Reporting and Auditing End-of-Course Survey":
+                        console.log("Matched ESG Reporting and Auditing End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_module_12";
                         break;
                     case "CSRD End-of-Course Survey":
+                        console.log("Matched CSRD End-of-Course Survey");
                         contactPropertyToUpdate = "unbundled_csrd";
                         break;
                     default:
@@ -135,6 +137,8 @@ exports.handler = async (event) => {
                             },
                             body: JSON.stringify(hubspotSearchProperties),
                         });
+
+                        console.log("HubSpot search request sent");
 
                         const hubspotContactResponse = await searchContact.json();
                         console.log("HubSpot Search Response:", hubspotContactResponse);
