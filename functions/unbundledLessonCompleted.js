@@ -54,7 +54,7 @@ exports.handler = async (event) => {
             console.log("COURSE WRAP[DUMMY]:", surveyName);
 
             if (extractLessonName === surveyName) {
-                console.log("SHOWS ITS WORKINNG")
+                
                 const capitalizedCourseCompleted = "Complete"; 
 
                 // Define the contact property to update based on the course name
