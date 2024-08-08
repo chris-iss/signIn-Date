@@ -41,6 +41,12 @@ exports.handler = async (event) => {
 
         console.log("Searching for matching survey name...");
 
+        if (extractLessonName === "Decarbonisation End-of-Course Survey") {
+            console.log("TRUE OOOOOO", extractLessonName)
+        } else {
+            console.log("FALSE OOOOOO")
+        }
+
         for (let surveyName of courseWrapUp) {
             if (extractLessonName === surveyName) {
                 const capitalizedCourseCompleted = "Complete";
