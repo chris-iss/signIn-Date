@@ -3,7 +3,7 @@ require("dotenv").config();
 
 let isExecuting = false;
 
-// This codebase receives survey lesson completion on real-time and updates hubspot propeerty to trigger Cert generation
+// This codebase receives survey lesson completion in real-time and updates the HubSpot property to trigger Cert generation
 exports.handler = async (event) => {
     try {
         // Check if the function is already executing
@@ -13,7 +13,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Function is already executing" })
             };
         }
-      
+
         isExecuting = true;
 
         const courseWrapUp = [
@@ -31,15 +31,15 @@ exports.handler = async (event) => {
             "ESG Reporting and Auditing End-of-Course Survey",
             "CSRD End-of-Course Survey"
         ];
-        
-        const getNetlifyKey =  event.queryStringParameters && event.queryStringParameters.API_KEY;
-        const getValidationKey = process.env.Netlify_API_KEY;
-        const extractParameteres = JSON.parse(event.body);
-        const extractLessonName = extractParameteres?.payload?.lesson?.name;
-        const getUser = extractParameteres?.payload?.user
-        const courseCompleted = extractParameteres?.action;
 
-        console.log("LESSON NAME:", extractLessonName)
+        const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
+        const getValidationKey = process.env.Netlify_API_KEY;
+        const extractParameters = JSON.parse(event.body);
+        const extractLessonName = extractParameters?.payload?.lesson?.name;
+        const getUser = extractParameters?.payload?.user;
+        const courseCompleted = extractParameters?.action;
+
+        console.log("LESSON NAME:", extractLessonName);
 
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
@@ -50,11 +50,9 @@ exports.handler = async (event) => {
         }
 
         for (let surveyName of courseWrapUp) {
-            
-
             if (extractLessonName === surveyName) {
-                
-                const capitalizedCourseCompleted = "Complete"; 
+                const capitalizedCourseCompleted = "Complete";
+                console.log("Course matched:", surveyName);
 
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
@@ -98,18 +96,18 @@ exports.handler = async (event) => {
                     case "CSRD End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_csrd";
                         break;
-                    // Add other cases for modules if need be
                     default:
                         console.log("No contact property defined for:", surveyName);
                         continue;
                 }
 
-                // Search for the Contact on Hubspot
+                console.log("Updating property:", contactPropertyToUpdate, "for user:", getUser.email);
+
+                // Search for the Contact on HubSpot
                 const hubspotSearchContact = async () => {
                     const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
                     try {
-                        // Define properties for searching HubSpot contacts by email
                         const hubspotSearchProperties = {
                             after: "0",
                             filterGroups: [
@@ -119,13 +117,12 @@ exports.handler = async (event) => {
                             limit: "100",
                             properties: [
                                 "id",
-                                "email", 
+                                "email",
                                 contactPropertyToUpdate // Include contact property to update
-                            ], 
+                            ],
                             sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                         };
 
-                        // Make a POST request to search for HubSpot contacts
                         const searchContact = await fetch(hubspotBaseURL, {
                             method: "POST",
                             headers: {
@@ -135,20 +132,20 @@ exports.handler = async (event) => {
                             body: JSON.stringify(hubspotSearchProperties),
                         });
 
-                        // Parse the response from HubSpot contact search by email
                         const hubspotContactResponse = await searchContact.json();
-                        const extractHubspotUserId = hubspotContactResponse.results[0].properties.hs_object_id;
 
-                       
+                        if (!hubspotContactResponse.results || hubspotContactResponse.results.length === 0) {
+                            console.log("No contact found for email:", getUser.email);
+                            return;
+                        }
 
-                        // Update Module Completion Contact Property to Complete
+                        const extractHubspotUserId = hubspotContactResponse.results[0].id;
+
                         const updateModuleCompletion = async () => {
                             try {
-                                // Define the properties object for updating HubSpot contact
                                 const moduleCompletionProperties = {};
                                 moduleCompletionProperties[contactPropertyToUpdate] = capitalizedCourseCompleted;
 
-                                // Make a PATCH request to update the HubSpot contact
                                 const updateContact = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                                     method: "PATCH",
                                     headers: {
@@ -158,16 +155,15 @@ exports.handler = async (event) => {
                                     body: JSON.stringify({ properties: moduleCompletionProperties })
                                 });
 
-                                // Parse the response and log it
                                 const response = await updateContact.json();
                                 console.log("Module Completion Updated:", response);
 
                                 const sendResponseToZapier = await fetch('https://hooks.zapier.com/hooks/catch/14129819/2u3ts5t/', {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json"
-                                        },
-                                        body: JSON.stringify({ id: response.id, updatedProperty: contactPropertyToUpdate, firstname: getUser?.first_name, lastname: getUser?.last_name, email: getUser?.email, lessonCompleted: extractParameteres?.payload?.lesson?.name})
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({ id: response.id, updatedProperty: contactPropertyToUpdate, firstname: getUser?.first_name, lastname: getUser?.last_name, email: getUser?.email, lessonCompleted: extractParameters?.payload?.lesson?.name })
                                 });
 
                                 const sendResponseToZapier2 = await fetch('https://hooks.zapier.com/hooks/catch/14129819/3j1lp6r/', {
@@ -175,30 +171,32 @@ exports.handler = async (event) => {
                                     headers: {
                                         "Content-Type": "application/json"
                                     },
-                                    body: JSON.stringify({ id: response.id, updatedProperty: contactPropertyToUpdate, firstname: getUser?.first_name, lastname: getUser?.last_name, email: getUser?.email, lessonCompleted: extractParameteres?.payload?.lesson?.name})
+                                    body: JSON.stringify({ id: response.id, updatedProperty: contactPropertyToUpdate, firstname: getUser?.first_name, lastname: getUser?.last_name, email: getUser?.email, lessonCompleted: extractParameters?.payload?.lesson?.name })
                                 });
+
+                                console.log("Responses sent to Zapier");
+
                             } catch (error) {
-                                // Log any errors during the HubSpot contact update
                                 console.log("Error updating module completion:", error.message);
                             }
                         };
 
                         await updateModuleCompletion();
                     } catch (error) {
-                        // Log any errors during the HubSpot contact search
-                        console.log("HUBSPOT SEARCH ERROR", error.message);
+                        console.log("HUBSPOT SEARCH ERROR:", error.message);
                     }
                 };
 
                 await hubspotSearchContact();
-            } 
+            }
         }
 
         return {
             statusCode: 200,
             body: JSON.stringify({ message: "Success" })
         };
-    } catch(error) {
+    } catch (error) {
+        console.log("Error in main handler:", error.message);
         return {
             statusCode: 400,
             body: JSON.stringify({ message: error.message })
