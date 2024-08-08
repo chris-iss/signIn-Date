@@ -3,7 +3,6 @@ require("dotenv").config();
 
 let isExecuting = false;
 
-// This codebase receives survey lesson completion in real-time and updates the HubSpot property to trigger Cert generation
 exports.handler = async (event) => {
     try {
         // Check if the function is already executing
@@ -37,24 +36,25 @@ exports.handler = async (event) => {
         const extractParameters = JSON.parse(event.body);
         const extractLessonName = extractParameters?.payload?.lesson?.name;
         const getUser = extractParameters?.payload?.user;
-        const courseCompleted = extractParameters?.action;
 
         console.log("LESSON NAME:", extractLessonName);
 
         // Validate API key
         if (getNetlifyKey !== getValidationKey) {
+            console.log("API Key validation failed");
             return {
                 statusCode: 401,
                 body: JSON.stringify({ message: "Unauthorized Access" })
             };
         }
 
+        console.log("API Key validated successfully");
+
         for (let surveyName of courseWrapUp) {
             if (extractLessonName === surveyName) {
                 const capitalizedCourseCompleted = "Complete";
                 console.log("Course matched:", surveyName);
 
-                // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
                 switch (surveyName) {
                     case "Business Sustainability End-of-Course Survey":
@@ -118,10 +118,12 @@ exports.handler = async (event) => {
                             properties: [
                                 "id",
                                 "email",
-                                contactPropertyToUpdate // Include contact property to update
+                                contactPropertyToUpdate
                             ],
                             sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                         };
+
+                        console.log("Sending search request to HubSpot for user:", getUser.email);
 
                         const searchContact = await fetch(hubspotBaseURL, {
                             method: "POST",
@@ -133,6 +135,7 @@ exports.handler = async (event) => {
                         });
 
                         const hubspotContactResponse = await searchContact.json();
+                        console.log("HubSpot Search Response:", hubspotContactResponse);
 
                         if (!hubspotContactResponse.results || hubspotContactResponse.results.length === 0) {
                             console.log("No contact found for email:", getUser.email);
@@ -140,6 +143,7 @@ exports.handler = async (event) => {
                         }
 
                         const extractHubspotUserId = hubspotContactResponse.results[0].id;
+                        console.log("Found HubSpot user ID:", extractHubspotUserId);
 
                         const updateModuleCompletion = async () => {
                             try {
