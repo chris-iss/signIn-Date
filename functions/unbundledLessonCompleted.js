@@ -31,6 +31,8 @@ exports.handler = async (event) => {
             "CSRD End-of-Course Survey"
         ];
 
+        console.log("CHECKINNG DEPLOYMENT")
+
         const getNetlifyKey = event.queryStringParameters && event.queryStringParameters.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameters = JSON.parse(event.body);
