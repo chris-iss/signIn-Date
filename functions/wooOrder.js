@@ -212,7 +212,8 @@ exports.handler = async (event) => {
                 state: state || null,
                 country: country || null,
                 amount: amount || null,
-                paymentintent: paymentintentId || null
+                paymentintent: paymentintentId || null,
+                prdUrl: prdUrl
             })
         });
 
