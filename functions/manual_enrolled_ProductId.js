@@ -164,7 +164,6 @@ exports.handler = async (event) => {
                 const matchedCourses = [];
 
                 for (let course of coursesMap) {
-                    console.log("CHECKING FOR COURSE IN LOOP:", course)
                     if (selectedCoursesData.includes(course)) {
                         const enrolled = "Enrolled";
                         let updateContactProperty;
