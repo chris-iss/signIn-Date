@@ -37,27 +37,6 @@ const coursesMap = [
     "Diploma in Business Sustainability"
 ];
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
-
-async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
-    try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    } catch (error) {
-        if (retries > 0) {
-            console.log(`Retrying... (${retries} retries left)`);
-            await new Promise(res => setTimeout(res, RETRY_DELAY_MS));
-            return fetchWithRetry(url, options, retries - 1);
-        } else {
-            throw new Error(`Max retries reached. ${error.message}`);
-        }
-    }
-}
-
 exports.handler = async (event) => {
     try {
         if (isExecuting) {
@@ -116,7 +95,7 @@ exports.handler = async (event) => {
                     sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
                 };
 
-                const searchContact = await fetchWithRetry(hubspotBaseURL, {
+                const response = await fetch(hubspotBaseURL, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -124,6 +103,12 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify(hubspotSearchProperties),
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const searchContact = await response.json();
 
                 if (!searchContact.results.length) {
                     throw new Error("No contact found");
@@ -136,13 +121,9 @@ exports.handler = async (event) => {
                         const unbundledProductIdProperty = {};
                         unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
 
-                        // Test Case
-                        let productIds = [];
-                        productIds.push(unbundledProductIdProperty);
+                        console.log("CHECKING PRODUCT ID'S:", unbundledProductIdProperty);
 
-                        console.log("CHECKING PRODUCT ID'S:", productIds);
-
-                        const updateContact = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                        const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
                             headers: {
                                 Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -151,6 +132,11 @@ exports.handler = async (event) => {
                             body: JSON.stringify({ properties: unbundledProductIdProperty })
                         });
 
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const updateContact = await response.json();
                         console.log("Course Product Id Updated:", updateContact);
 
                     } catch (error) {
@@ -225,7 +211,7 @@ exports.handler = async (event) => {
                             const updateContactPropertyObject = {};
                             updateContactPropertyObject[updateContactProperty] = status;
 
-                            const updateCourseStatus = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                            const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                                 method: "PATCH",
                                 headers: {
                                     Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
@@ -234,6 +220,11 @@ exports.handler = async (event) => {
                                 body: JSON.stringify({ properties: updateContactPropertyObject })
                             });
 
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+
+                            const updateCourseStatus = await response.json();
                             console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, updateCourseStatus);
                         } catch (error) {
                             console.log(`Error updating ${course} status:`, error.message);
