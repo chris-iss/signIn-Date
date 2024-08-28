@@ -58,7 +58,6 @@ async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
     }
 }
 
-// This codebase Thinkific Product ID in real-time and updates Product id HubSpot properties
 exports.handler = async (event) => {
     try {
         if (isExecuting) {
@@ -85,16 +84,17 @@ exports.handler = async (event) => {
 
         const { email, responseDataId, coursesSelected } = extractParameters;
 
-        console.log("SELECTED PRODUCID:", responseDataId);
+        console.log("RECEIVED PRODUCT ID:", responseDataId);
         console.log("COURSE-SELECTED:", coursesSelected);
 
-        const selectedCoursesData = coursesSelected.split(";");
+        const selectedCoursesData = coursesSelected.split(",");
 
         const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
         if (!contactPropertyToUpdate) {
+            console.log("Invalid product ID:", responseDataId);
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: "Invalid product ID" })
+                body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
             };
         }
 
@@ -136,12 +136,11 @@ exports.handler = async (event) => {
                         const unbundledProductIdProperty = {};
                         unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
 
-                        //Test Case
+                        // Test Case
                         let productIds = [];
                         productIds.push(unbundledProductIdProperty);
 
-                        console.log("CHECKING PRODUCT ID'S:", productIds)
-
+                        console.log("CHECKING PRODUCT ID'S:", productIds);
 
                         const updateContact = await fetchWithRetry(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
@@ -164,10 +163,11 @@ exports.handler = async (event) => {
                 const matchedCourses = [];
 
                 for (let course of coursesMap) {
+                    console.log("CHECKING FOR COURSE IN LOOP:", course);
                     if (selectedCoursesData.includes(course)) {
                         const enrolled = "Enrolled";
                         let updateContactProperty;
-                        switch(course) {
+                        switch (course) {
                             case "Certificate in Business Sustainability":
                                 updateContactProperty = "unbundled_module_1";
                                 break;
