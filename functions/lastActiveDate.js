@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
             thinkific_diploma_last_activity_date: lastActivityDate,
           },
         };
-      } else if (extractCourseName === "Certificate in Business Sustainability 2024") {
+      } else if (extractCourseName === "Certificate in Business Sustainability") {
         lastActivity_DateProperty = {
           properties: {
             thinkific_diploma_last_activity_date: lastActivityDate,
