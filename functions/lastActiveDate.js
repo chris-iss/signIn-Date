@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
       // Initialize the last activity date property based on the course name
       let lastActivity_DateProperty;
 
-      if (extractCourseName === "Diploma in Business Sustainability 2024") {
+      if (extractCourseName === "Diploma in Business Sustainability") {
         lastActivity_DateProperty = {
           properties: {
             thinkific_diploma_last_activity_date: lastActivityDate,
