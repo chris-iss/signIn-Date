@@ -118,14 +118,15 @@ exports.handler = async (event) => {
 
                 const updateCustomerCourse = async () => {
                     try {
-                        // Concatenate the selected courses into a single string
-                        const customerCourseValue = selectedCoursesData.join(", ");
-
+                        // Building the checkbox values for unbundled_module_type
                         const updateProperty = {
-                            unbundled_module_type: customerCourseValue
+                            unbundled_module_type: selectedCoursesData.reduce((acc, course) => {
+                                acc[course.trim()] = true; // Set the selected course to true
+                                return acc;
+                            }, {})
                         };
 
-                        console.log("UPDATING Customer_Course TO:", customerCourseValue);
+                        console.log("UPDATING unbundled_module_type TO:", updateProperty);
 
                         const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
@@ -148,7 +149,7 @@ exports.handler = async (event) => {
                     }
                 };
 
-                // Update Customer_Course property with selected courses
+                // Update unbundled_module_type property with selected courses
                 await updateCustomerCourse();
 
             } catch (error) {
