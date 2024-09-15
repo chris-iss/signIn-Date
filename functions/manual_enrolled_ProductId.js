@@ -117,7 +117,7 @@ exports.handler = async (event) => {
                 const extractHubspotUserId = searchContact.results[0].id;
 
 
-                // Update Unbudled Module Type
+                ////////////////////Update Unbudled Module Type//////////////////////////
                 const updateCustomerCourse = async () => {
                     try {
                         // Building the multi-line text for unbundled_module_type
@@ -152,7 +152,7 @@ exports.handler = async (event) => {
                 await updateCustomerCourse();
 
 
-                // Update product id property with id
+                //////////////////Update product id property with id////////////////////
                 const updateCoursePrdId = async () => {
                     try {
                         const unbundledProductIdProperty = {};
