@@ -66,7 +66,7 @@ exports.handler = async (event) => {
         console.log("RECEIVED PRODUCT ID:", responseDataId);
         console.log("COURSE-SELECTED:", coursesSelected);
 
-        const selectedCoursesData = coursesSelected.split(",");
+        const selectedCoursesData = coursesSelected.split(",").map(course => course.trim()).filter(course => coursesMap.includes(course));
 
         const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
         if (!contactPropertyToUpdate) {
@@ -118,12 +118,9 @@ exports.handler = async (event) => {
 
                 const updateCustomerCourse = async () => {
                     try {
-                        // Building the checkbox values for unbundled_module_type
+                        // Building the multi-line text for unbundled_module_type
                         const updateProperty = {
-                            unbundled_module_type: selectedCoursesData.reduce((acc, course) => {
-                                acc[course.trim()] = true; // Set the selected course to true
-                                return acc;
-                            }, {})
+                            unbundled_module_type: selectedCoursesData.join("\n") // Join selected courses with newline
                         };
 
                         console.log("UPDATING unbundled_module_type TO:", updateProperty);
