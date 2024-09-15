@@ -129,6 +129,43 @@ exports.handler = async (event) => {
                     throw new Error("No contact found");
                 }
 
+
+                ////////////////////Update Unbudled Module Type//////////////////////////
+                const updateCustomerCourse = async () => {
+                    try {
+                        // Building the multi-line text for unbundled_module_type
+                        const updateProperty = {
+                            unbunled_bought_modules: selectedCoursesData.join("\n") // Join selected courses with newline
+                        };
+
+                        console.log("UPDATING unbundled_module_type TO:", updateProperty);
+
+                        const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+                            method: "PATCH",
+                            headers: {
+                                Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ properties: updateProperty })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const updateContact = await response.json();
+                        console.log("Customer_Course Updated:", updateContact);
+
+                    } catch (error) {
+                        console.log("Error updating Customer_Course:", error.message);
+                    }
+                };
+
+                // Update unbundled_module_type property with selected courses
+                await updateCustomerCourse();
+
+                
+
                 const extractHubspotUserId = searchContact.results[0].id;
 
                 const updateCoursePrdId = async () => {
@@ -160,6 +197,7 @@ exports.handler = async (event) => {
                 };
 
                 await updateCoursePrdId();
+                
 
                 const matchedCourses = [];
 
