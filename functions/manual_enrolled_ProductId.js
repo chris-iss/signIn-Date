@@ -122,7 +122,7 @@ exports.handler = async (event) => {
                     try {
                         // Building the multi-line text for unbundled_module_type
                         const updateProperty = {
-                            unbundled_module_type: selectedCoursesData.join("\n") // Join selected courses with newline
+                            unbunled_bought_modules: selectedCoursesData.join("\n") // Join selected courses with newline
                         };
 
                         console.log("UPDATING unbundled_module_type TO:", updateProperty);
