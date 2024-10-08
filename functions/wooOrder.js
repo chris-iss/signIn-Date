@@ -217,6 +217,35 @@ exports.handler = async (event) => {
             })
         });
 
+        ///////////////////TESTING FOR DEPLOYMENNT///////////////////////
+        await fetch('https://hooks.zapier.com/hooks/catch/14129819/2dah57x/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                selectedCourses: courses,
+                selectdCoursesType: courseType,
+                selectedCourseCout: countsArray,
+                firstname: buyerBillingData.billing.first_name,
+                lastname: buyerBillingData.billing.last_name,
+                email: billingUserEmail,
+                currency: requestBody.currency,
+                startDate: requestBody.startDate,
+                unbundledSkuCode: requestBody.unbundledSkuCode || null,
+                diplomaSkuCode: requestBody.diplomaSkuCode || null,
+                orderId: orderId,
+                addresss_1: addressOne || null,
+                address_2: addressTwo || null,
+                city: city || null,
+                state: state || null,
+                country: country || null,
+                amount: amount || null,
+                paymentintent: paymentintentId || null,
+                prdUrl: prdUrl
+            })
+        });
+
 
         // Step 2: If participant array is empty: BNP === Participant is Buyer
         if (participants.length === 0) {
