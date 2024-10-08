@@ -52,8 +52,6 @@ exports.handler = async (event) => {
         const getValidationKey = process.env.Netlify_API_KEY;
         const extractParameters = JSON.parse(event.body);
 
-        console.log("Request Body:", extractParameters);
-
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
@@ -61,221 +59,223 @@ exports.handler = async (event) => {
             };
         }
 
+        console.log("Request Body:", extractParameters);
+
         const { email, responseDataId, coursesSelected } = extractParameters;
 
         console.log("RECEIVED PRODUCT ID:", responseDataId);
         console.log("COURSE-SELECTED:", coursesSelected);
 
-        const selectedCoursesData = coursesSelected.split(",");
+        // const selectedCoursesData = coursesSelected.split(",");
 
-        const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
-        if (!contactPropertyToUpdate) {
-            console.log("Invalid product ID:", responseDataId);
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
-            };
-        }
+        // const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
+        // if (!contactPropertyToUpdate) {
+        //     console.log("Invalid product ID:", responseDataId);
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
+        //     };
+        // }
 
-        const hubspotSearchContact = async () => {
-            const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
+        // const hubspotSearchContact = async () => {
+        //     const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
 
-            try {
-                const hubspotSearchProperties = {
-                    filterGroups: [
-                        { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
-                        { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: email }] },
-                    ],
-                    limit: 100,
-                    properties: [
-                        "id",
-                        "email",
-                        contactPropertyToUpdate
-                    ],
-                    sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
-                };
+        //     try {
+        //         const hubspotSearchProperties = {
+        //             filterGroups: [
+        //                 { filters: [{ operator: "EQ", propertyName: "email", value: email }] },
+        //                 { filters: [{ operator: "EQ", propertyName: "hs_additional_emails", value: email }] },
+        //             ],
+        //             limit: 100,
+        //             properties: [
+        //                 "id",
+        //                 "email",
+        //                 contactPropertyToUpdate
+        //             ],
+        //             sorts: [{ propertyName: "lastmodifieddate", direction: "ASCENDING" }],
+        //         };
 
-                const response = await fetch(hubspotBaseURL, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(hubspotSearchProperties),
-                });
+        //         const response = await fetch(hubspotBaseURL, {
+        //             method: "POST",
+        //             headers: {
+        //                 "Authorization": `Bearer ${process.env.HUBSPOT_API_KEY}`,
+        //                 "Content-Type": "application/json",
+        //             },
+        //             body: JSON.stringify(hubspotSearchProperties),
+        //         });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! status: ${response.status}`);
+        //         }
 
-                const searchContact = await response.json();
+        //         const searchContact = await response.json();
 
-                if (!searchContact.results.length) {
-                    throw new Error("No contact found");
-                }
+        //         if (!searchContact.results.length) {
+        //             throw new Error("No contact found");
+        //         }
 
-                const extractHubspotUserId = searchContact.results[0].id;
-
-
-                ////////////////////Update Unbudled Module Type//////////////////////////
-                const updateCustomerCourse = async () => {
-                    try {
-                        // Building the multi-line text for unbundled_module_type
-                        const updateProperty = {
-                            unbunled_bought_modules: selectedCoursesData.join("\n") // Join selected courses with newline
-                        };
-
-                        console.log("UPDATING unbundled_module_type TO:", updateProperty);
-
-                        const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
-                            method: "PATCH",
-                            headers: {
-                                Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ properties: updateProperty })
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const updateContact = await response.json();
-                        console.log("Customer_Course Updated:", updateContact);
-
-                    } catch (error) {
-                        console.log("Error updating Customer_Course:", error.message);
-                    }
-                };
-
-                // Update unbundled_module_type property with selected courses
-                await updateCustomerCourse();
+        //         const extractHubspotUserId = searchContact.results[0].id;
 
 
-                //////////////////Update product id property with id////////////////////
-                const updateCoursePrdId = async () => {
-                    try {
-                        const unbundledProductIdProperty = {};
-                        unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
+        //         ////////////////////Update Unbudled Module Type//////////////////////////
+        //         const updateCustomerCourse = async () => {
+        //             try {
+        //                 // Building the multi-line text for unbundled_module_type
+        //                 const updateProperty = {
+        //                     unbunled_bought_modules: selectedCoursesData.join("\n") // Join selected courses with newline
+        //                 };
 
-                        console.log("CHECKING PRODUCT ID'S:", unbundledProductIdProperty);
+        //                 console.log("UPDATING unbundled_module_type TO:", updateProperty);
 
-                        const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
-                            method: "PATCH",
-                            headers: {
-                                Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ properties: unbundledProductIdProperty })
-                        });
+        //                 const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+        //                     method: "PATCH",
+        //                     headers: {
+        //                         Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+        //                         "Content-Type": "application/json",
+        //                     },
+        //                     body: JSON.stringify({ properties: updateProperty })
+        //                 });
 
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
+        //                 if (!response.ok) {
+        //                     throw new Error(`HTTP error! status: ${response.status}`);
+        //                 }
 
-                        const updateContact = await response.json();
-                        console.log("Course Product Id Updated:", updateContact);
+        //                 const updateContact = await response.json();
+        //                 console.log("Customer_Course Updated:", updateContact);
 
-                    } catch (error) {
-                        console.log("Error updating module completion:", error.message);
-                    }
-                };
+        //             } catch (error) {
+        //                 console.log("Error updating Customer_Course:", error.message);
+        //             }
+        //         };
 
-                await updateCoursePrdId();
+        //         // Update unbundled_module_type property with selected courses
+        //         await updateCustomerCourse();
 
-                const matchedCourses = [];
 
-                for (let course of coursesMap) {
-                    console.log("CHECKING FOR COURSE IN LOOP:", course);
-                    if (selectedCoursesData.includes(course)) {
-                        const enrolled = "Enrolled";
-                        let updateContactProperty;
-                        switch (course) {
-                            case "Certificate in Business Sustainability":
-                                updateContactProperty = "unbundled_module_1";
-                                break;
-                            case "Certificate in Sustainability Plan Development":
-                                updateContactProperty = "unbundled_module_2";
-                                break;
-                            case "Certificate in Sustainability Plan Implementation":
-                                updateContactProperty = "unbundled_module_3";
-                                break;
-                            case "Certificate in Decarbonisation: Achieving Net Zero":
-                                updateContactProperty = "unbundled_module_4";
-                                break;
-                            case "Certificate in Circular Economy":
-                                updateContactProperty = "unbundled_module_5";
-                                break;
-                            case "Certificate in Business with Biodiversity":
-                                updateContactProperty = "unbundled_module_6";
-                                break;
-                            case "Certificate in Diversity Equity and Inclusion":
-                                updateContactProperty = "unbundled_module_7";
-                                break;
-                            case "Certificate in Sustainable Finance":
-                                updateContactProperty = "unbundled_module_8";
-                                break;
-                            case "Certificate in Sustainable Business Operations":
-                                updateContactProperty = "unbundled_module_9";
-                                break;
-                            case "Certificate in Sustainable Supply Chain":
-                                updateContactProperty = "unbundled_module_10";
-                                break;
-                            case "Certificate in Green Marketing":
-                                updateContactProperty = "unbundled_module_11";
-                                break;
-                            case "Certificate in ESG Reporting and Auditing":
-                                updateContactProperty = "unbundled_module_12";
-                                break;
-                            case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
-                                updateContactProperty = "unbundled_csrd";
-                                break;
-                            case "Diploma in Business Sustainability":
-                                updateContactProperty = "diploma_enrolment";
-                                break;
-                            default:
-                                console.log("No contact Property defined for:", course);
-                        }
-                        if (updateContactProperty) {
-                            matchedCourses.push({ course, updateContactProperty, status: enrolled });
-                        }
-                    }
-                }
+        //         //////////////////Update product id property with id////////////////////
+        //         const updateCoursePrdId = async () => {
+        //             try {
+        //                 const unbundledProductIdProperty = {};
+        //                 unbundledProductIdProperty[contactPropertyToUpdate] = `${responseDataId}`;
 
-                if (matchedCourses.length > 0) {
-                    await Promise.all(matchedCourses.map(async ({ course, updateContactProperty, status }) => {
-                        try {
-                            const updateContactPropertyObject = {};
-                            updateContactPropertyObject[updateContactProperty] = status;
+        //                 console.log("CHECKING PRODUCT ID'S:", unbundledProductIdProperty);
 
-                            const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
-                                method: "PATCH",
-                                headers: {
-                                    Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({ properties: updateContactPropertyObject })
-                            });
+        //                 const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+        //                     method: "PATCH",
+        //                     headers: {
+        //                         Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+        //                         "Content-Type": "application/json",
+        //                     },
+        //                     body: JSON.stringify({ properties: unbundledProductIdProperty })
+        //                 });
 
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
+        //                 if (!response.ok) {
+        //                     throw new Error(`HTTP error! status: ${response.status}`);
+        //                 }
 
-                            const updateCourseStatus = await response.json();
-                            console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, updateCourseStatus);
-                        } catch (error) {
-                            console.log(`Error updating ${course} status:`, error.message);
-                        }
-                    }));
-                } else {
-                    console.log("No courses matched the update criteria.");
-                }
-            } catch (error) {
-                console.log("HUBSPOT SEARCH ERROR", error.message);
-            }
-        };
+        //                 const updateContact = await response.json();
+        //                 console.log("Course Product Id Updated:", updateContact);
 
-        await hubspotSearchContact();
+        //             } catch (error) {
+        //                 console.log("Error updating module completion:", error.message);
+        //             }
+        //         };
+
+        //         await updateCoursePrdId();
+
+        //         const matchedCourses = [];
+
+        //         for (let course of coursesMap) {
+        //             console.log("CHECKING FOR COURSE IN LOOP:", course);
+        //             if (selectedCoursesData.includes(course)) {
+        //                 const enrolled = "Enrolled";
+        //                 let updateContactProperty;
+        //                 switch (course) {
+        //                     case "Certificate in Business Sustainability":
+        //                         updateContactProperty = "unbundled_module_1";
+        //                         break;
+        //                     case "Certificate in Sustainability Plan Development":
+        //                         updateContactProperty = "unbundled_module_2";
+        //                         break;
+        //                     case "Certificate in Sustainability Plan Implementation":
+        //                         updateContactProperty = "unbundled_module_3";
+        //                         break;
+        //                     case "Certificate in Decarbonisation: Achieving Net Zero":
+        //                         updateContactProperty = "unbundled_module_4";
+        //                         break;
+        //                     case "Certificate in Circular Economy":
+        //                         updateContactProperty = "unbundled_module_5";
+        //                         break;
+        //                     case "Certificate in Business with Biodiversity":
+        //                         updateContactProperty = "unbundled_module_6";
+        //                         break;
+        //                     case "Certificate in Diversity Equity and Inclusion":
+        //                         updateContactProperty = "unbundled_module_7";
+        //                         break;
+        //                     case "Certificate in Sustainable Finance":
+        //                         updateContactProperty = "unbundled_module_8";
+        //                         break;
+        //                     case "Certificate in Sustainable Business Operations":
+        //                         updateContactProperty = "unbundled_module_9";
+        //                         break;
+        //                     case "Certificate in Sustainable Supply Chain":
+        //                         updateContactProperty = "unbundled_module_10";
+        //                         break;
+        //                     case "Certificate in Green Marketing":
+        //                         updateContactProperty = "unbundled_module_11";
+        //                         break;
+        //                     case "Certificate in ESG Reporting and Auditing":
+        //                         updateContactProperty = "unbundled_module_12";
+        //                         break;
+        //                     case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
+        //                         updateContactProperty = "unbundled_csrd";
+        //                         break;
+        //                     case "Diploma in Business Sustainability":
+        //                         updateContactProperty = "diploma_enrolment";
+        //                         break;
+        //                     default:
+        //                         console.log("No contact Property defined for:", course);
+        //                 }
+        //                 if (updateContactProperty) {
+        //                     matchedCourses.push({ course, updateContactProperty, status: enrolled });
+        //                 }
+        //             }
+        //         }
+
+        //         if (matchedCourses.length > 0) {
+        //             await Promise.all(matchedCourses.map(async ({ course, updateContactProperty, status }) => {
+        //                 try {
+        //                     const updateContactPropertyObject = {};
+        //                     updateContactPropertyObject[updateContactProperty] = status;
+
+        //                     const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
+        //                         method: "PATCH",
+        //                         headers: {
+        //                             Authorization: `Bearer ${process.env.HUBSPOT_API_KEY}`,
+        //                             "Content-Type": "application/json",
+        //                         },
+        //                         body: JSON.stringify({ properties: updateContactPropertyObject })
+        //                     });
+
+        //                     if (!response.ok) {
+        //                         throw new Error(`HTTP error! status: ${response.status}`);
+        //                     }
+
+        //                     const updateCourseStatus = await response.json();
+        //                     console.log(`Course: ${course}, Property: ${updateContactProperty}, Status: ${status} - Updated Successfully:`, updateCourseStatus);
+        //                 } catch (error) {
+        //                     console.log(`Error updating ${course} status:`, error.message);
+        //                 }
+        //             }));
+        //         } else {
+        //             console.log("No courses matched the update criteria.");
+        //         }
+        //     } catch (error) {
+        //         console.log("HUBSPOT SEARCH ERROR", error.message);
+        //     }
+        // };
+
+        // await hubspotSearchContact();
 
         return {
             statusCode: 200,
