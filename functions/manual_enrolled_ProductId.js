@@ -66,16 +66,17 @@ exports.handler = async (event) => {
         console.log("RECEIVED PRODUCT ID:", responseDataId);
         console.log("COURSE-SELECTED:", coursesSelected);
 
-        // const selectedCoursesData = coursesSelected.split(",");
+        const selectedCoursesData = coursesSelected.split(",");
 
-        // const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
-        // if (!contactPropertyToUpdate) {
-        //     console.log("Invalid product ID:", responseDataId);
-        //     return {
-        //         statusCode: 400,
-        //         body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
-        //     };
-        // }
+        const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
+        console.log("CHECKING PRD EXISST", contactPropertyToUpdate)
+        if (!contactPropertyToUpdate) {
+            console.log("Invalid product ID:", responseDataId);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
+            };
+        }
 
         // const hubspotSearchContact = async () => {
         //     const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
