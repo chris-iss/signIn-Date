@@ -3,8 +3,9 @@ require("dotenv").config();
 
 let isExecuting = false;
 
+//Module 1 to 14(Diploma)
 const thinkificProductIdMap = {
-    "2965465": "2965465",
+    "2965465": "2965465", //Module 1 to 14(Diploma)
     "2965473": "2965473",
     "2965479": "2965479",
     "2965489": "2965489",
