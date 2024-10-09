@@ -5,20 +5,20 @@ let isExecuting = false;
 
 //Module 1 to 14(Diploma)
 const thinkificProductIdMap = {
-    "2965465": "2965465", //Module 1 to 14(Diploma)
-    "2965473": "2965473",
-    "2965479": "2965479",
-    "2965489": "2965489",
-    "2965499": "2965499",
-    "2965518": "2965518",
-    "2965523": "2965523",
-    "2965534": "2965534",
-    "2965538": "2965538",
-    "2965541": "2965541",
-    "2965546": "2965546",
-    "2965548": "2965548",
-    "2937008": "2937008",
-    "2822347": "2822347"
+    "2965465": "unbundled_module_1_course_id",
+    "2965473": "unbundled_module_2_course_id",
+    "2965479": "unbundled_module_3_course_id",
+    "2965489": "unbundled_module_4_course_id",
+    "2965499": "unbundled_module_5_course_id",
+    "2965518": "unbundled_module_6_course_id",
+    "2965523": "unbundled_module_7_course_id",
+    "2965534": "unbundled_module_8_course_id",
+    "2965538": "unbundled_module_9_course_id",
+    "2965541": "unbundled_module_10_course_id",
+    "2965546": "unbundled_module_11_course_id",
+    "2965548": "unbundled_module_12_course_id",
+    "2937008": "unbundled_csrd_product_id",
+    "2822347": "bs_diploma_course_id"
 };
 
 
@@ -70,15 +70,15 @@ exports.handler = async (event) => {
 
         const selectedCoursesData = coursesSelected.split(",");
 
-        const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
-        console.log("CHECKING PRD EXISST", contactPropertyToUpdate)
-        if (!contactPropertyToUpdate) {
-            console.log("Invalid product ID:", responseDataId);
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
-            };
-        }
+        // const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
+        // console.log("CHECKING PRD EXISST", contactPropertyToUpdate)
+        // if (!contactPropertyToUpdate) {
+        //     console.log("Invalid product ID:", responseDataId);
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({ message: `Invalid product ID: ${responseDataId}` })
+        //     };
+        // }
 
         const hubspotSearchContact = async () => {
             const hubspotBaseURL = `https://api.hubapi.com/crm/v3/objects/contacts/search`;
