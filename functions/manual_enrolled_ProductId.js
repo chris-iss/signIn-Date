@@ -70,8 +70,8 @@ exports.handler = async (event) => {
 
         const selectedCoursesData = coursesSelected.split(",");
 
-        // const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
-        // console.log("CHECKING PRD EXISST", contactPropertyToUpdate)
+        const contactPropertyToUpdate = thinkificProductIdMap[responseDataId];
+        console.log("CHECKING PRD EXISST", contactPropertyToUpdate)
         // if (!contactPropertyToUpdate) {
         //     console.log("Invalid product ID:", responseDataId);
         //     return {
