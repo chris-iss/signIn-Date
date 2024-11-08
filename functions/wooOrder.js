@@ -336,6 +336,29 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
+
+                   
+                    await fetch('https://hooks.zapier.com/hooks/catch/14129819/251ydr7/', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            selectedCourses: courses,
+                            selectdCoursesType: courseType,
+                            selectedCourseCout: countsArray,
+                            thinkificCourseId: thinkificCourseId,
+                            thnkificUserId: userId,
+                            firstname: buyerBillingData.billing.first_name,
+                            lastname: buyerBillingData.billing.last_name,
+                            email: billingUserEmail,
+                            currency: requestBody.currency,
+                            startDate: requestBody.startDate,
+                            unbundledSkuCode: requestBody.unbundledSkuCode,
+                            diplomaSkuCode: requestBody.diplomaSkuCode,
+                            BNP: "No"
+                        })
+                    });
                 }
 
                 // Create or update contact in HubSpot
