@@ -38,6 +38,7 @@ exports.handler = async (event) => {
         const state = requestBody.state;
         const country = requestBody.country;
         const amount = requestBody.amount;
+        const amount_total = requestBody.amount;
         const paymentintentId = requestBody.paymentIntent_Id;
 
 
@@ -212,12 +213,12 @@ exports.handler = async (event) => {
                 state: state || null,
                 country: country || null,
                 amount: amount || null,
+                amount_total: amount_total || null,
                 paymentintent: paymentintentId || null,
                 prdUrl: prdUrl
             })
         });
 
-        ///////////////////TESTING FOR DEPLOYMENNT///////////////////////
         await fetch('https://hooks.zapier.com/hooks/catch/14129819/2dah57x/', {
             method: "POST",
             headers: {
@@ -241,6 +242,7 @@ exports.handler = async (event) => {
                 state: state || null,
                 country: country || null,
                 amount: amount || null,
+                amount_total: amount_total || null,
                 paymentintent: paymentintentId || null,
                 prdUrl: prdUrl
             })
