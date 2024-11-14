@@ -36,7 +36,7 @@ const coursesMap = [
     "Certificate in Green Marketing",
     "Certificate in ESG Reporting and Auditing",
     "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
-    "Certificate in Corporate Sustainability Reporting Directive (FREE)",
+    "Certificate in Corporate Sustainability Reporting Directive (CSRD) - Free",
     "Diploma in Business Sustainability"
 ];
 
@@ -230,7 +230,7 @@ exports.handler = async (event) => {
                             case "Certificate in ESG Reporting and Auditing":
                                 updateContactProperty = "unbundled_module_12";
                                 break;
-                            case "Certificate in Corporate Sustainability Reporting Directive (FREE)":
+                            case "Certificate in Corporate Sustainability Reporting Directive (CSRD) - Free":
                                 updateContactProperty = "unbundled_csrd";
                                 break;
                             case "Certificate in Corporate Sustainability Reporting Directive (CSRD)":
