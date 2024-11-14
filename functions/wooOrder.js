@@ -118,6 +118,7 @@ exports.handler = async (event) => {
                     "Certificate in Green Marketing": "2755281",
                     "Certificate in ESG Reporting and Auditing": "2755283",
                     "Certificate in Corporate Sustainability Reporting Directive (CSRD)": "2730358",
+                    "Certificate in Corporate Sustainability Reporting Directive (CSRD) - Free": "2730358",
                     "Diploma in Business Sustainability": "2622273"
                 };
 
