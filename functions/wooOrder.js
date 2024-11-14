@@ -39,6 +39,7 @@ exports.handler = async (event) => {
         const country = requestBody.country;
         const amount = requestBody.amount;
         const amount_total = requestBody.amount;
+        const discount = requestBody.discount;
         const paymentintentId = requestBody.paymentIntent_Id;
 
 
@@ -214,6 +215,7 @@ exports.handler = async (event) => {
                 country: country || null,
                 amount: amount || null,
                 amount_total: amount_total || null,
+                discount: discount || null,
                 paymentintent: paymentintentId || null,
                 prdUrl: prdUrl
             })
@@ -243,6 +245,7 @@ exports.handler = async (event) => {
                 country: country || null,
                 amount: amount || null,
                 amount_total: amount_total || null,
+                discount: discount || null,
                 paymentintent: paymentintentId || null,
                 prdUrl: prdUrl
             })
