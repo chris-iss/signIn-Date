@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-const getMongoClient = require("../functions/mongoClient");
 
 let isExecuting = false;
 
@@ -16,10 +15,6 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     try {
-        const client = await getMongoClient(); 
-        const database = client.db(); 
-        const collection = database.collection("orders");
-
         
         // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
@@ -374,16 +369,6 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
-
-
-                    const mongoResult = await collection.insertOne({ 
-                        orderId, email: billingUserEmail, 
-                        courses, 
-                        billing: buyerBillingData, 
-                        timestamp: new Date(), 
-                    }); 
-                    
-                    console.log("Data stored in MongoDB:", mongoResult.insertedId);
             
                 }
 
