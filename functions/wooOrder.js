@@ -20,14 +20,6 @@ exports.handler = async (event) => {
         const database = client.db(); 
         const collection = database.collection("orders");
 
-        const mongoResult = await collection.insertOne({ 
-            orderId, email: billingUserEmail, 
-            courses, 
-            billing: buyerBillingData, 
-            timestamp: new Date(), 
-        }); 
-        
-        console.log("Data stored in MongoDB:", mongoResult.insertedId);
         
         // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
@@ -382,6 +374,16 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
+
+
+                    const mongoResult = await collection.insertOne({ 
+                        orderId, email: billingUserEmail, 
+                        courses, 
+                        billing: buyerBillingData, 
+                        timestamp: new Date(), 
+                    }); 
+                    
+                    console.log("Data stored in MongoDB:", mongoResult.insertedId);
             
                 }
 
