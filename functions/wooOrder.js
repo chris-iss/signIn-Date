@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-const { MongoClient } = require("mongodb");
+const { MongoClient: MongoClientAlias } = require("mongodb");
 require("dotenv").config();
 
 let isExecuting = false;
@@ -16,10 +16,11 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     const url = process.env.MONGO_URI;
-    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    const client = new MongoClientAlias(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
     try {
+        console.log("Attempting to connect to MongoDB...");
         await client.connect();
         console.log("MongoDB connected successfully.");
         const database = client.db();
