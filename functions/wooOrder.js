@@ -5,12 +5,6 @@ require("dotenv").config();
 let isExecuting = false;
 
 
-const { MongoClient } = require("mongodb");
-
-const url = process.env.MONGO_URI;
-const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-
-
 exports.handler = async (event) => {
     if (isExecuting) {
         return {
@@ -27,6 +21,7 @@ exports.handler = async (event) => {
 
     try {
         await client.connect();
+        console.log("MongoDB connected successfully.");
         const database = client.db();
         const collection = database.collection("orders");
         
