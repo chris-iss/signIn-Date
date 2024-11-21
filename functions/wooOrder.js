@@ -13,6 +13,9 @@ exports.handler = async (event) => {
 
     isExecuting = true;
 
+    const url = process.env.MONGO_URI;
+    const client = client.db(url)
+
     try {
         // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
@@ -25,6 +28,12 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Unauthorized Access" })
             };
         }
+
+        // Database Connection
+        await client.connect();
+        const database = client.db();
+        const collection = database.collection("orders");
+        
 
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
@@ -321,6 +330,7 @@ exports.handler = async (event) => {
 
                     const thinkificCourseId = courseId;
 
+                    // This is for the Old System turned off
                     await fetch('https://hooks.zapier.com/hooks/catch/14129819/23s3wnv/', {
                         method: "POST",
                         headers: {
@@ -343,7 +353,7 @@ exports.handler = async (event) => {
                         })
                     });
 
-                   
+                   // This is for the New System turned On
                     await fetch('https://hooks.zapier.com/hooks/catch/14129819/251ydr7/', {
                         method: "POST",
                         headers: {
@@ -365,6 +375,23 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
+
+                    //Send Data to MongoDb
+                    const sendDataToMongo = await collection.insertOne({
+                        selectedCourses: courses,
+                        selectedCourseCout: countsArray,
+                        firstname: buyerBillingData.billing.first_name,
+                        lastname: buyerBillingData.billing.last_name,
+                        email: billingUserEmail,
+                        currency: requestBody.currency,
+                        startDate: requestBody.startDate,
+                        amount,
+                        timestamp: new Date(), // Add a timestamp for tracking
+                    })
+
+                    console.log('Data stored successfully:', sendDataToMongo.insertedId);
+            
+            
                 }
 
                 // Create or update contact in HubSpot
