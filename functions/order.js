@@ -12,17 +12,17 @@ exports.handler = async (event) => {
   try {
 
     // Validate API key
-    const getNetlifyKey = event.queryStringParameters?.API_KEY;
-    const getValidationKey = process.env.Netlify_API_KEY;
+    // const getNetlifyKey = event.queryStringParameters?.API_KEY;
+    // const getValidationKey = process.env.Netlify_API_KEY;
     
-    if (getNetlifyKey !== getValidationKey) {
-      console.error("Unauthorized Access: Invalid API Key");
-      isExecuting = false;
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ message: "Unauthorized Access" })
-      };
-    }
+    // if (getNetlifyKey !== getValidationKey) {
+    //   console.error("Unauthorized Access: Invalid API Key");
+    //   isExecuting = false;
+    //   return {
+    //     statusCode: 401,
+    //     body: JSON.stringify({ message: "Unauthorized Access" })
+    //   };
+    // }
 
     // Determine payload format and parse appropriately
     let requestBody;
@@ -55,7 +55,7 @@ exports.handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({ message: "Success", requestBody })
     };
-    
+
   } catch (error) {
 
     console.error("Error processing data:", error.message);
