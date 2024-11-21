@@ -4,6 +4,13 @@ require("dotenv").config();
 
 let isExecuting = false;
 
+
+const { MongoClient } = require("mongodb");
+
+const url = process.env.MONGO_URI;
+const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+
+
 exports.handler = async (event) => {
     if (isExecuting) {
         return {
@@ -15,9 +22,14 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     const url = process.env.MONGO_URI;
-    const client = MongoClient.db(url)
+    const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
     try {
+        await client.connect();
+        const database = client.db();
+        const collection = database.collection("orders");
+        
         // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
@@ -29,11 +41,6 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Unauthorized Access" })
             };
         }
-
-        // Database Connection
-        await client.connect();
-        const database = client.db();
-        const collection = database.collection("orders");
 
 
         // Parse request body and check for orderId
