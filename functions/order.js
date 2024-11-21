@@ -10,12 +10,11 @@ exports.handler = async (event) => {
   }
   isExecuting = true;
   try {
-    console.log("Event received:", JSON.stringify(event, null, 2));
+
     // Validate API key
     const getNetlifyKey = event.queryStringParameters?.API_KEY;
     const getValidationKey = process.env.Netlify_API_KEY;
-    console.log("Received API Key:", getNetlifyKey);
-    console.log("Expected API Key:", getValidationKey);
+    
     if (getNetlifyKey !== getValidationKey) {
       console.error("Unauthorized Access: Invalid API Key");
       isExecuting = false;
@@ -24,8 +23,10 @@ exports.handler = async (event) => {
         body: JSON.stringify({ message: "Unauthorized Access" })
       };
     }
+
     // Determine payload format and parse appropriately
     let requestBody;
+
     try {
       if (event.headers["content-type"] === "application/json") {
         requestBody = JSON.parse(event.body);
@@ -45,16 +46,21 @@ exports.handler = async (event) => {
         body: JSON.stringify({ message: "Invalid payload format", error: parseError.message })
       };
     }
+
     // Business logic or data handling (if any)
     console.log("Webhook processed successfully:", requestBody);
     isExecuting = false;
+
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Success", requestBody })
     };
+    
   } catch (error) {
+
     console.error("Error processing data:", error.message);
     isExecuting = false;
+
     return {
       statusCode: 500,
       body: JSON.stringify({ message: error.message })
