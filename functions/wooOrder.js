@@ -1,9 +1,7 @@
 const fetch = require("node-fetch");
-const { MongoClient: MongoClientAlias } = require("mongodb");
 require("dotenv").config();
 
 let isExecuting = false;
-
 
 exports.handler = async (event) => {
     if (isExecuting) {
@@ -15,17 +13,7 @@ exports.handler = async (event) => {
 
     isExecuting = true;
 
-    const url = process.env.MONGO_URI;
-    const client = new MongoClientAlias(url, { useNewUrlParser: true, useUnifiedTopology: true });
-
-
     try {
-        console.log("Attempting to connect to MongoDB...");
-        await client.connect();
-        console.log("MongoDB connected successfully.");
-        const database = client.db();
-        const collection = database.collection("orders");
-        
         // Validate API key
         const getNetlifyKey = event.queryStringParameters?.API_KEY;
         const getValidationKey = process.env.Netlify_API_KEY;
@@ -37,7 +25,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({ message: "Unauthorized Access" })
             };
         }
-
+        
 
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
@@ -379,22 +367,6 @@ exports.handler = async (event) => {
                             BNP: "No"
                         })
                     });
-
-                    //Send Data to MongoDb
-                    const sendDataToMongo = await collection.insertOne({
-                        selectedCourses: courses,
-                        selectedCourseCout: countsArray,
-                        firstname: buyerBillingData.billing.first_name,
-                        lastname: buyerBillingData.billing.last_name,
-                        email: billingUserEmail,
-                        currency: requestBody.currency,
-                        startDate: requestBody.startDate,
-                        amount,
-                        timestamp: new Date(), // Add a timestamp for tracking
-                    })
-
-                    console.log('Data stored successfully:', sendDataToMongo.insertedId);
-            
             
                 }
 
