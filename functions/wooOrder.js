@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 let isExecuting = false;
@@ -14,7 +15,7 @@ exports.handler = async (event) => {
     isExecuting = true;
 
     const url = process.env.MONGO_URI;
-    const client = client.db(url)
+    const client = MongoClient.db(url)
 
     try {
         // Validate API key
@@ -33,7 +34,7 @@ exports.handler = async (event) => {
         await client.connect();
         const database = client.db();
         const collection = database.collection("orders");
-        
+
 
         // Parse request body and check for orderId
         const requestBody = JSON.parse(event.body);
