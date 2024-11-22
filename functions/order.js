@@ -48,27 +48,35 @@ exports.handler = async (event) => {
     let requestBody;
 
     try {
-       //const database = (await clientPromise).db(process.env.MONGODB_DATABASE);
-       //const collection = database.collection(process.env.MONGODB_COLLECTION);
+       const database = (await clientPromise).db(process.env.MONGODB_DATABASE);
+       const collection = database.collection(process.env.MONGODB_COLLECTION);
        //const results = await collection.find({}).limit(10).toArray();
-
-       //let response = await fetch("/.netlify/functions/order?API_KEY=900381b0-ab33-4bf3-8e61-ee4161d43b81")
-       //.then((res) => res.json());
 
       requestBody = JSON.parse(event.body);
 
       const fName = requestBody.billing.first_name;
-      const lastName = requestBody.billing.las_name;
+      const lastName = requestBody.billing.last_name;
       const course = requestBody.line_items[0]?.name
       const quantity = requestBody.line_items[3]?.quantity;
       const amount = requestBody.line_items[5]?.subtotal;
+      const status = requestBody.status;
       const date = new Date();
 
-      console.log(`${fName} ${lastName} ${course}`)
+      const sendDataToMongo = await collection.insertOne({
+        firstname: fName,
+        lastname: lastName,
+        course: course,
+        quantity: quantity,
+        amount: amount,
+        status: status,
+        date: date
+    });
+
+    console.log("INSERTED DATE TO DB", sendDataToMongo)
 
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Success", requestBody })
+        body: JSON.stringify({ message: "Success", sendDataToMongo })
       };
 
 
