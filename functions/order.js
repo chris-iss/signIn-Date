@@ -19,9 +19,6 @@ exports.handler = async (event) => {
     const getNetlifyKey = event.queryStringParameters?.API_KEY;
     const getValidationKey = process.env.Netlify_API_KEY;
 
-    console.log("Received API Key:", getNetlifyKey);
-    console.log("Expected API Key:", getValidationKey);
-
     if (getNetlifyKey !== getValidationKey) {
       console.error("Unauthorized Access: Invalid API Key");
       isExecuting = false;
@@ -43,22 +40,9 @@ exports.handler = async (event) => {
 
     // Determine payload format and parse appropriately
     let requestBody;
-    const contentType = event.headers?.["content-type"] || event.headers?.["Content-Type"] || ""; // Case-insensitive handling
 
     try {
-      console.log("Content-Type:", contentType);
-
-      if (contentType.includes("application/json")) {
-        requestBody = JSON.parse(event.body);
-        console.log("Parsed JSON Body:", requestBody);
-      } else if (contentType.includes("application/x-www-form-urlencoded")) {
-        const querystring = require("querystring");
-        requestBody = querystring.parse(event.body);
-        console.log("Parsed Form Data:", requestBody);
-      } else {
-        console.error(`Unsupported Content-Type: ${contentType}`);
-        throw new Error(`Unsupported Content-Type: ${contentType}`);
-      }
+      requestBody = JSON.parse(event.body);
     } catch (parseError) {
       console.error("Error parsing request body:", parseError.message);
       isExecuting = false;
