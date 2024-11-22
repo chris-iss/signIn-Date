@@ -31,24 +31,32 @@ exports.handler = async (event) => {
       };
     }
 
+    // Check for request body
+    if (!event.body) {
+      console.error("Empty body received");
+      isExecuting = false;
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Request body is empty or missing" })
+      };
+    }
+
     // Determine payload format and parse appropriately
     let requestBody;
-    const contentType = event.headers?.["content-type"] || event.headers?.["Content-Type"] || ""; // Handle case-insensitivity
+    const contentType = event.headers?.["content-type"] || event.headers?.["Content-Type"] || ""; // Case-insensitive handling
 
     try {
       console.log("Content-Type:", contentType);
 
       if (contentType.includes("application/json")) {
-        requestBody = JSON.parse(event.body || "{}");
+        requestBody = JSON.parse(event.body);
         console.log("Parsed JSON Body:", requestBody);
       } else if (contentType.includes("application/x-www-form-urlencoded")) {
         const querystring = require("querystring");
-        requestBody = querystring.parse(event.body || "");
+        requestBody = querystring.parse(event.body);
         console.log("Parsed Form Data:", requestBody);
-      } else if (!event.body) {
-        console.error("Empty body received");
-        throw new Error("Request body is empty or missing");
       } else {
+        console.error(`Unsupported Content-Type: ${contentType}`);
         throw new Error(`Unsupported Content-Type: ${contentType}`);
       }
     } catch (parseError) {
