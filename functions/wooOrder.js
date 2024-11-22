@@ -402,6 +402,11 @@ exports.handler = async (event) => {
             console.log("Processed buyerInfo:", buyerBillingData);
         }
 
+
+
+
+
+        
         // Step 3: Participants array isn't empty
         if (participants.length > 0) {
         

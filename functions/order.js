@@ -1,6 +1,13 @@
 const fetch = require("node-fetch");
+const { MongoClient } = require("mongodb");
 require("dotenv").config();
+
 let isExecuting = false;
+
+const mongoClient = new MongoClient(process.env.MONGO_URI);
+
+const clientPromise = mongoClient.connect();
+
 
 exports.handler = async (event) => {
   if (isExecuting) {
@@ -13,7 +20,6 @@ exports.handler = async (event) => {
   isExecuting = true;
 
   try {
-    console.log("Event received:", JSON.stringify(event, null, 2));
 
     // Validate API key
     const getNetlifyKey = event.queryStringParameters?.API_KEY;
@@ -24,11 +30,6 @@ exports.handler = async (event) => {
       isExecuting = false;
       return {
         statusCode: 401,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        },
         body: JSON.stringify({ message: "Unauthorized Access" })
       };
     }
@@ -39,47 +40,40 @@ exports.handler = async (event) => {
       isExecuting = false;
       return {
         statusCode: 400,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        },
         body: JSON.stringify({ message: "Request body is empty or missing" })
       };
     }
 
     // Determine payload format and parse appropriately
     let requestBody;
+
     try {
+    //   const database = (await clientPromise).db(process.env.MONGODB_DATABASE);
+    //   const collection = database.collection(process.env.MONGODB_COLLECTION);
+    //   const results = await collection.find({}).limit(10).toArray();
+
+    //   let response = await fetch("/.netlify/functions/order?API_KEY=900381b0-ab33-4bf3-8e61-ee4161d43b81")
+    //   .then((res) => res.json());
       requestBody = JSON.parse(event.body);
-      console.log("Parsed JSON Body:", requestBody);
+
+      console.log("USERS RESULT:", response)
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ message: "Success", requestBody })
+      };
+
+
+    //   requestBody = JSON.parse(event.body);
+    //   //console.log("Parsed JSON Body:", requestBody);
     } catch (parseError) {
       console.error("Error parsing request body:", parseError.message);
       isExecuting = false;
       return {
         statusCode: 400,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        },
         body: JSON.stringify({ message: "Invalid payload format", error: parseError.message })
       };
     }
-
-    // Business logic or data handling (if any)
-    console.log("Webhook processed successfully:", requestBody);
-
-    isExecuting = false;
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      },
-      body: JSON.stringify({ message: "Success", requestBody })
-    };
 
   } catch (error) {
     console.error("Error processing data:", error.message);
@@ -87,11 +81,6 @@ exports.handler = async (event) => {
     isExecuting = false;
     return {
       statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      },
       body: JSON.stringify({ message: error.message })
     };
   }
