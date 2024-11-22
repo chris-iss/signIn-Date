@@ -24,6 +24,11 @@ exports.handler = async (event) => {
       isExecuting = false;
       return {
         statusCode: 401,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        },
         body: JSON.stringify({ message: "Unauthorized Access" })
       };
     }
@@ -34,20 +39,30 @@ exports.handler = async (event) => {
       isExecuting = false;
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        },
         body: JSON.stringify({ message: "Request body is empty or missing" })
       };
     }
 
     // Determine payload format and parse appropriately
     let requestBody;
-
     try {
       requestBody = JSON.parse(event.body);
+      console.log("Parsed JSON Body:", requestBody);
     } catch (parseError) {
       console.error("Error parsing request body:", parseError.message);
       isExecuting = false;
       return {
         statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        },
         body: JSON.stringify({ message: "Invalid payload format", error: parseError.message })
       };
     }
@@ -58,6 +73,11 @@ exports.handler = async (event) => {
     isExecuting = false;
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      },
       body: JSON.stringify({ message: "Success", requestBody })
     };
 
@@ -67,6 +87,11 @@ exports.handler = async (event) => {
     isExecuting = false;
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      },
       body: JSON.stringify({ message: error.message })
     };
   }
