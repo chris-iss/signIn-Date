@@ -1,12 +1,12 @@
 const fetch = require("node-fetch");
-const { MongoClient } = require("mongodb");
+//const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
 let isExecuting = false;
 
-const mongoClient = new MongoClient(process.env.MONGO_URI);
+// const mongoClient = new MongoClient(process.env.MONGO_URI);
 
-const clientPromise = mongoClient.connect();
+// const clientPromise = mongoClient.connect();
 
 
 exports.handler = async (event) => {
