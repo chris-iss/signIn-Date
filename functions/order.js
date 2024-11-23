@@ -50,27 +50,27 @@ exports.handler = async (event) => {
         const date = new Date();
 
         // Connect to MongoDB
-        const db = await connectToDatabase();
-        const collection = db.collection(process.env.MONGODB_COLLECTION);
+        // const db = await connectToDatabase();
+        // const collection = db.collection(process.env.MONGODB_COLLECTION);
 
-        // Insert data into MongoDB
-        const insertResult = await collection.insertOne({
-            firstname: fName,
-            lastname: lastName,
-            course: course,
-            quantity: quantity,
-            amount: amount,
-            status: status,
-            date: date,
-        });
+        // // Insert data into MongoDB
+        // const insertResult = await collection.insertOne({
+        //     firstname: fName,
+        //     lastname: lastName,
+        //     course: course,
+        //     quantity: quantity,
+        //     amount: amount,
+        //     status: status,
+        //     date: date,
+        // });
 
-        console.log("Data inserted in MongoDB in:", Date.now() - startTime, "ms");
+        console.log("Data inserted in MongoDB in:", requestBody);
 
         // Return success response
         isExecuting = false;
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Success", insertResult }),
+            body: JSON.stringify({ message: "Success" }),
         };
     } catch (error) {
         console.error("Error processing data:", error.message);
