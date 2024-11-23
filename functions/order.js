@@ -1,16 +1,4 @@
-const { MongoClient } = require("mongodb");
-require("dotenv").config();
-
-let mongoClient;
-let clientPromise;
-
-async function getMongoClient() {
-    if (!mongoClient) {
-        mongoClient = new MongoClient(process.env.MONGO_URI);
-        clientPromise = mongoClient.connect();
-    }
-    return clientPromise;
-}
+import {connectToDatabase } from "../lib/database"
 
 exports.handler = async (event) => {
     let isExecuting = false;
@@ -50,12 +38,7 @@ exports.handler = async (event) => {
         }
 
         const requestBody = JSON.parse(event.body);
-        console.log("Request parsed in:", Date.now() - startTime, "ms");
-
-        // Connect to MongoDB
-        const database = (await getMongoClient()).db(process.env.MONGODB_DATABASE);
-        const collection = database.collection(process.env.MONGODB_COLLECTION);
-        console.log("MongoDB connected in:", Date.now() - startTime, "ms");
+        
 
         const fName = requestBody.billing.first_name;
         const lastName = requestBody.billing.last_name;
@@ -76,10 +59,16 @@ exports.handler = async (event) => {
         });
         console.log("Data inserted in MongoDB in:", Date.now() - startTime, "ms");
 
+        // Connect to MongoDB
+        const db = await connectToDatabase();
+        const collection = await db.collection(process.env.MONGODB_COLLECTION);
+
+        const insertOrder = await collection.insertOne(sendDataToMongo);
+
         isExecuting = false;
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Success", sendDataToMongo }),
+            body: JSON.stringify({ message: "Success", insertOrder }),
         };
     } catch (error) {
         console.error("Error processing data:", error.message);
