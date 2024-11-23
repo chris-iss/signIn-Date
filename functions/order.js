@@ -1,5 +1,3 @@
-import { connectToDatabase } from "./lib/database";
-
 exports.handler = async (event) => {
     let isExecuting = false;
 
