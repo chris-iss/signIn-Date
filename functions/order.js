@@ -1,181 +1,92 @@
-const fetch = require("node-fetch");
 const { MongoClient } = require("mongodb");
 require("dotenv").config();
 
-let isExecuting = false;
+let mongoClient;
+let clientPromise;
 
-const mongoClient = new MongoClient(process.env.MONGO_URI);
-
-const clientPromise = mongoClient.connect();
-
+async function getMongoClient() {
+    if (!mongoClient) {
+        mongoClient = new MongoClient(process.env.MONGO_URI);
+        clientPromise = mongoClient.connect();
+    }
+    return clientPromise;
+}
 
 exports.handler = async (event) => {
-  if (isExecuting) {
-    return {
-      statusCode: 409,
-      body: JSON.stringify({ message: "Function is already executing" })
-    };
-  }
+    let isExecuting = false;
 
-  isExecuting = true;
-
-  try {
-
-    // Validate API key
-    const getNetlifyKey = event.queryStringParameters?.API_KEY;
-    const getValidationKey = process.env.Netlify_API_KEY;
-
-    if (getNetlifyKey !== getValidationKey) {
-      console.error("Unauthorized Access: Invalid API Key");
-      isExecuting = false;
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ message: "Unauthorized Access" })
-      };
+    if (isExecuting) {
+        return {
+            statusCode: 409,
+            body: JSON.stringify({ message: "Function is already executing" }),
+        };
     }
 
-    // Check for request body
-    if (!event.body) {
-      console.error("Empty body received");
-      isExecuting = false;
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Request body is empty or missing" })
-      };
-    }
-
-    // Determine payload format and parse appropriately
-    let requestBody;
+    isExecuting = true;
 
     try {
-       const database = (await clientPromise).db(process.env.MONGODB_DATABASE);
-       const collection = database.collection(process.env.MONGODB_COLLECTION);
-       //const results = await collection.find({}).limit(10).toArray();s
+        const startTime = Date.now();
 
-      requestBody = JSON.parse(event.body);
+        // Validate API key
+        const getNetlifyKey = event.queryStringParameters?.API_KEY;
+        const getValidationKey = process.env.Netlify_API_KEY;
 
-      const fName = requestBody.billing.first_name;
-      const lastName = requestBody.billing.last_name;
-      const course = requestBody.line_items[0]?.name
-      const quantity = requestBody.line_items[3]?.quantity;
-      const amount = requestBody.line_items[5]?.subtotal;
-      const status = requestBody.status;
-      const date = new Date();
+        if (getNetlifyKey !== getValidationKey) {
+            console.error("Unauthorized Access: Invalid API Key");
+            isExecuting = false;
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ message: "Unauthorized Access" }),
+            };
+        }
 
-      const sendDataToMongo = await collection.insertOne({
-        firstname: fName,
-        lastname: lastName,
-        course: course,
-        quantity: quantity,
-        amount: amount,
-        status: status,
-        date: date
-    });
+        if (!event.body) {
+            console.error("Empty body received");
+            isExecuting = false;
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "Request body is empty or missing" }),
+            };
+        }
 
-    console.log("INSERTED DATE TO DB", sendDataToMongo)
+        const requestBody = JSON.parse(event.body);
+        console.log("Request parsed in:", Date.now() - startTime, "ms");
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Success", sendDataToMongo })
-      };
+        // Connect to MongoDB
+        const database = (await getMongoClient()).db(process.env.MONGODB_DATABASE);
+        const collection = database.collection(process.env.MONGODB_COLLECTION);
+        console.log("MongoDB connected in:", Date.now() - startTime, "ms");
 
+        const fName = requestBody.billing.first_name;
+        const lastName = requestBody.billing.last_name;
+        const course = requestBody.line_items[0]?.name;
+        const quantity = requestBody.line_items[0]?.quantity;
+        const amount = requestBody.line_items[0]?.subtotal;
+        const status = requestBody.status;
+        const date = new Date();
 
-    //   requestBody = JSON.parse(event.body);
-    //   //console.log("Parsed JSON Body:", requestBody);
-    } catch (parseError) {
-      console.error("Error parsing request body:", parseError.message);
-      isExecuting = false;
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid payload format", error: parseError.message })
-      };
+        const sendDataToMongo = await collection.insertOne({
+            firstname: fName,
+            lastname: lastName,
+            course: course,
+            quantity: quantity,
+            amount: amount,
+            status: status,
+            date: date,
+        });
+        console.log("Data inserted in MongoDB in:", Date.now() - startTime, "ms");
+
+        isExecuting = false;
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Success", sendDataToMongo }),
+        };
+    } catch (error) {
+        console.error("Error processing data:", error.message);
+        isExecuting = false;
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: error.message }),
+        };
     }
-
-  } catch (error) {
-    console.error("Error processing data:", error.message);
-
-    isExecuting = false;
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: error.message })
-    };
-  }
 };
-
-
-
-
-
-// const fetch = require("node-fetch");
-// require("dotenv").config();
-
-// let isExecuting = false;
-
-// exports.handler = async (event) => {
-//   if (isExecuting) {
-//     return {
-//       statusCode: 409,
-//       body: JSON.stringify({ message: "Function is already executing" }),
-//     };
-//   }
-
-//   isExecuting = true;
-
-//   try {
-//     // Validate API key
-//     const getNetlifyKey = event.queryStringParameters?.API_KEY;
-//     const getValidationKey = process.env.Netlify_API_KEY;
-
-//     if (getNetlifyKey !== getValidationKey) {
-//       console.error("Unauthorized Access: Invalid API Key");
-//       isExecuting = false;
-//       return {
-//         statusCode: 401,
-//         body: JSON.stringify({ message: "Unauthorized Access" }),
-//       };
-//     }
-
-//     // Check for request body
-//     if (!event.body) {
-//       console.error("Empty body received");
-//       isExecuting = false;
-//       return {
-//         statusCode: 400,
-//         body: JSON.stringify({ message: "Request body is empty or missing" }),
-//       };
-//     }
-
-//     // Parse body
-//     let requestBody;
-//     try {
-//       console.log("Event Body (Raw):", event.body);
-//       requestBody = JSON.parse(event.body);
-//       console.log("Parsed Request Body:", requestBody);
-//     } catch (parseError) {
-//       console.error("Error parsing request body:", parseError.message);
-//       isExecuting = false;
-//       return {
-//         statusCode: 400,
-//         body: JSON.stringify({
-//           message: "Invalid payload format",
-//           error: parseError.message,
-//         }),
-//       };
-//     }
-
-//     // Simulate response for success
-//     isExecuting = false;
-//     return {
-//       statusCode: 200,
-//       body: JSON.stringify({ message: "Success", requestBody }),
-//     };
-//   } catch (error) {
-//     console.error("Error processing data:", error.message);
-//     isExecuting = false;
-//     return {
-//       statusCode: 500,
-//       body: JSON.stringify({ message: error.message }),
-//     };
-//   }
-// };
-
