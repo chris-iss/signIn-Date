@@ -1,4 +1,4 @@
-import {connectToDatabase } from "../lib/database"
+import { connectToDatabase } from "../lib/database";
 
 exports.handler = async (event) => {
     let isExecuting = false;
@@ -28,6 +28,7 @@ exports.handler = async (event) => {
             };
         }
 
+        // Validate request body
         if (!event.body) {
             console.error("Empty body received");
             isExecuting = false;
@@ -38,8 +39,8 @@ exports.handler = async (event) => {
         }
 
         const requestBody = JSON.parse(event.body);
-        
 
+        // Extract data from request
         const fName = requestBody.billing.first_name;
         const lastName = requestBody.billing.last_name;
         const course = requestBody.line_items[0]?.name;
@@ -48,7 +49,12 @@ exports.handler = async (event) => {
         const status = requestBody.status;
         const date = new Date();
 
-        const sendDataToMongo = await collection.insertOne({
+        // Connect to MongoDB
+        const db = await connectToDatabase();
+        const collection = db.collection(process.env.MONGODB_COLLECTION);
+
+        // Insert data into MongoDB
+        const insertResult = await collection.insertOne({
             firstname: fName,
             lastname: lastName,
             course: course,
@@ -57,25 +63,25 @@ exports.handler = async (event) => {
             status: status,
             date: date,
         });
+
         console.log("Data inserted in MongoDB in:", Date.now() - startTime, "ms");
 
-        // Connect to MongoDB
-        const db = await connectToDatabase();
-        const collection = await db.collection(process.env.MONGODB_COLLECTION);
-
-        const insertOrder = await collection.insertOne(sendDataToMongo);
-
+        // Return success response
         isExecuting = false;
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: "Success", insertOrder }),
+            body: JSON.stringify({ message: "Success", insertResult }),
         };
     } catch (error) {
         console.error("Error processing data:", error.message);
+
+        // Reset execution flag
         isExecuting = false;
+
+        // Return error response
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: error.message }),
+            body: JSON.stringify({ message: "Internal Server Error", error: error.message }),
         };
     }
 };
