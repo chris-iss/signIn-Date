@@ -95,7 +95,7 @@ exports.handler = async (event) => {
                     case "Green Marketing End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_11";
                         break;
-                    case "ESG Reporting and Auditing End-of-Course Survey":
+                    case "ESG Reporting and Auditing: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_12";
                         break;
                     case "CSRD End-of-Course Survey":
