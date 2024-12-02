@@ -17,18 +17,18 @@ exports.handler = async (event) => {
         isExecuting = true;
 
         const courseWrapUp = [
-            "Business Sustainability End-of-Course Survey",
-            "Sustainability Plan Development End-of-Course Survey",
-            "Sustainability Plan Implementation End-of-Course Survey",
-            "Decarbonisation End-of-Course Survey",
-            "Circular Economy and Sustainable Products End-of-Course Survey",
+            "Business Sustainability: End-of-Course Survey",
+            "Sustainability Plan Development: End-of-Course Survey",
+            "Sustainability Plan Implementation: End-of-Course Survey",
+            "Decarbonisation: End-of-Course Survey",
+            "Circular Economy and Sustainable Products: End-of-Course Survey",
             "Business with Biodiversity End-of-Course Survey",
-            "DEI End-of-Course Survey",
-            "Sustainable Finance End-of-Course Survey",
-            "Sustainable Operations End-of-Course Survey",
-            "Supply Chain End-of-Course Survey",
-            "Green Marketing End-of-Course Survey",
-            "ESG Reporting and Auditing End-of-Course Survey",
+            "DEI: End-of-Course Survey",
+            "Sustainable Finance: End-of-Course Survey",
+            "Sustainable Operations: End-of-Course Survey",
+            "Supply Chain: End-of-Course Survey",
+            "Green Marketing: End-of-Course Survey",
+            "ESG Reporting and Auditing: End-of-Course Survey",
             "CSRD End-of-Course Survey"
         ];
         
@@ -61,38 +61,38 @@ exports.handler = async (event) => {
                 let contactPropertyToUpdate;
                 console.log("2")
                 switch (surveyName) {
-                    case "Business Sustainability End-of-Course Survey":
+                    case "Business Sustainability: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_1";
                         break;
-                    case "Sustainability Plan Development End-of-Course Survey":
+                    case "Sustainability Plan Development: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_2";
                         break;
-                    case "Sustainability Plan Implementation End-of-Course Survey":
+                    case "Sustainability Plan Implementation: End-of-Course Survey":
                         console.log("INSIDE ")
                         contactPropertyToUpdate = "unbundled_module_3";
                         break;
-                    case "Decarbonisation End-of-Course Survey":
+                    case "Decarbonisation: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_4";
                         break;
-                    case "Circular Economy and Sustainable Products End-of-Course Survey":
+                    case "Circular Economy and Sustainable Products: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_5";
                         break;
-                    case "Business with Biodiversity End-of-Course Survey":
+                    case "Business with Biodiversity: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_6";
                         break;
-                    case "DEI End-of-Course Survey":
+                    case "DEI: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_7";
                         break;
-                    case "Sustainable Finance End-of-Course Survey":
+                    case "Sustainable Finance: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_8";
                         break;
-                    case "Sustainable Operations End-of-Course Survey":
+                    case "Sustainable Operations: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_9";
                         break;
-                    case "Supply Chain End-of-Course Survey":
+                    case "Supply Chain: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_10";
                         break;
-                    case "Green Marketing End-of-Course Survey":
+                    case "Green Marketing: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_11";
                         break;
                     case "ESG Reporting and Auditing: End-of-Course Survey":
