@@ -436,39 +436,6 @@ exports.handler = async (event) => {
     // Step 3: Participants array isn't empty
     if (participants.length > 0) {
 
-        const userId = await getOrCreateThinkificUser(
-            buyerBillingData.billing.first_name,
-            buyerBillingData.billing.last_name,
-            billingUserEmail
-          );
-          
-      for (const courseId of selectedCourseIds) {
-        const thinkificCourseId = courseId;
-
-        // This is for the New System turned On
-        await fetch("https://hooks.zapier.com/hooks/catch/14129819/2igsms6/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            selectedCourses: courses,
-            selectdCoursesType: courseType,
-            selectedCourseCout: countsArray,
-            thinkificCourseId: thinkificCourseId,
-            thnkificUserId: userId,
-            firstname: buyerBillingData.billing.first_name,
-            lastname: buyerBillingData.billing.last_name,
-            email: billingUserEmail,
-            currency: requestBody.currency,
-            startDate: requestBody.startDate,
-            unbundledSkuCode: requestBody.unbundledSkuCode,
-            diplomaSkuCode: requestBody.diplomaSkuCode,
-            BNP: "Yes",
-          }),
-        });
-      }
-
       //Function to update buyer not participant_ contact property to Yes and Order Id
       await fetch("https://hooks.zapier.com/hooks/catch/14129819/2blsx1o/", {
         method: "POST",
