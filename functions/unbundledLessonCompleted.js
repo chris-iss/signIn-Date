@@ -22,7 +22,7 @@ exports.handler = async (event) => {
             "Sustainability Plan Implementation: End-of-Course Survey",
             "Decarbonisation: End-of-Course Survey",
             "Circular Economy and Sustainable Products: End-of-Course Survey",
-            "Business with Biodiversity End-of-Course Survey",
+            "Business with Biodiversity: End-of-Course Survey",
             "DEI: End-of-Course Survey",
             "Sustainable Finance: End-of-Course Survey",
             "Sustainable Operations: End-of-Course Survey",
