@@ -17,6 +17,7 @@ exports.handler = async (event) => {
         isExecuting = true;
 
         const courseWrapUp = [
+            "Cert in Business Sustainability: End-of-Course Survey",
             "Business Sustainability: End-of-Course Survey",
             "Sustainability Plan Development: End-of-Course Survey",
             "Sustainability Plan Implementation: End-of-Course Survey",
@@ -55,12 +56,14 @@ exports.handler = async (event) => {
             if (extractLessonName === surveyName) {
                 
                 const capitalizedCourseCompleted = "Complete"; 
-                console.log("1")
 
                 // Define the contact property to update based on the course name
                 let contactPropertyToUpdate;
-                console.log("2")
+
                 switch (surveyName) {
+                    case "Cert in Business Sustainability: End-of-Course Survey":
+                        contactPropertyToUpdate = "unbundled_module_1";
+                        break;
                     case "Business Sustainability: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_1";
                         break;
@@ -68,7 +71,6 @@ exports.handler = async (event) => {
                         contactPropertyToUpdate = "unbundled_module_2";
                         break;
                     case "Sustainability Plan Implementation: End-of-Course Survey":
-                        console.log("INSIDE ")
                         contactPropertyToUpdate = "unbundled_module_3";
                         break;
                     case "Decarbonisation: End-of-Course Survey":

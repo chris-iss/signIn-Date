@@ -269,6 +269,9 @@ exports.handler = async (event) => {
       }),
     });
 
+
+
+
     // Step 2: If participant array is empty: BNP === Participant is Buyer
     if (participants.length === 0) {
       console.log(
@@ -431,7 +434,9 @@ exports.handler = async (event) => {
     }
 
 
-    ///////////////////// Buyer isn't Participant ///////////////////////////////
+
+
+    ///////////////////// Buyer is buying for Participant Function ///////////////////////////////
 
     // Step 3: Participants array isn't empty
     if (participants.length > 0) {
