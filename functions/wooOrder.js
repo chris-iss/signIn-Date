@@ -41,6 +41,7 @@ exports.handler = async (event) => {
     const amount_total = requestBody.amount;
     const discount = requestBody.discount;
     const paymentintentId = requestBody.paymentIntent_Id;
+    const stage_charge_url = requestBody.charge_url
 
     if (!orderId) {
       isExecuting = false;
@@ -55,16 +56,25 @@ exports.handler = async (event) => {
     // WooCommerce credentials
     const consumerKey = process.env.CONSUMERKEY;
     const consumerSecret = process.env.CONSUMERSECRET;
+    
+    let baseUrl;
+
     const prdUrl =
       "https://www.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders";
     const stageUrl =
       "https://stage.instituteofsustainabilitystudies.com/wp-json/wc/v3/orders";
 
-    // Determine which environment to use
-    const baseUrl = process.env.NODE_ENV === "production" ? prdUrl : stageUrl;
 
-    console.log("URL RUNNING-STG", baseUrl)
-    console.log("ORDER-ID", orderId )
+      if (stage_charge_url === "https://stage.instituteofsustainabilitystudies.com") {
+        baseUrl = stageUrl
+      } else {
+        baseUrl = prdUrl
+      }
+
+    // Determine which environment to use
+    // const baseUrl = process.env.NODE_ENV === "production" ? prdUrl : stageUrl;
+
+    console.log("WHAT URL IS RUNNING:", baseUrl)
 
     if (!consumerKey || !consumerSecret) {
       isExecuting = false;
