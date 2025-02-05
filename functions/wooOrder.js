@@ -63,6 +63,9 @@ exports.handler = async (event) => {
     // Determine which environment to use
     const baseUrl = process.env.NODE_ENV === "production" ? prdUrl : stageUrl;
 
+    console.log("URL RUNNING-STG", baseUrl)
+    console.log("ORDER-ID", orderId )
+
     if (!consumerKey || !consumerSecret) {
       isExecuting = false;
       return {
