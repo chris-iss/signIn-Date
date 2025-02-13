@@ -24,7 +24,7 @@ exports.handler = async (event) => {
             "Decarbonisation: End-of-Course Survey",
             "Circular Economy and Sustainable Products: End-of-Course Survey",
             "Business with Biodiversity: End-of-Course Survey",
-            "DEI: End-of-Course Survey",
+            "Diversity, Equity, and Inclusion: End-of-Course Survey",
             "Sustainable Finance: End-of-Course Survey",
             "Sustainable Operations: End-of-Course Survey",
             "Supply Chain: End-of-Course Survey",
@@ -82,7 +82,7 @@ exports.handler = async (event) => {
                     case "Business with Biodiversity: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_6";
                         break;
-                    case "DEI: End-of-Course Survey":
+                    case "Diversity, Equity, and Inclusion: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_7";
                         break;
                     case "Sustainable Finance: End-of-Course Survey":
