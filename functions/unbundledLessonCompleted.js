@@ -38,11 +38,10 @@ exports.handler = async (event) => {
         const extractParameteres = JSON.parse(event.body);
         const extractLessonName = extractParameteres?.payload?.lesson?.name;
         const getUser = extractParameteres?.payload?.user
-        const courseCompleted = extractParameteres?.action;
 
         console.log("LESSON NAME:", extractLessonName)
 
-        // Validate API key
+        // Validate API keys
         if (getNetlifyKey !== getValidationKey) {
             return {
                 statusCode: 401,
