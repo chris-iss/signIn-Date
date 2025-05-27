@@ -90,7 +90,7 @@ exports.handler = async (event) => {
                     case "Sustainable Operations: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_9";
                         break;
-                    case "Supply Chain: End-of-Course Survey":
+                    case "Sustainable Supply Chain: End-of-Course Survey":
                         contactPropertyToUpdate = "unbundled_module_10";
                         break;
                     case "Green Marketing: End-of-Course Survey":
