@@ -35,7 +35,7 @@ exports.handler = async (event) => {
     await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody.payload),
+      body: JSON.stringify(requestBody.payload, requestBody.action),
     });
 
     isExecuting = false;
