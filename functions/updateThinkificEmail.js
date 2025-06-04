@@ -14,11 +14,11 @@ exports.handler = async (event) => {
   isExecuting = true;
 
   try {
-    // Validate API key
+    // ✅ Validate API key
     const apiKey = event.queryStringParameters?.API_KEY;
     const validApiKey = process.env.Netlify_API_KEY;
 
-    if (apiKey !== validApiKey) {
+    if (!apiKey || apiKey !== validApiKey) {
       isExecuting = false;
       return {
         statusCode: 401,
@@ -26,23 +26,40 @@ exports.handler = async (event) => {
       };
     }
 
-    // Parse request body
-    const requestBody = JSON.parse(event.body);
+    // ✅ Parse request body safely
+    let requestBody = {};
+    try {
+      requestBody = JSON.parse(event.body || "{}");
+    } catch (err) {
+      isExecuting = false;
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid JSON in request body" }),
+      };
+    }
 
-    const { data } = requestBody
+    const { data } = requestBody;
 
-    // Send data to Zapier for further processing (e.g. Xero, Thinkific, HubSpot)
-    await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
+    if (!data) {
+      isExecuting = false;
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "'data' field is required in request body" }),
+      };
+    }
+
+    // ✅ Send data to Zapier
+    const zapierResponse = await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        data: data
-      }),
+      body: JSON.stringify({ data }),
     });
 
-    // console.log("Zapier webhook triggered successfully");
+    if (!zapierResponse.ok) {
+      throw new Error(`Zapier returned ${zapierResponse.status}`);
+    }
 
     isExecuting = false;
     return {
@@ -50,11 +67,11 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: "Success" }),
     };
   } catch (error) {
-    console.error("Error processing data:", error.message);
+    console.error("Error processing data:", error);
     isExecuting = false;
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: error.message }),
+      body: JSON.stringify({ message: error.message || "Internal Server Error" }),
     };
   }
 };
