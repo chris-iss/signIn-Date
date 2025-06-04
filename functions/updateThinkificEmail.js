@@ -29,13 +29,13 @@ exports.handler = async (event) => {
     // Parse the body and use it directly
     const requestBody = JSON.parse(event.body);
 
-    console.log("Incoming Payload:", requestBody); // Useful for debugging
+    console.log("Incoming Payload:", requestBody);
 
     // Forward the data to Zapier or any system
     await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(requestBody.payload),
     });
 
     isExecuting = false;
