@@ -30,6 +30,8 @@ exports.handler = async (event) => {
     let requestBody = {};
     try {
       requestBody = JSON.parse(event.body || "{}");
+
+      console.log("REQUEST-BODY:", requestBody)
     } catch (err) {
       isExecuting = false;
       return {
