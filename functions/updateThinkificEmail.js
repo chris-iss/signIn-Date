@@ -39,6 +39,7 @@ exports.handler = async (event) => {
     }
 
     const { data } = requestBody;
+    console.log("DATA:", data)
 
     if (!data) {
       isExecuting = false;
@@ -49,17 +50,17 @@ exports.handler = async (event) => {
     }
 
     // ✅ Send data to Zapier
-    const zapierResponse = await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data }),
-    });
+    // const zapierResponse = await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ data }),
+    // });
 
-    if (!zapierResponse.ok) {
-      throw new Error(`Zapier returned ${zapierResponse.status}`);
-    }
+    // if (!zapierResponse.ok) {
+    //   throw new Error(`Zapier returned ${zapierResponse.status}`);
+    // }
 
     isExecuting = false;
     return {
