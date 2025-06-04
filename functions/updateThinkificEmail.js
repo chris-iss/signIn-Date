@@ -28,60 +28,19 @@ exports.handler = async (event) => {
 
     // Parse request body
     const requestBody = JSON.parse(event.body);
-    console.log("DATA:", requestBody)
-    // const {
-    //   orderId,
-    //   currency,
-    //   startDate,
-    //   unbundledSkuCode,
-    //   diplomaSkuCode,
-    //   addressOne,
-    //   addressTwo,
-    //   city,
-    //   state,
-    //   country,
-    //   amount,
-    //   amount_total,
-    //   discount,
-    //   paymentintentId,
-    //   prdUrl,
-    //   buyerBillingData,
-    //   billingUserEmail,
-    //   courses,
-    //   courseType,
-    //   countsArray
-    // } = requestBody;
+
+    const { data } = requestBody
 
     // Send data to Zapier for further processing (e.g. Xero, Thinkific, HubSpot)
-    // await fetch("https://hooks.zapier.com/hooks/catch/14129819/22s08uv/", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     selectedCourses: courses,
-    //     selectdCoursesType: courseType,
-    //     selectedCourseCout: countsArray,
-    //     firstname: buyerBillingData?.billing?.first_name,
-    //     lastname: buyerBillingData?.billing?.last_name,
-    //     email: billingUserEmail,
-    //     currency,
-    //     startDate,
-    //     unbundledSkuCode: unbundledSkuCode || null,
-    //     diplomaSkuCode: diplomaSkuCode || null,
-    //     orderId,
-    //     addresss_1: addressOne || null,
-    //     address_2: addressTwo || null,
-    //     city: city || null,
-    //     state: state || null,
-    //     country: country || null,
-    //     amount: amount || null,
-    //     amount_total: amount_total || null,
-    //     discount: discount || null,
-    //     paymentintent: paymentintentId || null,
-    //     prdUrl: prdUrl || null,
-    //   }),
-    // });
+    await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: data
+      }),
+    });
 
     // console.log("Zapier webhook triggered successfully");
 
