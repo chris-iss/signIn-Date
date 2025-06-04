@@ -14,11 +14,11 @@ exports.handler = async (event) => {
   isExecuting = true;
 
   try {
-    // ✅ Validate API key
+    // Validate API key (if you're using it)
     const apiKey = event.queryStringParameters?.API_KEY;
     const validApiKey = process.env.Netlify_API_KEY;
 
-    if (!apiKey || apiKey !== validApiKey) {
+    if (apiKey !== validApiKey) {
       isExecuting = false;
       return {
         statusCode: 401,
@@ -26,55 +26,30 @@ exports.handler = async (event) => {
       };
     }
 
-    // ✅ Parse request body safely
-    let requestBody = {};
-    try {
-      requestBody = JSON.parse(event.body || "{}");
+    // Parse the body and use it directly
+    const requestBody = JSON.parse(event.body);
 
-      console.log("REQUEST-BODY:", requestBody)
-    } catch (err) {
-      isExecuting = false;
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid JSON in request body" }),
-      };
-    }
+    console.log("Incoming Payload:", requestBody); // Useful for debugging
 
-    const { data } = requestBody;
-    console.log("DATA:", data)
-
-    if (!data) {
-      isExecuting = false;
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "'data' field is required in request body" }),
-      };
-    }
-
-    // ✅ Send data to Zapier
-    // const zapierResponse = await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ data }),
-    // });
-
-    // if (!zapierResponse.ok) {
-    //   throw new Error(`Zapier returned ${zapierResponse.status}`);
-    // }
+    // Forward the data to Zapier or any system
+    await fetch("https://hooks.zapier.com/hooks/catch/14129819/2vgev9d/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    });
 
     isExecuting = false;
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Success" }),
     };
+
   } catch (error) {
-    console.error("Error processing data:", error);
+    console.error("Error:", error.message);
     isExecuting = false;
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: error.message || "Internal Server Error" }),
+      body: JSON.stringify({ message: error.message }),
     };
   }
 };
