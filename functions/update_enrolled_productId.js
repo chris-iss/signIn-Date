@@ -17,7 +17,8 @@ const thinkificProductIdMap = {
     "2965546": "unbundled_module_11_course_id",
     "2965548": "unbundled_module_12_course_id",
     "2937008": "unbundled_csrd_product_id",
-    "2822347": "bs_diploma_course_id"
+    "2822347": "bs_diploma_course_id",
+    "3364616": "baltic_diploma_product_id"
 };
 
 const coursesMap = [
@@ -34,7 +35,8 @@ const coursesMap = [
     "Certificate in Green Marketing",
     "Certificate in ESG Reporting and Auditing",
     "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
-    "Diploma in Business Sustainability"
+    "Diploma in Business Sustainability",
+    "Diploma in Business Sustainability – ISS | Baltic Apprenticeships"
 ];
 
 const MAX_RETRIES = 3;
