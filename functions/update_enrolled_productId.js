@@ -36,7 +36,7 @@ const coursesMap = [
     "Certificate in ESG Reporting and Auditing",
     "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
     "Diploma in Business Sustainability",
-    "Diploma in Business Sustainability – ISS | Baltic Apprenticeships"
+    "Diploma in Baltic Apprenticeships"
 ];
 
 const MAX_RETRIES = 3;
@@ -214,6 +214,8 @@ exports.handler = async (event) => {
                                 break;
                             case "Diploma in Business Sustainability":
                                 updateContactProperty = "diploma_enrolment";
+                            case "Diploma in Baltic Apprenticeships":
+                                updateContactProperty = "baltic_diploma_enrolment";
                                 break;
                             default:
                                 console.log("No contact Property defined for:", course);
