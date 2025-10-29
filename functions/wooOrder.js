@@ -151,6 +151,10 @@ exports.handler = async (event) => {
           "Diploma in Business Sustainability": "2622273",
         };
 
+       // Function to determine if course is Unbundled or Diploma or even both
+       const diplomaCourse = "Diploma in Business Sustainability";
+       const membershipCourse = "ISS Professional Membership - (12 months access)";
+
        data.line_items.forEach((item) => {
           if (item.name !== membershipCourse) {
             courses.push(item.name);
@@ -171,10 +175,6 @@ exports.handler = async (event) => {
         });
 
         console.log("Enrolling user with course IDs:", selectedCourseIds);
-
-        // Function to determine if course is Unbundled or Diploma or even both
-       const diplomaCourse = "Diploma in Business Sustainability";
-      const membershipCourse = "ISS Professional Membership - (12 months access)";
 
       // ✅ Remove membership before any logic
       const filteredCourses = courses.filter(course => course !== membershipCourse);
