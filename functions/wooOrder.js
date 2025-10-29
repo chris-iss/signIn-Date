@@ -151,9 +151,12 @@ exports.handler = async (event) => {
           "Diploma in Business Sustainability": "2622273",
         };
 
-        data.line_items.forEach((course) => {
-          courses.push(course.name);
+       data.line_items.forEach((item) => {
+          if (item.name !== membershipCourse) {
+            courses.push(item.name);
+          }
         });
+
 
         // Holds course ID
         const selectedCourseIds = [];
@@ -170,40 +173,32 @@ exports.handler = async (event) => {
         console.log("Enrolling user with course IDs:", selectedCourseIds);
 
         // Function to determine if course is Unbundled or Diploma or even both
-        const diplomaCourse = "Diploma in Business Sustainability";
+       const diplomaCourse = "Diploma in Business Sustainability";
+      const membershipCourse = "ISS Professional Membership - (12 months access)";
 
-        const hasDiploma = courses.includes(diplomaCourse);
+      // ✅ Remove membership before any logic
+      const filteredCourses = courses.filter(course => course !== membershipCourse);
 
-        const unbundledCourses = courses.filter(
-          (course) => !course.includes("ISS Professional Membership - (12 months access)") && course !== diplomaCourse
-        );
+      const hasDiploma = filteredCourses.includes(diplomaCourse);
 
-        if (hasDiploma) {
-          courseType.push("Diploma");
-        }
+      // ✅ Remove membership + diploma for unbundled check
+      const unbundledCourses = filteredCourses.filter(course => course !== diplomaCourse);
 
-        if (unbundledCourses.length > 0) {
-          courseType.push("Unbundled");
-        }
+      if (hasDiploma) {
+        courseType.push("Diploma");
+      }
 
-
-        const membership = courses.filter(
-          (course) => course !== diplomaCourse && !course.includes("Certificate") && course === "ISS Professional Membership - (12 months access)"
-        );
-
-        if (membership) {
-          courseType.push("ISS Professional Membership");
-        }
+      if (unbundledCourses.length > 0) {
+        courseType.push("Unbundled");
+      }
 
         // Create a new array to hold the counts
         countsArray = [
           `Unbundled: ${unbundledCourses.length}`,
           `Diploma: ${hasDiploma ? 1 : 0}`,
-          `Membership: ${membership.length}`,
         ];
 
         console.log("NO of Unbundled Selected:", unbundledCourses.length);
-        console.log("NO of Unbundled Selected:", membership.length);
         console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0);
 
         return { extractedData, selectedCourseIds };
