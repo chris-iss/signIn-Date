@@ -175,7 +175,7 @@ exports.handler = async (event) => {
         const hasDiploma = courses.includes(diplomaCourse);
 
         const unbundledCourses = courses.filter(
-          (course) => course !== diplomaCourse
+          (course) => !course.includes("ISS Professional Membership - (12 months access)") && course !== diplomaCourse
         );
 
         if (hasDiploma) {
@@ -187,23 +187,23 @@ exports.handler = async (event) => {
         }
 
 
-        const masterclassCourses = courses.filter(
-          (course) => course !== diplomaCourse && !course.includes("Certificate")
+        const membership = courses.filter(
+          (course) => course !== diplomaCourse && !course.includes("Certificate") && course === "ISS Professional Membership - (12 months access)"
         );
 
-        if (masterclassCourses) {
-          courseType.push("Masterclasses");
+        if (membership) {
+          courseType.push("ISS Professional Membership");
         }
 
         // Create a new array to hold the counts
         countsArray = [
           `Unbundled: ${unbundledCourses.length}`,
           `Diploma: ${hasDiploma ? 1 : 0}`,
-          `Masterclasses: ${masterclassCourses.length}`,
+          `Masterclasses: ${membership.length}`,
         ];
 
         console.log("NO of Unbundled Selected:", unbundledCourses.length);
-        console.log("NO of Unbundled Selected:", masterclassCourses.length);
+        console.log("NO of Unbundled Selected:", membership.length);
         console.log("NO of Diploma Selected:", hasDiploma ? 1 : 0);
 
         return { extractedData, selectedCourseIds };
