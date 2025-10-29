@@ -199,7 +199,7 @@ exports.handler = async (event) => {
         countsArray = [
           `Unbundled: ${unbundledCourses.length}`,
           `Diploma: ${hasDiploma ? 1 : 0}`,
-          `Masterclasses: ${membership.length}`,
+          `Membership: ${membership.length}`,
         ];
 
         console.log("NO of Unbundled Selected:", unbundledCourses.length);
