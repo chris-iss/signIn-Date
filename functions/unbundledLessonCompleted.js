@@ -16,6 +16,7 @@ exports.handler = async (event) => {
       
         isExecuting = true;
 
+        // For certs
         const courseWrapUp = [
             "Cert in Business Sustainability: End-of-Course Survey",
             "Business Sustainability: End-of-Course Survey",
@@ -27,7 +28,7 @@ exports.handler = async (event) => {
             "Diversity, Equity, and Inclusion: End-of-Course Survey",
             "Sustainable Finance: End-of-Course Survey",
             "Sustainable Operations: End-of-Course Survey",
-            "Supply Chain: End-of-Course Survey",
+            "Sustainable Supply Chain: End-of-Course Survey",
             "Green Marketing: End-of-Course Survey",
             "ESG Reporting and Auditing: End-of-Course Survey",
             "CSRD End-of-Course Survey"
