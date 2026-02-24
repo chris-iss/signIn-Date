@@ -265,11 +265,7 @@ exports.handler = async (event) => {
                         };
 
                         console.log("UPDATING unbundled_module_type TO:", updateProperty);
-
-                        console.log("HUBSPOT TOKEN EXISTS:", !!process.env.HUBSPOT_API_KEY);
-
-                        console.log("TOKEN LENGTH:", process.env.HUBSPOT_API_KEY?.length);
-
+                        
                         const response = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${extractHubspotUserId}`, {
                             method: "PATCH",
                             headers: {
