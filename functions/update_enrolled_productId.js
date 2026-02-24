@@ -19,7 +19,7 @@ const thinkificProductIdMap = {
     "2937008": "unbundled_csrd_product_id",
     "2822347": "bs_diploma_course_id",
     "3363718": "baltic_diploma_product_id",
-    "3363718": "diploma_in_business_sustainability_access_apprenticeships_product_id"
+    "3691120": "diploma_in_business_sustainability_access_apprenticeships_product_id"
 };
 
 const coursesMap = [
