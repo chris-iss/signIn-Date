@@ -38,7 +38,7 @@ const coursesMap = [
     "Certificate in Corporate Sustainability Reporting Directive (CSRD)",
     "Diploma in Business Sustainability",
     "Diploma in Baltic Apprenticeships",
-    "Diploma in Business Sustainability – ISS | Access Apprenticeships"
+    "Diploma in Business Sustainability Access Apprenticeships"
 ];
 
 const MAX_RETRIES = 3;
