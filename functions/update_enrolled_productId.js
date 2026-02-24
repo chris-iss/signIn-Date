@@ -216,6 +216,7 @@ exports.handler = async (event) => {
                                 break;
                             case "Diploma in Business Sustainability":
                                 updateContactProperty = "diploma_enrolment";
+                                break;
                             case "Diploma in Baltic Apprenticeships":
                                 updateContactProperty = "baltic_diploma_enrolment";
                                 break;
