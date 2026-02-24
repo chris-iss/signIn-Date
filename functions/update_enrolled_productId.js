@@ -219,7 +219,7 @@ exports.handler = async (event) => {
                             case "Diploma in Baltic Apprenticeships":
                                 updateContactProperty = "baltic_diploma_enrolment";
                                 break;
-                            case "Diploma in Business Sustainability – ISS | Access Apprenticeships":
+                            case "Diploma in Business Sustainability Access Apprenticeships":
                                 updateContactProperty = "diploma_access_apprenticeships_enrollement";
                                 break;
                             default:
